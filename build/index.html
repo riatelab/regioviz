@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Regioviz</title>
+<link href="vendor/css/vanilla-dataTables.min.css" rel="stylesheet">
+<link href="vendor/css/tingle.min.css" rel="stylesheet">
+<link href="vendor/css/tippy.css" rel="stylesheet">
+<link href="vendor/css/alertify.min.css" rel="stylesheet">
+<link href="vendor/css/semantic.min.css" rel="stylesheet">
+<link rel="stylesheet" href="vendor/css/font-awesome.min.css">
+<link href="styles/main.css" rel="stylesheet">
+
+<body class='loading'>
+  <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/dom4/1.8.3/dom4.js"></script> -->
+  <div class="spinner"><div class="cube1"></div><div class="cube2"></div></div>
+  <div id="menutop"></div>
+  <div id="mainframe" style="clear: both;">
+    <div id="menu" class="t1"></div>
+    <div id="map_section" class="t3">
+      <!-- <svg id="svg_map" width="98%" height="470"></svg>
+      <svg id="svg_legend" width="98%" height="80"></svg> -->
+      <svg id="svg_map" width="98%" height="48%"></svg>
+      <svg id="svg_legend" width="98%" height="10%"></svg>
+    </div>
+    <div id="bar_section" class="t2">
+      <svg id="svg_bar" width="100%"></svg>
+      <!-- <svg id="svg_bar" width="100%" height="500"></svg> -->
+    </div>
+  </div>
+
+  <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
+  <script src="vendor/d3.v4.min.js"></script>
+  <script src="vendor/d3-selection-multi.v1.min.js"></script>
+  <script src="js/main.min.js"></script>
+</body>

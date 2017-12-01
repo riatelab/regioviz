@@ -1,0 +1,1053 @@
+@import url('https://fonts.googleapis.com/css?family=Signika|Courgette');
+
+@media only screen and (max-width: 959px) {
+  body {
+    font-size: 10px;
+  }
+  #menutop {
+    width: 540px;
+  }
+  #mainframe {
+    width: 540px;
+    height: 500px;
+  }
+}
+
+@media only screen and (min-width: 960px) and (max-width: 1160px) {
+  body {
+    font-size: 14px;
+  }
+  #menutop {
+    width: 960px;
+  }
+  #mainframe {
+    width: 960px;
+    height: 600px;
+  }
+}
+
+@media only screen and (min-width: 1161px) and (max-width: 1360px) {
+  body {
+    font-size: 14px;
+  }
+  #menutop {
+    width: 1160px;
+  }
+  #mainframe {
+    width: 1160px;
+    height: 800px;
+  }
+}
+
+@media only screen and (min-width: 1361px) and (max-width: 1560px) {
+  body {
+    font-size: 16px;
+  }
+  #menutop {
+    width: 1350px;
+  }
+  #mainframe {
+    width: 1350px;
+    height: 960px;
+  }
+}
+
+@media only screen and (min-width: 1561px) {
+  body {
+    font-size: 18px;
+  }
+  #menutop {
+    width: 1550px;
+  }
+  #mainframe {
+    width: 1550px;
+    height: 960px;
+  }
+}
+
+body.loading {
+  background-color: #e5edf8;
+}
+
+body {
+  -webkit-transition: background-color 100ms linear;
+  -ms-transition: background-color 100ms linear;
+  transition: background-color 100ms linear;
+}
+
+/* Styles for the spinner displayed while the data is loading: */
+.spinner {
+  margin: 100px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.cube1, .cube2 {
+  background-color: #333;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  -webkit-animation: sk-cubemove 1.8s infinite ease-in-out;
+  animation: sk-cubemove 1.8s infinite ease-in-out;
+}
+
+.cube2 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+
+@-webkit-keyframes sk-cubemove {
+  25% { -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5) }
+  50% { -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg) }
+  75% { -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5) }
+  100% { -webkit-transform: rotate(-360deg) }
+}
+
+@keyframes sk-cubemove {
+  25% {
+    transform: translateX(42px) rotate(-90deg) scale(0.5);
+    -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5);
+  } 50% {
+    transform: translateX(42px) translateY(42px) rotate(-179deg);
+    -webkit-transform: translateX(42px) translateY(42px) rotate(-179deg);
+  } 50.1% {
+    transform: translateX(42px) translateY(42px) rotate(-180deg);
+    -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg);
+  } 75% {
+    transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+    -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+  } 100% {
+    transform: rotate(-360deg);
+    -webkit-transform: rotate(-360deg);
+  }
+}
+/* End of style for spinner */
+
+/* Style for the notification zone: */
+.alertify-notifier .ajs-message.ajs-warning {
+    background: rgb(228, 144, 83) !important;
+}
+
+.alertify-notifier .ajs-message {
+    font-size: 0.8em !important;
+    padding: 12px !important;
+}
+/* End of style for the notification zone */
+
+/* Styles for svg elements */
+.area {
+  fill: steelblue;
+  clip-path: url(#clip);
+}
+
+.zoom {
+  cursor: move;
+  fill: none;
+  pointer-events: all;
+}
+
+.axis--y > .domain, .axis--x > .domain{
+  stroke: #BEBEBE;
+}
+
+.axis--y > g.tick > line, .axis--x > g.tick > line{
+  stroke: #BEBEBE;
+}
+/* End of styles for svg elements */
+
+/* Styles for information (i) icon and information dialogs */
+span.i_info {
+  font-family: Courgette;
+  color: #4f81bd;
+  padding-left: 5px;
+  padding-right: 4px;
+  font-weight: bold;
+  cursor: help;
+}
+
+div.tingle-modal-box__content {
+  padding: 1rem 2rem 2rem 2rem !important;
+}
+/* End of styles for information icons and information dialog */
+
+/* Styles for the left menu */
+.title_menu {
+  background: #4f81bd;
+  color: white;
+  padding: 2px !important;
+  margin: 0;
+}
+
+#menu {
+  font-family: 'Signika', sans-serif;
+  color: #4f81bd;
+  height: 100%;
+}
+
+#menu > div.box > p, #menu > div.box > div > p {
+  font-size: 0.75em;
+  padding: 1px 1px 1px 8px;
+  margin: 0;
+}
+
+#menu > div.box > p.small, #menu > div.box > div > p.small {
+  font-size: 0.7em;
+  margin-left: 0.7em;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.box {
+  border: solid 1px #4f81bd;
+  margin-bottom: 0.8em;
+}
+
+span.square {
+    height: 6px;
+    border: 1px solid #4f81bd;
+    content: " ";
+    padding-left: 10px;
+    margin-right: 5px;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+span.small_square {
+  height: 5px;
+  border: 1px solid #4f81bd;
+  content: " ";
+  padding-left: 8px;
+  margin-right: 4px;
+  font-size: 0.6em;
+  cursor: pointer;
+}
+
+span.small_square.disabled {
+  height: 5px;
+  border: 1px solid lightgray;
+  content: " ";
+  padding-left: 8px;
+  margin-right: 4px;
+  font-size: 0.6em;
+  cursor: not-allowed;
+}
+
+span.square.checked, span.small_square.checked {
+  background: #4f81bd;
+  cursor: pointer;
+}
+
+span.label_chk {
+  cursor: pointer;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+span.label_chk.disabled {
+  color: lightgray;
+  cursor: not-allowed;
+}
+/* End on styles for left menu */
+
+/* Styles for top menu */
+.title_section {
+  color: #4f81bd;
+  font-size: 1.3em;
+  text-align: center;
+}
+
+.type_comparaison {
+  border: solid 1px #4f81bd;
+  margin-bottom: 15px;
+  float: left;
+  margin: auto;
+  cursor: pointer;
+  width: 41%;
+}
+
+.title_type_comp {
+  color: #4f81bd;
+  font-size: 1.3em;
+  margin: 0;
+}
+
+.type_chart {
+  margin: 0 5px;
+  cursor: pointer;
+  color: #4f81bd;
+}
+
+.type_chart.disabled {
+  color: lightgray;
+  cursor: not-allowed;
+}
+
+.type_chart.selected {
+  font-weight: 800;
+}
+/* End of styles for top menu */
+
+/* Styles for the completness section */
+.completude_section, .filter_info {
+  font-family: "Signika", sans-serif;
+  font-size: 0.7em;
+  text-align: center;
+  width: 100%;
+  margin: auto;
+  height: 1.2em;
+}
+
+.completude_section > p {
+  display: none;
+  cursor: pointer;
+  margin: auto;
+}
+
+.completude_section > p.active {
+  display: inherit;
+}
+/* End of styles for completness section */
+
+/* Styles for buttons (used in various place) */
+/*.button_blue {
+  border-top: 1px solid #96d1f8;
+  background: #65a9d7;
+  background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+  background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+  background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+  background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+  background: -o-linear-gradient(top, #3e779d, #65a9d7);
+  padding: 5px 10px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+  -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+  box-shadow: rgba(0,0,0,1) 0 1px 0;
+  text-shadow: rgba(0,0,0,.4) 0 1px 0;
+  color: white;
+  font-size: 12px;
+  font-family: 'Lucida Grande', Helvetica, Arial, Sans-Serif;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  margin: 8px;
+}
+.button_blue:hover {
+  border-top-color: #28597a;
+  background: #28597a;
+  color: #ccc;
+}
+
+.button_blue:active {
+  border-top-color: #1b435e;
+  background: #1b435e;
+}*/
+.button_blue {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.4em 0.8em;
+    border: 1px solid #3f6797;
+    border-radius: 8px;
+    background: #67a8f6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#67a8f6), to(#3f6797));
+    background: -moz-linear-gradient(top, #67a8f6, #3f6797);
+    background: linear-gradient(to bottom, #67a8f6, #3f6797);
+    font: normal normal normal 0.7em 'Signika', sans-serif;
+    color: #ffffff;
+    text-decoration: none;
+}
+.button_blue:hover,
+.button_blue:focus {
+    border: 1px solid #4f81bd;
+    background: #7ccaff;
+    background: -webkit-gradient(linear, left top, left bottom, from(#7ccaff), to(#4c7cb5));
+    background: -moz-linear-gradient(top, #7ccaff, #4c7cb5);
+    background: linear-gradient(to bottom, #7ccaff, #4c7cb5);
+    color: #ffffff;
+    text-decoration: none;
+}
+.button_blue:active, .button_blue.pressed {
+    background: #3f6797;
+    background: -webkit-gradient(linear, left top, left bottom, from(#3f6797), to(#3f6797));
+    background: -moz-linear-gradient(top, #3f6797, #3f6797);
+    background: linear-gradient(to bottom, #3f6797, #3f6797);
+}
+
+#menu_selection > .button_blue {
+  margin: 0.4em 5em;
+}
+/* End of styles for buttons */
+
+#menu_selection {
+  font-size: 0.75em;
+  font-family: "Signika",sans-serif;
+}
+
+/* Styles for buttons on the top of the map */
+.map_button {
+  margin: 5px 7px 0px 7px;
+  float: left;
+  filter: opacity(25%);
+  cursor: pointer;
+}
+
+.map_button.active {
+  filter: none;
+}
+
+.map_button.disabled {
+  display: none;
+}
+/* End of styles of buttons on the top of the map */
+
+/* Styles for context-menu */
+.context-menu {
+	font-family: Arial, sans;
+	position: absolute;
+	background: white;
+	border: 1px solid #c3c3c3;
+	border-radius: 5px;
+	box-shadow: 0 5px 5px #c3c3c3;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	min-width: 200px;
+	font-size: 0.8em;
+}
+
+.context-menu ul {
+	list-style: none;
+	padding-left: 0;
+	margin: 0;
+}
+
+.context-menu li {
+	position: relative;
+	padding-left: 20px;
+	padding-right: 30px;
+	cursor: default;
+}
+
+.context-menu li:hover {
+	//background: #b1b1ff;
+    background: rgba(145, 209, 230, 0.52);
+    color: rgb(0,0,0);
+}
+
+.context-menu li span.arrow {
+	position: absolute;
+	font-size: 0.8em;
+	right: 10px;
+}
+
+.context-menu li div.context-menu {
+	left: 100%;
+	top: -5px;
+}
+/* End of styles for context-menu */
+
+/* Styles for BubbleChart1 : */
+input.nb_select {
+  width: 30px;
+  -moz-appearance: textfield;
+  text-align: right;
+  border: none;
+  border-bottom-style: dashed;
+  border-bottom-width: 0.5px;
+  margin-left: 3px;
+  margin-right: 4px;
+  font-size: 1em;
+}
+
+input.nb_select::-webkit-inner-spin-button,
+input.nb_select::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0; /* Removes leftover margin */
+}
+/* End of style for BubbleChart1 */
+
+/* Styles for minitable (displaying statistical summary) */
+.minitable_container {
+  text-align: center;
+  font-family: "Signika", sans-serif;
+}
+
+.minitable {
+  margin: auto;
+}
+
+.minitable > tbody > tr > td, .minitable > thead > tr > th  {
+  padding: 0.4em 1em;
+  font-size: 0.7em;
+  font-weight: 400;
+}
+
+thead > tr {
+  background: #4f81bd;
+  color: white;
+}
+
+tr td:nth-child(1){
+  background: #4f81bd;
+  color: white;
+}
+
+tr {
+  color: #4f81bd;
+}
+/* End of style for minitable */
+
+/* Style for menu / buttons under some charts */
+.choice_ind {
+  color: #4f81bd;
+  opacity: 0.5;
+  font-weight: 800;
+  cursor: pointer;
+  margin: 0 9px;
+}
+
+.choice_ind.active {
+  opacity: 1;
+}
+
+/* End of styles for menu / buttons under charts */
+
+/* Style for map */
+#layers > g > path:focus {
+  outline: 0;
+}
+
+.rotate {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+/* End of styles for map */
+
+/* Styles for map header */
+#header_map {
+  width: 99%;
+}
+/* End of styles for map header */
+
+/* Style for half circle buttons on the top of the map */
+.top_half_circle {
+  background: #4f81bd;
+  display: inline-block;
+  margin: 0 0.3em 0 0;
+  height: 1.4em;
+  width: 1.8em;
+  border-top-left-radius: 1.6em;
+  border-top-right-radius: 1.6em;
+  font-weight: bold;
+  float: right;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  color: white;
+}
+/* End of styles for half circle buttons */
+
+/* Styles for slider checkbox */
+.slider-checkbox {
+  position: relative;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+.slider-checkbox input {
+  margin: 0px;
+  margin-top: 1px;
+  cursor: pointer;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+  -moz-opacity: 0;
+  -khtml-opacity: 0;
+  opacity: 0;
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  background: red;
+  width: 40px;
+  height: 20px;
+}
+.slider-checkbox input:checked + .label:before {
+  background-color: #1877c1;
+  content: "";
+  padding-left: 0.2em;
+}
+.slider-checkbox input:checked + .label:after {
+  left: 21px;
+}
+.slider-checkbox .label {
+  position: relative;
+  padding-left: 46px;
+  text-align: justify;
+  cursor: pointer;
+}
+.slider-checkbox .label:before, .slider-checkbox .label:after {
+  position: absolute;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  transition: background-color 0.3s, left 0.3s;
+}
+.slider-checkbox .label:before {
+  content: "";
+  color: #667078;
+  box-sizing: border-box;
+  font-family: FontAwesome;
+  padding-left: 1.3em;
+  font-size: 0.9em;
+  line-height: 1em;
+  background-color: #888;
+  left: 0px;
+  top: 0px;
+  height: 20px;
+  width: 40px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+.slider-checkbox .label:after {
+  content: "";
+  letter-spacing: 20px;
+  background: #fff;
+  left: 1px;
+  top: 1px;
+  height: 18px;
+  width: 18px;
+}
+.slider-checkbox input:not(:checked) + .label:before {
+  background-color: #667078;
+}
+.label.not_selected {
+  color: #667078;
+}
+
+/* End of styles for slider checkbox */
+
+/* Styles for 2nd slider checkbox */
+.btn-switch {
+  font-size: 1em;
+	position: relative;
+	display: inline-block;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+  font-family: FontAwesome;
+}
+.btn-switch__radio {
+	display: none;
+}
+.btn-switch__label {
+	display: inline-block;
+	padding: .5em .4em .5em .5em;
+	vertical-align: top;
+	font-size: 0.8em;
+	font-weight: 800;
+	line-height: 1.1em;
+	color: #666;
+  cursor: pointer;
+	transition: color .2s ease-in-out;
+}
+.btn-switch__label + .btn-switch__label {
+  padding-right: .5em;
+	padding-left: 0;
+}
+.btn-switch__txt {
+	position: relative;
+	z-index: 2;
+  display: inline-block;
+  min-width: 1.5em;
+	opacity: 1;
+	pointer-events: none;
+	transition: opacity .2s ease-in-out;
+}
+.btn-switch__radio_no:checked ~ .btn-switch__label_yes .btn-switch__txt,
+.btn-switch__radio_yes:checked ~ .btn-switch__label_no .btn-switch__txt {
+	opacity: 0;
+}
+.btn-switch__label:before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: #f0f0f0;
+	border-radius: 1.5em;
+	box-shadow: inset 0 .0715em .3572em rgba(43,43,43,.05);
+	transition: background .2s ease-in-out;
+}
+.btn-switch__radio_yes:checked ~ .btn-switch__label:before {
+	background: #1877c1;
+}
+.btn-switch__label_no:after {
+	content: "";
+	position: absolute;
+	z-index: 2;
+	top: .5em;
+	bottom: .5em;
+	left: .5em;
+	width: 2em;
+	background: #fff;
+	border-radius: 1em;
+	pointer-events: none;
+	box-shadow: 0 .1429em .2143em rgba(43,43,43,.2), 0 .3572em .3572em rgba(43,43,43,.1);
+	transition: left .2s ease-in-out, background .2s ease-in-out;
+}
+.btn-switch__radio_yes:checked ~ .btn-switch__label_no:after {
+	left: calc(100% - 2.5em);
+	background: #fff;
+}
+.btn-switch__radio_no:checked ~ .btn-switch__label_yes:before,
+.btn-switch__radio_yes:checked ~ .btn-switch__label_no:before {
+	z-index: 1;
+}
+.btn-switch__radio_yes:checked ~ .btn-switch__label_yes {
+	color: #fff;
+}
+/* End of styles for 2nd slider checkbox */
+.t1 {
+  width:25%;
+  float: left;
+}
+.t2 {
+  width:39%;
+  float:left;
+  height:100%;
+  padding-left: 1% !important;
+ }
+
+.t3 {
+  width:31%;
+  float:right;
+  height:100%;
+}
+
+.t1, .t2, .t3 {
+  padding-left: 0.5%;
+  padding-right: 0.5%;
+}
+
+/* Styles for tooltips */
+.tooltip {
+  pointer-events: none;
+  position: absolute;
+  background-color: rgba(245, 245, 220, 0.85);
+  padding: 0px 0px 5px 0px;
+  margin: auto;
+  min-width: 260px;
+  font-family: "Signika", sans-serif;
+  font-size: 0.85em;
+  border-radius: 4px;
+  color: #353d44;
+  z-index: 13;
+}
+
+.tooltip > .title {
+  margin: auto;
+  background-color: #4f81bd;
+  padding: 2px 8px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  color: white;
+  font-weight: 800;
+}
+
+.tooltip > .title.red {
+  margin: auto;
+  background-color: red;
+  padding: 2px 8px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  color: white;
+  font-weight: 800;
+}
+
+.tooltip > .content {
+  margin: auto;
+  padding: 1px 8px;
+  font-size: 0.75em;
+  font-size: 0.8em;
+}
+/* End of styles for tooltips */
+
+/* Styles for map tooltips */
+.tooltip_map, .tooltip-black {
+  pointer-events: none;
+  position: absolute;
+  background-color: black;
+  padding: 5px 8px;
+  margin: auto;
+  font-family: "Signika", sans-serif;
+  font-size: 0.9em;
+  border-radius: 4px;
+  color: white;
+}
+.tooltip_map > .title, .tooltip-black > .content {
+  margin: auto;
+}
+.tooltip_map > .content {
+  display: none;
+  height: 0;
+}
+/* End of styles for map tooltips */
+
+span.arrow_down:before {
+  content: '\025BA';
+  margin-right: 4px;
+}
+
+span.arrow_right:before {
+  content: '\025BE';
+  margin-right: 5px;
+  margin-left: 2px;
+  font-weight: 800;
+}
+
+.title-axis {
+  font-family: sans-serif;
+  font-size: 13px;
+  text-anchor: middle;
+  fill: black;
+  cursor: pointer;
+}
+
+.axis {
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.axis > text.legend {
+  cursor: initial;
+  -webkit-user-select: initial;
+  -moz-user-select: initial;
+  -ms-user-select: initial;
+  user-select: initial;
+  pointer-events: initial;
+}
+
+/* Styles for rapport dialog */
+#prep_rapport {
+  text-align: center;
+  min-height: 390px;
+}
+#prep_rapport > .spinner > .cube1, #prep_rapport > .spinner > .cube2 {
+  background-color: #4f81bd;
+}
+#prep_rapport > p {
+  margin: auto;
+  text-align: center;
+  padding-top: 20%;
+}
+.buttonDownload {
+	display: inline-block;
+	position: relative;
+	padding: 10px 25px;
+
+	background-color: #4f81bd;
+	color: white;
+
+	font-family: sans-serif;
+	text-decoration: none;
+	font-size: 0.9em;
+	text-align: center;
+	text-indent: 15px;
+}
+
+.buttonDownload:hover {
+	background-color: #002565;
+	color: white;
+}
+
+.buttonDownload:before, .buttonDownload:after {
+	content: ' ';
+	display: block;
+	position: absolute;
+	left: 15px;
+	top: 52%;
+}
+
+/* Download box shape  */
+.buttonDownload:before {
+	width: 10px;
+	height: 2px;
+	border-style: solid;
+	border-width: 0 2px 2px;
+}
+
+/* Download arrow shape */
+.buttonDownload:after {
+	width: 0;
+	height: 0;
+	margin-left: 3px;
+	margin-top: -7px;
+
+	border-style: solid;
+	border-width: 4px 4px 0 4px;
+	border-color: transparent;
+	border-top-color: inherit;
+
+	animation: downloadArrow 2s linear infinite;
+	animation-play-state: paused;
+}
+
+.buttonDownload:hover:before {
+	border-color: #4f81bd;
+}
+
+.buttonDownload:hover:after {
+	border-top-color: #4f81bd;
+	animation-play-state: running;
+}
+
+.buttonDownload.large {
+  width: 200px;
+}
+/* keyframes for the download icon anim */
+@keyframes downloadArrow {
+	/* 0% and 0.001% keyframes used as a hackish way of having the button frozen on a nice looking frame by default */
+	0% {
+		margin-top: -7px;
+		opacity: 1;
+	}
+
+	0.001% {
+		margin-top: -15px;
+		opacity: 0;
+	}
+
+	50% {
+		opacity: 1;
+	}
+
+	100% {
+		margin-top: 0;
+		opacity: 0;
+	}
+}
+/* End of styles for download button */
+
+/* Style for radar chart legend */
+.mini-legend-item {
+  display: inline-block;
+}
+.mini-legend-item > p.color_square {
+  width: 1.1em;
+  height: 1.1em;
+  margin: auto;
+  display: inline-block;
+  vertical-align: text-top;
+  border-radius: 10%;
+}
+.mini-legend-item > span {
+  padding: 0 5px;
+}
+/* End of styles for radar chart legend */
+
+/* Styles for input with autocompletion (left menu) */
+.regio_name {
+  width: 100%;
+  position: relative;
+  display: inline-block;
+  padding-top: 4px;
+}
+
+.regio_name > p {
+  margin: auto;
+  display: inline-block;
+  padding: 6px;
+}
+
+.regio_name > input {
+  border: 2px solid #64889c;
+  -webkit-box-shadow: inset 0 0 6px  rgba(0,0,0,0.1), 0 0 12px rgba(0,0,0,0.1);
+  -moz-box-shadow: inset 0 0 6px  rgba(0,0,0,0.1), 0 0 12px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 6px  rgba(0,0,0,0.1), 0 0 12px rgba(0,0,0,0.1);
+  padding: 0.4em;
+  margin: 0 0 10px 0;
+  height: 45%;
+  font-weight: 800;
+  font-size: 0.8em;
+}
+
+#search {
+  position: absolute;
+  z-index: 11;
+  width: calc(90% - 7em);
+  background: rgba(255,255,255,0.4);
+  color: white;
+}
+
+#autocomplete {
+  position: absolute;
+  z-index: 10;
+  width: calc(90% - 7em);
+  background: rgb(79, 129, 189);
+  color: black;
+}
+
+#list_regio {
+  height: 15%;
+  transition: all 400ms ease-in-out;
+}
+
+#list_regio.hidden {
+  height: 0;
+}
+/* End of styles for input with autocompletion (left menu) */
+
+
+h3 {
+  color: #4f81bd;
+}
+
+.title_variable {
+  margin-left: 1.5em;
+  font-size: 0.9em;
+  font-family: "Signika", sans-serif;
+  padding: 3px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+
+span.down_arrow {
+  float: right;
+  padding-right: 1px;
+  margin: 4px;
+  cursor: pointer;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.btn_delete_mini {
+  margin-left: 5px;
+}
