@@ -1,0 +1,24 @@
+{
+  "extends": "airbnb-base",
+  "plugins": [
+      "import"
+  ],
+  "globals": {
+    "ENV": true
+  },
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "camelcase": 0,
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "no-underscore-dangle": 0,
+    "no-mixed-operators": 0
+  },
+  "globals": {
+    "d3": false,
+    "turf": false,
+    "alertify": false,
+    "tippy": false
+  }
+}
