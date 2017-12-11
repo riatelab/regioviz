@@ -1,14 +1,19 @@
-// import debug from 'debug';
 import tingle from 'tingle.js';
 import alertify from 'alertifyjs';
+import '../styles/main.css';
+import '../styles/tingle.min.css';
+import '../styles/tippy.css';
+import '../styles/alertify.min.css';
+import '../styles/semantic.min.css';
+import '../styles/font-awesome.min.css';
 import { createMenu, handleInputRegioName } from './modules/menuleft';
 import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
 import { MapSelect, makeSourceSection, svg_map, zoomClick } from './modules/map';
 import { color_highlight, MAX_VARIABLES, RATIO_WH_MAP } from './modules/options';
-import { BarChart1 } from './modules/charts/barChart_1v';
-import { ScatterPlot2 } from './modules/charts/scatterPlot_2v';
-import { RadarChart3 } from './modules/charts/radarChart_3v';
-import { Similarity1plus } from './modules/charts/similarity1v';
+import BarChart1 from './modules/charts/barChart_1v';
+import ScatterPlot2 from './modules/charts/scatterPlot_2v';
+import RadarChart3 from './modules/charts/radarChart_3v';
+import Similarity1plus from './modules/charts/similarity1v';
 import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, Tooltipsify, getRatioToWide } from './modules/helpers';
 import {
   prepare_dataset,
@@ -76,38 +81,6 @@ function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NU
   app.colors[app.current_config.my_region] = color_highlight;
 }
 
-function setDefaultConfigMenu(code = 'FRE', variable = 'REVMEN', level = 'N1') {
-  document.querySelector(`.target_region.square[value="${code}"]`).classList.add('checked');
-  document.querySelector(`.target_variable.small_square[value="${variable}"]`).classList.add('checked');
-  document.querySelector('.filter_v.square[filter-value="no_filter"]').classList.add('checked');
-  document.querySelector(`.territ_level.square[value="${level}"]`).classList.add('checked');
-  document.querySelector('.regio_name > #search').value = app.feature_names[code];
-  document.querySelector('.regio_name > #autocomplete').value = app.feature_names[code];
-  updateAvailableRatios(code);
-}
-
-function updateMenuStudyZones() {
-  Array.prototype.forEach.call(
-    document.querySelectorAll('#menu_studyzone > p'),
-    (elem) => {
-      const val = elem.querySelector('.filter_v.square').getAttribute('display_level');
-      if (val === '' || val === app.current_config.current_level) {
-        elem.style.display = null;
-      } else {
-        elem.style.display = 'none';
-      }
-    });
-}
-
-
-export function resetColors() {
-  app.colors = {};
-  // for (let i = 0, len_i = current_ids.length; i < len_i; i++) {
-  //   app.colors[current_ids[i]] = color_countries;
-  // }
-  app.colors[app.current_config.my_region] = color_highlight;
-}
-
 /**
 * Function to update the availables ratios in the left menu (after changing region)
 * If a selected variable is not available anymore it will be deselected.
@@ -151,6 +124,42 @@ function updateAvailableRatios(my_region) {
     resetVariables(app, new_var_names);
   }
   return new_var.length;
+}
+
+
+function setDefaultConfigMenu(code = 'FRE', variable = 'REVMEN', level = 'N1') {
+  document.querySelector(`.target_region.square[value="${code}"]`).classList.add('checked');
+  document.querySelector(`.target_variable.small_square[value="${variable}"]`).classList.add('checked');
+  document.querySelector('.filter_v.square[filter-value="no_filter"]').classList.add('checked');
+  document.querySelector(`.territ_level.square[value="${level}"]`).classList.add('checked');
+  document.querySelector('.regio_name > #search').value = app.feature_names[code];
+  document.querySelector('.regio_name > #autocomplete').value = app.feature_names[code];
+  updateAvailableRatios(code);
+}
+
+
+function updateMenuStudyZones() {
+  Array.prototype.forEach.call(
+    document.querySelectorAll('#menu_studyzone > p'),
+    (elem) => {
+      const val = elem.querySelector('.filter_v.square').getAttribute('display_level');
+      if (val === '' || val === app.current_config.current_level) {
+        // eslint-disable-next-line no-param-reassign
+        elem.style.display = null;
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        elem.style.display = 'none';
+      }
+    });
+}
+
+
+export function resetColors() {
+  app.colors = {};
+  // for (let i = 0, len_i = current_ids.length; i < len_i; i++) {
+  //   app.colors[current_ids[i]] = color_countries;
+  // }
+  app.colors[app.current_config.my_region] = color_highlight;
 }
 
 /**
@@ -255,6 +264,7 @@ function bindUI_chart(chart, map_elem) {
         // variables after that:
         const new_nb_var = updateAvailableRatios(id_region);
         updateAvailableCharts(new_nb_var);
+        updateMyCategorySection();
         if (new_nb_var >= app.current_config.nb_var) {
           if (old_nb_var === new_nb_var) {
             chart.updateChangeRegion();
@@ -293,8 +303,8 @@ function bindUI_chart(chart, map_elem) {
     .on('click', function () {
       if (this.classList.contains('disabled')) return;
       let nb_var = Array.prototype.slice.call(
-        document.querySelectorAll('span.target_variable')).filter(
-          elem => !!elem.classList.contains('checked')).length;
+        document.querySelectorAll('span.target_variable'))
+        .filter(elem => !!elem.classList.contains('checked')).length;
       // Select a new variable and trigger the appropriate changes on the current chart:
       if (!this.classList.contains('checked')) {
         // We don't want the user to be able to select more than
@@ -305,10 +315,10 @@ function bindUI_chart(chart, map_elem) {
         }
         this.classList.add('checked');
         const code_variable = this.getAttribute('value');
-        const name_variable = variables_info.find(d => d.id === code_variable).name;
+        // const name_variable = variables_info.find(d => d.id === code_variable).name;
         addVariable(app, code_variable);
-        // makeTable(app.current_data, app.current_config);
-        chart.addVariable(code_variable, name_variable);
+
+        chart.addVariable(code_variable);
         nb_var += 1;
       } else { // Remove a variable from the selection:
         nb_var -= 1;
@@ -561,6 +571,7 @@ function loadData() {
     .defer(d3.json, 'data/frame3035.geojson')
     .defer(d3.json, 'data/boxes3035.geojson')
     .defer(d3.json, 'data/line3035.geojson')
+    .defer(d3.json, 'data/styles.json')
     .defer(d3.csv, 'data/indicateurs_meta.csv')
     .awaitAll((error, results) => {
       if (error) throw error;
@@ -570,7 +581,8 @@ function loadData() {
       const [
         full_dataset, nuts, borders, countries, countries_remote,
         coasts, coasts_remote, cyprus_non_espon_space,
-        countries_remote_boundaries, frame, boxes, line, metadata_indicateurs,
+        countries_remote_boundaries, frame, boxes, line, styles_map,
+        metadata_indicateurs,
       ] = results;
       alertify.set('notifier', 'position', 'bottom-left');
       prepareVariablesInfo(metadata_indicateurs);
@@ -603,7 +615,7 @@ function loadData() {
         ['countries_remote_boundaries', countries_remote_boundaries],
         ['frame', frame], ['line', line], ['boxes2', boxes],
       ]);
-      const map_elem = new MapSelect(nuts, other_layers);
+      const map_elem = new MapSelect(nuts, other_layers, styles_map);
       const chart = new BarChart1(app.current_data);
       makeSourceSection();
       bindUI_chart(chart, map_elem);

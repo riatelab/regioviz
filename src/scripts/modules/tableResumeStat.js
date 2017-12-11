@@ -15,7 +15,7 @@ export default class TableResumeStat {
       const cell = doc.createElement('th');
       cell.innerHTML = ['Variable', 'Ma région'].indexOf(column_names[i]) > -1
         ? column_names[i]
-        : column_names[i] + '.';
+        : `${column_names[i]}.`;
       headers_row.appendChild(cell);
     }
     headers.appendChild(headers_row);

@@ -1,3 +1,4 @@
+import centroid from '@turf/centroid';
 import { app } from './../main';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, RATIO_WH_MAP } from './options';
 import { getSvgPathType, svgPathToCoords, euclidian_distance, prepareTooltip2, getElementsFromPoint } from './helpers';
@@ -5,26 +6,12 @@ import { filterLevelGeom } from './prepare_data';
 
 
 const svg_map = d3.select('svg#svg_map');
-const bbox_svg = svg_map.node().getBoundingClientRect();
-const width_map = +bbox_svg.width;
-const height_map = width_map * (1 / RATIO_WH_MAP);
+let bbox_svg = svg_map.node().getBoundingClientRect();
+let width_map = +bbox_svg.width;
+let height_map = width_map * (1 / RATIO_WH_MAP);
 svg_map.attr('height', `${height_map}px`);
 
-const styles = {
-  frame: { id: 'frame', fill: '#e9f4fe', 'fill-opacity': 1 },
-  countries: { id: 'countries', fill: '#d6d6d6', 'fill-opacity': 1 },
-  boxes: { id: 'boxes', fill: '#e9f4fe', 'fill-opacity': 1 },
-  nuts: { id: 'nuts', fill: '#9390fc', 'fill-opacity': 1, 'stroke-width': 0.5, stroke: '#f7fcfe', 'stroke-opacity': 0.9, target: true },
-  countries_remote: { id: 'countries_remote', fill: '#d6d6d6', 'fill-opacity': 1 },
-  cyprus_non_espon_space: { id: 'cyprus_non_espon_space', fill: '#ffffff', 'fill-opacity': 1 },
-  borders: { id: 'borders', fill: 'none', 'stroke-width': 1, stroke: '#ffffff' },
-  countries_remote_boundaries: { id: 'countries_remote_boundaries', fill: 'none', 'stroke-width': 1, stroke: '#ffffff' },
-  coasts: { id: 'coasts', fill: 'none', stroke: '#d2dbef', 'stroke-width': 0.5 },
-  coasts_remote: { id: 'coasts_remote', fill: 'none', stroke: '#d2dbef', 'stroke-width': 0.5 },
-  boxes2: { id: 'boxes2', stroke: '#7a7a7a', 'stroke-width': 1, fill: 'none' },
-  line: { id: 'line', stroke: '#d6d6d6', 'stroke-width': 1.5, fill: 'none' },
-};
-
+let styles;
 let projection;
 let path;
 
@@ -98,15 +85,15 @@ function interpolateZoom(translate, scale) {
 }
 
 function zoomClick() {
-  const direction = (this.id === 'zoom_in') ? 1 : -1,
-    factor = 0.1,
-    center = [width_map / 2, height_map / 2],
-    transform = d3.zoomTransform(svg_map.node()),
-    translate = [transform.x, transform.y],
-    view = { x: translate[0], y: translate[1], k: transform.k };
-  let target_zoom = 1,
-    translate0 = [],
-    l = [];
+  const direction = (this.id === 'zoom_in') ? 1 : -1;
+  const factor = 0.1;
+  const center = [width_map / 2, height_map / 2];
+  const transform = d3.zoomTransform(svg_map.node());
+  const translate = [transform.x, transform.y];
+  const view = { x: translate[0], y: translate[1], k: transform.k };
+  let target_zoom = 1;
+  let translate0 = [];
+  let l = [];
   d3.event.preventDefault();
   target_zoom = transform.k * (1 + factor * direction);
   translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
@@ -195,7 +182,12 @@ function getLegendElems(type) {
 
 
 class MapSelect {
-  constructor(nuts, other_layers, filter = 'N1') {
+  constructor(nuts, other_layers, user_styles, filter = 'N1') {
+    styles = Object.assign({}, user_styles);
+    bbox_svg = svg_map.node().getBoundingClientRect();
+    width_map = +bbox_svg.width;
+    height_map = width_map * (1 / RATIO_WH_MAP);
+    svg_map.attr('height', `${height_map}px`);
     app.mapDrawRatio = app.ratioToWide;
     projection = d3.geoIdentity()
       .fitExtent([[0, 0], [width_map, height_map]], other_layers.get('frame'))
@@ -303,7 +295,8 @@ class MapSelect {
           .styles({
             display: null,
             left: `${left}px`,
-            top: `${d3.event.pageY - b.height - 20}px` });
+            top: `${d3.event.pageY - b.height - 20}px`,
+          });
       });
   }
 
@@ -372,7 +365,8 @@ class MapSelect {
               clientY: d3.event.clientY,
               bubbles: true,
               cancelable: true,
-              view: window });
+              view: window,
+            });
             elem.dispatchEvent(new_click_event);
           } else {
             self.tooltip.style('display', 'none');
@@ -407,12 +401,12 @@ class MapSelect {
     const nb_ft = features.length;
     const my_region_geom = features.find(
       d => d.__data__.id === app.current_config.my_region).__data__.geometry;
-    const my_region_centroid = turf.centroid(my_region_geom);
+    const my_region_centroid = centroid(my_region_geom);
     const result_dist = [];
     for (let i = 0; i < nb_ft; i++) {
       const id = features[i].__data__.id;
       const dist = euclidian_distance(
-        my_region_centroid, turf.centroid(features[i].__data__.geometry));
+        my_region_centroid, centroid(features[i].__data__.geometry));
       result_dist.push({ id, dist });
     }
     this.dist_to_my_region = result_dist;

@@ -1,13 +1,18 @@
 import { Rect, comp2, prepareTooltip2, svgPathToCoords, _getPR, computePercentileRank, getMean } from './../helpers';
 import { color_disabled, color_countries, color_highlight } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-// import { svg_map } from './../map';
 import { app, variables_info, resetColors } from './../../main';
 import ContextMenu from './../contextMenu';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
 
-let svg_bar, margin, bbox_svg, width, height, svg_container, t;
+let svg_bar;
+let margin;
+let bbox_svg;
+let width;
+let height;
+let svg_container;
+let t;
 
 const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
@@ -19,7 +24,7 @@ const updateDimensions = () => {
   svg_container = svg_bar.append('g').attr('class', 'container');
 };
 /** Class representing a scatterplot */
-export class ScatterPlot2 {
+export default class ScatterPlot2 {
   /**
    * Create a the scatterplot on the `svg_bar` svg element previously defined
    * @param {Array} ref_data - A reference to the subset of the dataset to be used
@@ -177,7 +182,7 @@ export class ScatterPlot2 {
         clearTimeout(t);
         t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
       })
-      .on('mousemove mousedown', (d) => {
+      .on('mousemove mousedown', () => {
         clearTimeout(t);
         const content = ['Moyenne de l\'espace d\'étude'];
         let _h = 65;
@@ -451,7 +456,7 @@ export class ScatterPlot2 {
         y: margin.top + height + margin.bottom / 2 + 15,
         'title-tooltip': this.pretty_name1,
       })
-      .html(this.variable1 + ' &#x25BE;')
+      .html(`${this.variable1}  &#x25BE;`)
       .on('click', function () {
         const bbox = this.getBoundingClientRect();
         if (self.menuY.displayed) {
@@ -469,7 +474,7 @@ export class ScatterPlot2 {
         transform: `rotate(-90, ${margin.left / 2}, ${margin.top + (height / 2)})`,
         'title-tooltip': this.pretty_name2,
       })
-      .html(this.variable2 + ' &#x25BE;')
+      .html(`${this.variable2}  &#x25BE;`)
       .on('click', function () {
         const bbox = this.getBoundingClientRect();
         if (self.menuX.displayed) {
@@ -676,9 +681,11 @@ export class ScatterPlot2 {
     this.scatter.selectAll('.dot')
       .on('mouseover.tooltip', () => {
         clearTimeout(t);
-        self.tooltip.style('display', null).select('.title').attr('class', 'title');
+        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        // clearTimeout(t);
+        // self.tooltip.style('display', null).select('.title').attr('class', 'title');
       })
-      .on('mousemove.tooltip', function (d) {
+      .on('mousemove.tooltip', (d) => {
         clearTimeout(t);
         self.tooltip.select('.title')
           .attr('class', 'title')
@@ -701,7 +708,7 @@ export class ScatterPlot2 {
             ].join('<br>'));
           yoffset = 85;
         }
-        const b = self.tooltip.node().getBoundingClientRect();
+        // const b = self.tooltip.node().getBoundingClientRect();
         self.tooltip
           .styles({
             display: null,
@@ -815,7 +822,7 @@ export class ScatterPlot2 {
     this.unit1 = var_info.unit;
     svg_container.select('#title-axis-x')
       .attr('title-tooltip', this.pretty_name1)
-      .html(code_variable + ' &#x25BE;');
+      .html(`${code_variable} &#x25BE;`);
     // TODO: Also change the position of the button alowing to inverse the serie
     this.updateItemsCtxMenu();
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
@@ -846,7 +853,7 @@ export class ScatterPlot2 {
     this.unit2 = var_info.unit;
     svg_container.select('#title-axis-y')
       .attr('title-tooltip', this.pretty_name2)
-      .html(code_variable + ' &#x25BE;');
+      .html(`${code_variable} &#x25BE;`);
     // TODO: Also change the position of the button alowing to inverse the serie
     this.updateItemsCtxMenu();
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
@@ -882,7 +889,7 @@ export class ScatterPlot2 {
       }));
   }
 
-  addVariable(code_variable, name_variable) {
+  addVariable(code_variable) {
     this.itemsX.push({
       name: code_variable,
       action: () => this.changeVariableX(code_variable),
@@ -1080,8 +1087,8 @@ export class ScatterPlot2 {
 <b>Aide générale</b>
 Ce graphique bidimensionnel représente la position de l’unité territoriale de référence sur deux indicateurs pour un espace d’étude et un maillage territorial d’analyse donné. La valeur de l’unité territoriale de référence apparaît en surbrillance (jaune). Les lignes représentées par un tireté rouge représentent la moyenne de l’espace d’étude pour chacun des indicateurs sélectionnés (non pondérée).
 
-Sur le graphique et la carte, les unités territoriales qui disposent de valeurs supérieures à la unité territoriale de référence pour les deux indicateurs sont représentées en vert. Les unités territoriales caractérisées par des valeurs inférieures à l’unité territoriale de référence pour les deux indicateurs sont représentées en rouge. Celles qui sont supérieures pour l’indicateur représenté sur l’axe des abscisses et inférieur sur l’axe des ordonnées sont représentées en orange ; et violet à l’inverse. Sur ce graphique, il est possible d’inverser l’ordre de classement de l’indicateur (appuyer sur le « + ») : les valeurs minimales seront alors considérées comme maximale sur l’axe.
+Sur le graphique et la carte, les unités territoriales qui disposent de valeurs supérieures à la unité territoriale de référence pour les deux indicateurs sont représentées en vert. Les unités territoriales caractérisées par des valeurs inférieures à l’unité territoriale de référence pour les deux indicateurs sont représentées en rouge. Celles qui sont supérieures pour l’indicateur représenté sur l’axe des abscisses et inférieur sur l’axe des ordonnées sont représentées en orange ; et violet à l’inverse. Sur ce graphique, il est possible d’inverser l’ordre de classement de l’indicateur (appuyer sur le « + ») : les valeurs minimales seront alors considérées comme maximale sur l’axe.
 
-Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur (pourcentage par exemple). En sélectionnant l’option «valeurs de rang », l’indicateur est normalisé de 0 (valeur minimale) à 100 (valeur maximale). L’utilisation possible de ce type de transformation est la suivante : une unité territoriale disposant d’un indice de 67 sur un indicateur signifie que 33 % des unités territoriales de l’espace d’étude sont caractérisées par des valeurs supérieures à l’unité territoriale de référence pour les indicateurs sélectionnés. Et réciproquement. Les valeurs de rang permettent notamment de rendre comparables des unités de mesure et des paramètres de dispersion de deux indicateurs. Il ne faut néanmoins pas omettre que cette transformation nuit à la restitution de la dispersion statistique effective des indicateurs.`;
+Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur (pourcentage par exemple). En sélectionnant l’option «valeurs de rang », l’indicateur est normalisé de 0 (valeur minimale) à 100 (valeur maximale). L’utilisation possible de ce type de transformation est la suivante : une unité territoriale disposant d’un indice de 67 sur un indicateur signifie que 33 % des unités territoriales de l’espace d’étude sont caractérisées par des valeurs supérieures à l’unité territoriale de référence pour les indicateurs sélectionnés. Et réciproquement. Les valeurs de rang permettent notamment de rendre comparables des unités de mesure et des paramètres de dispersion de deux indicateurs. Il ne faut néanmoins pas omettre que cette transformation nuit à la restitution de la dispersion statistique effective des indicateurs.`;
   }
 }

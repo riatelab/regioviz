@@ -1,19 +1,42 @@
 import { color_inf, color_sup } from './options';
 
+/* eslint-disable wrap-iife, object-shorthand, no-bitwise,
+no-extend-native, prefer-rest-params, no-prototype-builtins */
 (function () {
-  if (!Element.prototype.remove) {
-    Element.prototype.remove = function () {
-      this.parentElement.removeChild(this);
-    };
-  }
+  /*
+  Polyfill for 'Element.remove'
+  from https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
+  */
+  (function (arr) {
+    arr.forEach((item) => {
+      if (item.hasOwnProperty('remove')) {
+        return;
+      }
+      Object.defineProperty(item, 'remove', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: function remove() {
+          if (this.parentNode !== null) {
+            this.parentNode.removeChild(this);
+          }
+        },
+      });
+    });
+  })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+  /*
+  Polyfill for 'Array.find'
+  from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+  */
   if (!Array.prototype.find) {
     Object.defineProperty(Array.prototype, 'find', {
       value: function (predicate) {
-       // 1. Let O be ? ToObject(this value).
+        // 1. Let O be ? ToObject(this value).
         if (this == null) {
           throw new TypeError('"this" is null or not defined');
         }
-        let k, kValue;
+        let k;
+        let kValue;
         const o = Object(this);
 
         // 2. Let len be ? ToLength(? Get(O, "length")).
@@ -41,16 +64,16 @@ import { color_inf, color_sup } from './options';
             return kValue;
           }
           // e. Increase k by 1.
-          k++;
+          k += 1;
         }
-
         // 7. Return undefined.
         return undefined;
       },
     });
   }
 })();
-
+/* eslint-enable wrap-iife, object-shorthand, no-bitwise,
+no-extend-native, prefer-rest-params, no-prototype-builtins */
 
 // eslint-disable-next-line no-restricted-properties
 const math_pow = Math.pow;
@@ -79,9 +102,11 @@ const getElementsFromPoint = (x, y, context = document.body) => {
   } else if (document.msElementsFromPoint) {
     return Array.prototype.slice.call(document.msElementsFromPoint(x, y));
   }
-  const elements = [],
-    children = context.children;
-  let i, l, pos;
+  const elements = [];
+  const children = context.children;
+  let i;
+  let l;
+  let pos;
 
   for (i = 0, l = children.length; i < l; i++) {
     pos = children[i].getBoundingClientRect();
@@ -172,7 +197,8 @@ const Tooltipsify = (selector, options = {}) => {
         .styles({
           display: null,
           left: `${d3.event.pageX - 5}px`,
-          top: `${d3.event.pageY - b.height - 15}px` });
+          top: `${d3.event.pageY - b.height - 15}px`,
+        });
     });
 };
 
@@ -268,9 +294,7 @@ class Rect {
 
 const PropSizer = function PropSizer(fixed_value, fixed_size) {
   this.fixed_value = fixed_value;
-  const sqrt = Math.sqrt;
-  const abs = Math.abs;
-  const PI = Math.PI;
+  const { sqrt, abs, PI } = Math;
   this.smax = fixed_size * fixed_size * PI;
   this.scale = val => sqrt(abs(val) * this.smax / this.fixed_value) / PI;
   // this.get_value = size => ((size * PI) ** 2) / this.smax * this.fixed_value;
@@ -423,6 +447,7 @@ function selectFirstAvailableVar() {
       return v[i].getAttribute('value');
     }
   }
+  return null;
 }
 
 /**

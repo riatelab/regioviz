@@ -71,14 +71,14 @@ const updateDimensions = () => {
 
 const wrap = (_text, _width) => {
   _text.each(function () {
-    const text = d3.select(this),
-      words = text.text().split(/\s+/).reverse(),
-      lineHeight = 1.4,
-      x = +text.attr('x'),
-      dy = parseFloat(text.attr('dy')), // ems
-      nb_var = app.current_config.ratio.length;
+    const text = d3.select(this);
+    const words = text.text().split(/\s+/).reverse();
+    const lineHeight = 1.4;
+    const x = +text.attr('x');
+    const dy = parseFloat(text.attr('dy'));
+    const nb_var = app.current_config.ratio.length;
+    const id = +text.attr('id');
     let y = +text.attr('y');
-    let id = +text.attr('id');
     let line = [];
     let lineNumber = 0;
     // if (y > height / 2 - 35) {
@@ -99,8 +99,9 @@ const wrap = (_text, _width) => {
         line.pop();
         tspan.text(line.join(' '));
         line = [word];
+        lineNumber += 1;
         tspan = text.append('tspan')
-          .attrs({ x: 'x', y: 'y', dy: `${++lineNumber * lineHeight + dy}em` })
+          .attrs({ x: 'x', y: 'y', dy: `${lineNumber * lineHeight + dy}em` })
           .text(word);
       }
       word = words.pop();
@@ -118,7 +119,7 @@ const swap = function swap(array, ix1, ix2) {
   return array;
 };
 
-export const prepare_data_radar_default = (data, variables) => {
+const prepare_data_radar_default = (data, variables) => {
   // Prepare the data for "My Région":
   const v_my_region = data.find(d => d.id === app.current_config.my_region);
   const ojb_my_region = {
@@ -135,7 +136,7 @@ export const prepare_data_radar_default = (data, variables) => {
   return ojb_my_region;
 };
 
-export const prepare_data_radar_ft = (data, variables, ft) => {
+const prepare_data_radar_ft = (data, variables, ft) => {
   const ft_values = data.find(d => d.id === ft);
   if (!ft_values) {
     return null;
@@ -154,7 +155,7 @@ export const prepare_data_radar_ft = (data, variables, ft) => {
   return obj;
 };
 
-export class RadarChart3 {
+export default class RadarChart3 {
   constructor(data, options) {
     updateDimensions();
     const cfg = {
@@ -163,7 +164,8 @@ export class RadarChart3 {
       margin: margin, // The margins of the SVG
       levels: 10, // How many levels or inner circles should there be drawn
       maxValue: 100, // What is the value that the biggest circle will represent
-      labelFactor: 1.2, // How much farther than the radius of the outer circle should the labels be placed
+      // How much farther than the radius of the outer circle should the labels be placed:
+      labelFactor: 1.2,
       wrapWidth: 75, // The number of pixels after which a label needs to be given a new line
       opacityArea: 0.10, // The opacity of the area of the blob
       dotRadius: 4, // The size of the colored circles of each blog
@@ -172,7 +174,8 @@ export class RadarChart3 {
       roundStrokes: true, // If true the area and stroke will follow a round path (cardinal-closed)
       color: d3.scaleOrdinal(d3.schemeCategory10), // Color function,
       format: '.3', // The format string to be used by d3.format
-      unit: '%', // The unit to display after the number on the axis and point tooltips (like $, €, %, etc)
+      // The unit to display after the number on the axis and point tooltips (like $, €, %, etc):
+      unit: '%',
       legend: false,
       allowInverseData: true,
     };
@@ -254,7 +257,8 @@ export class RadarChart3 {
       if (this.id_my_region === this.data[j].name) app.colors[this.data[j].name] = color_highlight;
       else if (!app.colors[this.data[j].name]) {
         let ii = 0;
-        while (ii++ < 21) {
+        while (ii < 21) {
+          ii += 1;
           const c = this.cfg.color(ii);
           if (!(colors_in_use.indexOf(c) > -1)) {
             app.colors[this.data[j].name] = c;
@@ -823,7 +827,7 @@ export class RadarChart3 {
     this.updateLegend();
   }
 
-  addVariable(code_variable, name_variable) {
+  addVariable(code_variable) {
     const other_features = this.displayed_ids.filter(d => d !== this.id_my_region);
     this.g.remove();
     this.g = svg_bar.append('g')
@@ -916,8 +920,8 @@ export class RadarChart3 {
       .attr('fill', d => (d.id === this.id_my_region
         ? color_highlight
         : this.current_ids.indexOf(d.id) > -1
-        ? (this.displayed_ids.indexOf(d.id) > -1
-        ? app.colors[d.id] : color_countries) : color_disabled));
+          ? (this.displayed_ids.indexOf(d.id) > -1
+            ? app.colors[d.id] : color_countries) : color_disabled));
   }
 
   updateTableStat() {
@@ -936,7 +940,7 @@ export class RadarChart3 {
 
 <b>Aide générale</b>
 
-Ce graphique construit tel « une cible » permet de représenter la position de l’unité territoriale de référence pour 3 à 8 indicateurs simultanément. Les cercles concentriques qui constituent le graphique expriment les déciles de la distribution pour chacun des indicateurs sélectionnés (premier cercle = premier décile, valeurs minimales par défaut / cercle extérieur = dernier décile, valeurs maximales par défaut). Les indicateurs représentés sur ce graphique sont de fait normalisés selon leur rang respectif dans la distribution statistique pour chacun des indicateurs : 0 correspondant à la valeur minimale (100 % des unités territoriales disposent de valeurs plus fortes) et 100 la valeur maximale (100 % des unité territoriales sont caractérisées par des valeurs moins fortes).
+Ce graphique construit tel « une cible » permet de représenter la position de l’unité territoriale de référence pour 3 à 8 indicateurs simultanément. Les cercles concentriques qui constituent le graphique expriment les déciles de la distribution pour chacun des indicateurs sélectionnés (premier cercle = premier décile, valeurs minimales par défaut / cercle extérieur = dernier décile, valeurs maximales par défaut). Les indicateurs représentés sur ce graphique sont de fait normalisés selon leur rang respectif dans la distribution statistique pour chacun des indicateurs : 0 correspondant à la valeur minimale (100 % des unités territoriales disposent de valeurs plus fortes) et 100 la valeur maximale (100 % des unité territoriales sont caractérisées par des valeurs moins fortes).
 
 Le cercle représenté en tireté rouge représente la valeur médiane (50) pour l’espace d’étude. Si pour un indicateur la unité territoriale se situe à l’intérieur de ce cercle, cela signifie que la valeur pour cet indicateur se situe en-dessous de la médiane de l’espace d’étude. Si pour un autre indicateur la unité territoriale se situe à l’extérieur de ce cercle, cela signifie que la valeur pour cet indicateur se situe au dessus de la médiane de l’espace d’étude.
 

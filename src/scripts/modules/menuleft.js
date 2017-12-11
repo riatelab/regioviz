@@ -25,8 +25,9 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   // section1.style.height = '15%';
   // section1.style.height = '0';
   for (let i = 0, len_i = names.length; i < len_i; i++) {
-    const id = names[i].id;
-    const name = names[i].name;
+    // const id = names[i].id;
+    // const name = names[i].name;
+    const { id, name } = names[i];
     const entry = document.createElement('p');
     entry.innerHTML = `<span value="${id}" class='target_region square'></span><span class="label_chk">${name}</span>`;
     section1.appendChild(entry);

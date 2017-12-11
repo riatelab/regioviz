@@ -12,9 +12,6 @@ import { app } from './../main';
 export function makeTopMenu() {
   const top_menu = d3.select('#menutop')
     .styles({ 'font-family': "'Signika', sans-serif", 'font-size': '0.80em', 'text-align': 'center' });
-  // const width_left = `${document.querySelector('#menu').getBoundingClientRect().width + 25}px`;
-  // const width_central_chart = `${document.querySelector('#bar_section').getBoundingClientRect().width}px`;
-  // const width_map = `${document.querySelector('#map_section').getBoundingClientRect().width - 40}px`;
 
   top_menu
     .append('div')
@@ -182,7 +179,7 @@ export function makeHeaderChart() {
         modal.setContent(`<h3>Téléchargements</h3><div style="text-align:center;">
 <p><a class="buttonDownload large" id="dl_data" href="#">Table de données (.csv)</a></p>
 <p><a class="buttonDownload large disabled" id="dl_metadata" href="#">Métadonnées (.csv)</a></p>
-<p><a class="buttonDownload large" id="dl_geolayer" href="data/CGET_nuts_all.geojson">Fond de carte (.geojson)</a></p></div>`);
+<p><a class="buttonDownload large" id="dl_geolayer" href="data/CGET_nuts_all.geojson" download>Fond de carte (.geojson)</a></p></div>`);
         d3.select('#dl_data')
           .on('click', () => {
             const columns = Object.keys(app.current_data[0]);

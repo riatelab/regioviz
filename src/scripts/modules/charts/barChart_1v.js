@@ -1,21 +1,21 @@
+import debug from 'debug';
 import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-// import { svg_map } from './../map';
 import { app, resetColors, variables_info } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
 
 
-let svg_bar = d3.select('svg#svg_bar'),
-  margin = { top: 10, right: 20, bottom: 100, left: 45 },
-  margin2 = { top: 430, right: 20, bottom: 15, left: 45 },
-  bbox_svg = svg_bar.node().getBoundingClientRect(),
-  width = +bbox_svg.width - margin.left - margin.right,
-  height = +bbox_svg.height - margin.top - margin.bottom,
-  height2 = +bbox_svg.height - margin2.top - margin2.bottom,
-  svg_container;
+let svg_bar = d3.select('svg#svg_bar');
+let margin = { top: 10, right: 20, bottom: 100, left: 45 };
+let margin2 = { top: 430, right: 20, bottom: 15, left: 45 };
+let bbox_svg = svg_bar.node().getBoundingClientRect();
+let width = +bbox_svg.width - margin.left - margin.right;
+let height = +bbox_svg.height - margin.top - margin.bottom;
+let height2 = +bbox_svg.height - margin2.top - margin2.bottom;
+let svg_container;
 
 let nbFt;
 let current_range_brush = [0, 0];
@@ -25,8 +25,18 @@ let displayed;
 function updateDimensions() {
   svg_bar = d3.select('svg#svg_bar');
   bbox_svg = svg_bar.node().getBoundingClientRect();
-  margin = { top: 10, right: 20, bottom: (500 * app.ratioToWide) / 5, left: 45 };
-  margin2 = { top: (500 * app.ratioToWide) * 0.86, right: 20, bottom: (500 * app.ratioToWide) / 40, left: 45 };
+  margin = {
+    top: 10,
+    right: 20,
+    bottom: (500 * app.ratioToWide) / 5,
+    left: 45,
+  };
+  margin2 = {
+    top: (500 * app.ratioToWide) * 0.86,
+    right: 20,
+    bottom: (500 * app.ratioToWide) / 40,
+    left: 45,
+  };
   width = +bbox_svg.width - margin.left - margin.right;
   height = 500 * app.ratioToWide - margin.top - margin.bottom;
   svg_bar.attr('height', `${500 * app.ratioToWide}px`);
@@ -49,11 +59,14 @@ function getMeanRank(mean_value, ratio_to_use) {
 
 let t;
 
-export class BarChart1 {
+export default class BarChart1 {
   constructor(ref_data) {
     this.brushed = () => {
       if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
-      if (!this.x) { console.log('a'); return; }
+      if (!this.x) {
+        debug('a');
+        return;
+      }
       const s = d3.event.selection || this.x2.range();
       context_left_handle.attr('x', s[0] - 12);
       context_right_handle.attr('x', s[1] - 7);
@@ -75,7 +88,8 @@ export class BarChart1 {
       const ratio_to_use = this.ratio_to_use;
       const ref_value = this.ref_value;
 
-      // const elems = document.elementsFromPoint(d3_event.sourceEvent.pageX, d3_event.sourceEvent.pageY);
+      // const elems = document.elementsFromPoint(
+      //   d3_event.sourceEvent.pageX, d3_event.sourceEvent.pageY);
       // const elem = elems.find(e => e.className.baseVal === 'bar');
       // if (elem) {
       //   const new_click_event = new MouseEvent('mousedown', {
@@ -94,7 +108,9 @@ export class BarChart1 {
       // }
 
       // if (d3_event && d3_event.selection
-      //       && d3_event.sourceEvent && d3_event.sourceEvent.target === document.querySelector('.brush_top > rect.overlay')) {
+      //       && d3_event.sourceEvent
+      //       && d3_event.sourceEvent.target === document.querySelector(
+      //         '.brush_top > rect.overlay')) {
       if (d3_event && d3_event.selection && d3_event.sourceEvent && d3_event.sourceEvent.target) {
         this.map_elem.removeRectBrush();
         const s = d3_event.selection;
@@ -141,10 +157,10 @@ export class BarChart1 {
     app.chartDrawRatio = app.ratioToWide;
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 1;
-    const x = d3.scaleBand().range([0, width]).padding(0.1),
-      x2 = d3.scaleBand().range([0, width]).padding(0.1),
-      y = d3.scaleLinear().range([height, 0]),
-      y2 = d3.scaleLinear().range([height2, 0]);
+    const x = d3.scaleBand().range([0, width]).padding(0.1);
+    const x2 = d3.scaleBand().range([0, width]).padding(0.1);
+    const y = d3.scaleLinear().range([height, 0]);
+    const y2 = d3.scaleLinear().range([height2, 0]);
 
     const xAxis = d3.axisBottom(x);
     const xAxis2 = d3.axisBottom(x2);
@@ -237,15 +253,6 @@ export class BarChart1 {
       .call(brush_top);
 
     const groupe_line_mean = focus.append('g').attr('class', 'mean');
-    // groupe_line_mean.append('text')
-    //   .attrs({ x: 60, y: y(this.mean_value) + 20 })
-    //   .styles({
-    //     display: 'none',
-    //     fill: 'red',
-    //     'fill-opacity': '0.8',
-    //     'font-family': '\'Signika\', sans-serif',
-    //   })
-    //   .text(`Valeur moyenne : ${Math.round(this.mean_value * 10) / 10} ${this.unit}`);
 
     groupe_line_mean.append('line')
       .attrs({
@@ -270,7 +277,7 @@ export class BarChart1 {
         clearTimeout(t);
         t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
       })
-      .on('mousemove mousedown', (d) => {
+      .on('mousemove mousedown', () => {
         clearTimeout(t);
         const content = ['Moyenne de l\'espace d\'étude'];
         let _h = 65;
@@ -287,7 +294,8 @@ export class BarChart1 {
           .styles({
             display: null,
             left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - _h}px` });
+            top: `${d3.event.pageY - _h}px`,
+          });
       });
 
     this.updateMiniBars();
@@ -379,36 +387,6 @@ export class BarChart1 {
 
     const header_bar_section = d3.select('#header_chart');
 
-    // this.selec_var = header_bar_section
-    //   .insert('select', '#img_table')
-    //   .attrs({ class: 'title_variable' })
-    //   .styles({
-    //     'font-family': '\'Signika\', sans-serif',
-    //     'font-size': '0.8em',
-    //     'margin-top': '12px',
-    //     'margin-left': '40px',
-    //     float: 'left',
-    //   });
-
-    // for (let i = 0, len_i = available_ratios.length; i < len_i; i++) {
-    //   const code_variable = available_ratios[i];
-    //   const name_variable = app.current_config.ratio_pretty_name[i];
-    //   const unit = variables_info.find(ft => ft.id === code_variable).unit;
-    //   const year = name_variable.match(/\([^)]*\)$/)[0];
-    //   const unit_year = `${year.slice(0, 1)}${unit}, ${year.slice(1, 6)}`;
-    //
-    //   this.selec_var.append('option')
-    //     .attr('value', `v_${code_variable}`)
-    //     .text(name_variable.replace(year, unit_year));
-    // }
-    //
-    // this.selec_var.on('change', function () {
-    //   const code_variable = this.value.slice(2);
-    //   self.changeVariable(code_variable);
-    //   self.changeStudyZone();
-    //   self.updateCompletude();
-    // });
-
     this.menu_var = new ContextMenu();
     this.items_menu = available_ratios.map((elem, i) => {
       const code_variable = elem;
@@ -433,7 +411,7 @@ export class BarChart1 {
         class: 'title_variable',
         // 'title-tooltip': app.current_config.ratio_pretty_name[0],
       })
-      .html(this.items_menu[0].name.replace(/\(/, '&').split('&').join('<br>(') + ' &#x25BE;')
+      .html(`${this.items_menu[0].name.replace(/\(/, '&&&').split('&&&').join('<br>(')}  &#x25BE;`)
       .on('click', function () {
         const bbox = this.getBoundingClientRect();
         const items = self.items_menu.filter(el => el.code !== self.ratio_to_use);
@@ -505,7 +483,7 @@ export class BarChart1 {
 
   updateContext(min, max) {
     this.context.selectAll('.bar')
-       .style('fill-opacity', (_, i) => (i >= min && i < max ? '1' : '0.3'));
+      .style('fill-opacity', (_, i) => (i >= min && i < max ? '1' : '0.3'));
   }
 
   update() {
@@ -561,9 +539,8 @@ export class BarChart1 {
           return { dx: '-0.8em', dy: '0.15em', transform: 'rotate(-65)' };
         } else if (displayed > 20) {
           return { dx: '-0.8em', dy: '0.15em', transform: 'rotate(-65)' };
-        } else {
-          return { dx: '0', dy: '0.71em', transform: null };
         }
+        return { dx: '0', dy: '0.71em', transform: null };
       })
       .style('text-anchor', () => (displayed > 20 ? 'end' : 'middle'));
 
@@ -590,11 +567,12 @@ export class BarChart1 {
           .styles({
             display: null,
             left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - 85}px` });
+            top: `${d3.event.pageY - 85}px`,
+          });
       });
 
     svg_container.select('.brush_top')
-      .on('mousemove mousedown', function () {
+      .on('mousemove mousedown', () => {
         const elems = getElementsFromPoint(d3.event.pageX, d3.event.pageY);
         const elem = elems.find(e => e.className.baseVal === 'bar' || e.className.baseVal === 'transp_mean_line');
         if (elem) {
@@ -605,7 +583,8 @@ export class BarChart1 {
             clientY: d3.event.clientY,
             bubbles: true,
             cancelable: true,
-            view: window });
+            view: window,
+          });
           elem.dispatchEvent(new_click_event);
         } else {
           clearTimeout(t);
@@ -678,7 +657,8 @@ export class BarChart1 {
     svg_container.select('.brush_bottom').call(
       this.brush_bottom.move, this.x2.range());
     this.update();
-    // svg_container.select('.brush_top').call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
+    // svg_container.select('.brush_top')
+    //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
     this.map_elem.removeRectBrush();
     this.updateMapRegio();
     this.reset_state_button = true;
@@ -707,7 +687,8 @@ export class BarChart1 {
     svg_container.select('.brush_bottom').call(
       this.brush_bottom.move, this.x2.range());
     this.update();
-    // svg_bar.select('.brush_top').call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
+    // svg_bar.select('.brush_top')
+    //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
     this.map_elem.removeRectBrush();
     this.updateMapRegio();
     this.reset_state_button = true;
@@ -739,7 +720,8 @@ export class BarChart1 {
       this.brush_bottom.move, this.x2.range());
     this.update();
     this.map_elem.removeRectBrush();
-    // svg_bar.select('.brush_top').call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
+    // svg_bar.select('.brush_top')
+    //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
     this.updateMapRegio();
     this.reset_state_button = true;
   }
@@ -768,7 +750,8 @@ export class BarChart1 {
       this.brush_bottom.move, this.x2.range());
     this.update();
     this.map_elem.removeRectBrush();
-    // svg_bar.select('.brush_top').call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
+    // svg_bar.select('.brush_top')
+    //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
     this.updateMapRegio();
     this.reset_state_button = true;
   }
@@ -924,12 +907,12 @@ export class BarChart1 {
     this.updateMapRegio();
   }
 
-  addVariable(code_variable, name_variable) {
+  addVariable(code_variable) {
     // Fetch the unit for this indicator:
-    const unit = variables_info.find(ft => ft.id === code_variable).unit;
-    const year = name_variable.match(/\([^)]*\)$/)[0];
+    const { name, unit } = variables_info.find(d => d.id === code_variable);
+    const year = name.match(/\([^)]*\)$/)[0];
     const unit_year = `${year.slice(0, 1)}${unit}, ${year.slice(1, 6)}`;
-    const name_var = name_variable.replace(year, unit_year);
+    const name_var = name.replace(year, unit_year);
     // Add the variable to the input element allowing to choose variables:
     this.items_menu.push({
       name: name_var,
@@ -961,7 +944,7 @@ export class BarChart1 {
     this.ratio_to_use = code_variable;
     this.unit = variables_info.find(ft => ft.id === code_variable).unit;
     this.title_variable.html(
-      name_variable.replace(/\(/, '&').split('&').join('<br>(') + ' &#x25BE;')
+      `${name_variable.replace(/\(/, '&&&').split('&&&').join('<br>(')} &#x25BE;`);
   }
 
   remove() {
@@ -989,10 +972,10 @@ export class BarChart1 {
   prepareTableStat() {
     const values = this.data.map(d => d[this.ratio_to_use]);
     return {
-      'Min': d3.min(values),
-      'Max': d3.max(values),
-      'Moy': getMean(values),
-      'Med': d3.median(values),
+      Min: d3.min(values),
+      Max: d3.max(values),
+      Moy: getMean(values),
+      Med: d3.median(values),
       id: this.ratio_to_use,
       Variable: this.ratio_to_use,
       'Ma région': this.ref_value,
@@ -1011,8 +994,8 @@ export class BarChart1 {
 <b>Aide générale</b>
 Ce graphique représente l’indicateur sélectionné ordonné de la valeur minimale à la valeur maximale (barres bleues) pour l’espace d’étude et le maillage territorial d’analyse sélectionné. La valeur de l’unité territoriale sélectionnée apparaît en surbrillance (jaune). La ligne représentée par un tireté rouge représente la moyenne de l’espace d’étude (non pondérée).
 
-Sur ce graphique, il est possible d’inverser l’ordre de classement de l’indicateur (appuyer sur le « + »).
+Sur ce graphique, il est possible d’inverser l’ordre de classement de l’indicateur (appuyer sur le « + »).
 
-La carte et le graphique sont interactifs dans la mesure où l’utilisateur peut choisir de sélectionner des unités territoriales (clic gauche appuyé de la souris) et visualiser leur positionnement simultanément sur la carte (localisation géographique) ou sur le diagramme de distribution (positionnement statistique). Il peut aussi en un clic choisir de visualiser les unités territoriales ayant des valeurs inférieures/supérieures à la moyenne de l’espace d’étude ou inférieures/supérieures à la valeur de l’unité territoriale de référence (« ma région »).`;
+La carte et le graphique sont interactifs dans la mesure où l’utilisateur peut choisir de sélectionner des unités territoriales (clic gauche appuyé de la souris) et visualiser leur positionnement simultanément sur la carte (localisation géographique) ou sur le diagramme de distribution (positionnement statistique). Il peut aussi en un clic choisir de visualiser les unités territoriales ayant des valeurs inférieures/supérieures à la moyenne de l’espace d’étude ou inférieures/supérieures à la valeur de l’unité territoriale de référence (« ma région »).`;
   }
 }

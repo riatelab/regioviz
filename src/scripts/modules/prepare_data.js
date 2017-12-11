@@ -166,7 +166,7 @@ export function changeRegion(app, id_region, map_elem) {
   app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
   if (app.current_config.filter_key instanceof Array) {
     map_elem.computeDistMat();
-    app.current_config.filter_key = map_elem.getUnitsWithin(+d3.select('#dist_filter').property('value'));
+    app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
     filterLevelVar(app);
   } else if (app.current_config.filter_key) {
     filterLevelVar(app);
@@ -331,7 +331,7 @@ export function calcPopCompletudeSubset(app, vars) {
   }
   let total_pop = 0;
   for (let i = 0, len = temp.length; i < len; i++) {
-    total_pop += isNaN(+temp[i][pop_field]) ? 0 : +temp[i][pop_field];
+    total_pop += Number.isNaN(+temp[i][pop_field]) ? 0 : +temp[i][pop_field];
   }
   // Compute the population stock of the dataset if we filter empty features
   // on all the variables of "vars":
@@ -347,7 +347,7 @@ export function calcPopCompletudeSubset(app, vars) {
   }).filter(ft => vars.map(ratio_name => !!ft[ratio_name]).every(v => v === true));
   let subset_pop = 0;
   for (let i = 0, len = temp.length; i < len; i++) {
-    subset_pop += isNaN(temp[i].pop) ? 0 : temp[i].pop;
+    subset_pop += Number.isNaN(temp[i].pop) ? 0 : temp[i].pop;
   }
   // Return the ratio of population values ("complétude") within
   // the study zone selected by the user:

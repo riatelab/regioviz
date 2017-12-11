@@ -1,0 +1,72 @@
+{
+  "frame": {
+    "id": "frame",
+    "fill": "#e9f4fe",
+    "fill-opacity": 1
+  },
+  "countries": {
+    "id": "countries",
+    "fill": "#d6d6d6",
+    "fill-opacity": 1
+  },
+  "boxes": {
+    "id": "boxes",
+    "fill": "#e9f4fe",
+    "fill-opacity": 1
+  },
+  "nuts": {
+    "id": "nuts",
+    "fill": "#9390fc",
+    "fill-opacity": 1,
+    "stroke-width": 0.5,
+    "stroke": "#f7fcfe",
+    "stroke-opacity": 0.9,
+    "target": true
+  },
+  "countries_remote": {
+    "id": "countries_remote",
+    "fill": "#d6d6d6",
+    "fill-opacity": 1
+  },
+  "cyprus_non_espon_space": {
+    "id": "cyprus_non_espon_space",
+    "fill": "#ffffff",
+    "fill-opacity": 1
+  },
+  "borders": {
+    "id": "borders",
+    "fill": "none",
+    "stroke-width": 1,
+    "stroke": "#ffffff"
+  },
+  "countries_remote_boundaries": {
+    "id": "countries_remote_boundaries",
+    "fill": "none",
+    "stroke-width": 1,
+    "stroke": "#ffffff"
+  },
+  "coasts": {
+    "id": "coasts",
+    "fill": "none",
+    "stroke": "#d2dbef",
+    "stroke-width": 0.5
+  },
+  "coasts_remote": {
+    "id": "coasts_remote",
+    "fill": "none",
+    "stroke": "#d2dbef",
+    "stroke-width": 0.5
+  },
+  "boxes2": {
+    "id": "boxes2",
+    "stroke": "#7a7a7a",
+    "stroke-width": 1,
+    "fill": "none"
+  },
+  "line": {
+    "id": "line",
+    "stroke": "#d6d6d6",
+    "stroke-width": 1.5,
+    "fill": "none"
+  }
+}

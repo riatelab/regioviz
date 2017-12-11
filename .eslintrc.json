@@ -4,7 +4,9 @@
       "import"
   ],
   "globals": {
-    "ENV": true
+    "ENV": true,
+    "d3": false,
+    "document": true
   },
   "env": {
     "browser": true
@@ -13,12 +15,11 @@
     "camelcase": 0,
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     "no-underscore-dangle": 0,
-    "no-mixed-operators": 0
-  },
-  "globals": {
-    "d3": false,
-    "turf": false,
-    "alertify": false,
-    "tippy": false
+    "no-mixed-operators": 0,
+    "function-paren-newline": 0,
+    "func-names": 0,
+    "prefer-destructuring": 0,
+    "object-curly-newline": 0,
+    "object-shorthand": 0
   }
 }
