@@ -7,7 +7,8 @@ import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
 
-
+const log = debug('App:BarChart');
+debug.enable('*');
 let svg_bar = d3.select('svg#svg_bar');
 let margin = { top: 10, right: 20, bottom: 100, left: 45 };
 let margin2 = { top: 430, right: 20, bottom: 15, left: 45 };
@@ -64,7 +65,7 @@ export default class BarChart1 {
     this.brushed = () => {
       if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
       if (!this.x) {
-        debug('a');
+        log('a');
         return;
       }
       const s = d3.event.selection || this.x2.range();

@@ -5,7 +5,6 @@ import '../styles/tingle.min.css';
 import '../styles/tippy.css';
 import '../styles/alertify.min.css';
 import '../styles/semantic.min.css';
-import '../styles/font-awesome.min.css';
 import { createMenu, handleInputRegioName } from './modules/menuleft';
 import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
 import { MapSelect, makeSourceSection, svg_map, zoomClick } from './modules/map';

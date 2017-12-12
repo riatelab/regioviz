@@ -31,7 +31,7 @@ export default {
     }),
     postcss({
       plugins: [autoprefixer()], // [autoprefixer(), cssnano()],
-      sourceMap: true,
+      sourceMap: 'inline',
       extensions: ['.css'],
     }),
     babel({

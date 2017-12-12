@@ -23,11 +23,8 @@ $ npm run watch
 $ npm run build
 ```
 ##### Coding style
-The code use ES6 (Javascript 2015) features and follow AirBnb javascript style guide
-(2-spaces indent,space before leading brace and opening parenthesis in control statements, etc.)
-with some 4 amendments (allows camelcase, plusplus in for loop, dangling underscore and mixed operators).
-See the .eslintrc.json file for details.
+The code use ES6 (Javascript 2015) features and follow AirBnb javascript style guide (2-spaces indent, space before leading brace and opening parenthesis in control statements, etc.) with a few amendments (like "allows camelcase", "plusplus in for loop" and "mixed operators"; see the .eslintrc.json file for details).  
+CSS rules can be written without vendor prefixes (they are prefixed at build time with 'autoprefixer' PostCSS plugin).
 
 ##### Browser compatibility
-Code is transpiled to ES5 thanks to babel and the intended compatibility
-is Firefox 21 / Chrome 23 / IE9.
+Code is transpiled to ES5 thanks to babel and the intended compatibility is Firefox 21 / Chrome 23 / IE9.
