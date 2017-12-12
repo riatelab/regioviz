@@ -1,5 +1,5 @@
 import debug from 'debug';
-import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint } from './../helpers';
+import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
@@ -245,7 +245,7 @@ export default class BarChart1 {
 
     focus.append('g')
       .attr('class', 'axis axis--y')
-      .call(yAxis);
+      .call(yAxis.tickFormat(formatNumber));
 
     this.g_bar = focus.append('g');
 

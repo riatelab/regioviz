@@ -1,4 +1,4 @@
-import { Rect, comp2, prepareTooltip2, svgPathToCoords, _getPR, computePercentileRank, getMean } from './../helpers';
+import { Rect, comp2, prepareTooltip2, svgPathToCoords, _getPR, computePercentileRank, getMean, formatNumber } from './../helpers';
 import { color_disabled, color_countries, color_highlight } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors } from './../../main';
@@ -119,10 +119,10 @@ export default class ScatterPlot2 {
     this.y = d3.scaleLinear()
       .range([height, 0])
       .nice();
-    this.xAxis = d3.axisBottom(this.x).ticks(12);
-    this.yAxis = d3.axisLeft(this.y).ticks(12 * height / width);
-    this.xAxis2 = d3.axisBottom(this.x).ticks(12);
-    this.yAxis2 = d3.axisLeft(this.y).ticks(12 * height / width);
+    this.xAxis = d3.axisBottom(this.x).ticks(12).tickFormat(formatNumber);
+    this.yAxis = d3.axisLeft(this.y).ticks(12 * height / width).tickFormat(formatNumber);
+    this.xAxis2 = d3.axisBottom(this.x).ticks(12).tickFormat(formatNumber);
+    this.yAxis2 = d3.axisLeft(this.y).ticks(12 * height / width).tickFormat(formatNumber);
 
     this.brush = d3.brush()
       .extent([[0, 0], [width, height]])

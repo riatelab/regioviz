@@ -495,6 +495,30 @@ const getRatioToWide = () => {
   return 1350 / 1350;
 };
 
+
+function addSpacesSeparator(value) {
+  const reg = /(\d+)(\d{3})/;
+  let val = `${value}`;
+  while (reg.test(val)) {
+    val = val.replace(reg, '$1 $2');
+  }
+  return val;
+}
+
+
+function formatNumber(value, precision) {
+  let val = `${value}`;
+  if (!val.match(/^-?[0-9]*.?[0-9]*$/)) return false;
+  if (precision) {
+    const mult = +([1].concat(Array(precision).fill(0)).join(''));
+    val = `${Math.round(+val * mult) / mult}`;
+  }
+  const values_list = val.split('.');
+  values_list[0] = addSpacesSeparator(values_list[0]);
+  return values_list.join(',');
+}
+
+
 export {
   comp,
   comp2,
@@ -526,4 +550,5 @@ export {
   Tooltipsify,
   getElementsFromPoint,
   getRatioToWide,
+  formatNumber,
 };

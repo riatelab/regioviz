@@ -586,13 +586,20 @@ export default class RadarChart3 {
     const self = this;
     const menu_selection = d3.select('#menu_selection');
     menu_selection.selectAll('div').remove();
+    menu_selection.append('div')
+      .attr('class', 'mini-legend-line noselect redline')
+      .style('margin', 'auto')
+      .html(`<div class="mini-legend-item"><p class="color_square" style="background-image:url('img/legend_red_line2.png')"></p><span>Médiane de l'espace d'étude</span></div>`);
     menu_selection.selectAll('div')
       .data(this.data.map(a => a.name), d => d)
       .enter()
       .append('div')
       .attr('class', 'mini-legend-line noselect')
       .style('margin', 'auto')
-      .html(d => `<div class="mini-legend-item"><p class="color_square" style="background-color:${app.colors[d]}"></p><span>${app.feature_names[d]}</span></div><span value="ft_${d}" class="btn_delete_mini">✘</span>`);
+      .html(d => (
+        d === this.id_my_region
+          ? `<div class="mini-legend-item"><p class="color_square" style="background-color:${app.colors[d]}"></p><span>${app.feature_names[d]}</span></div>`
+          : `<div class="mini-legend-item"><p class="color_square" style="background-color:${app.colors[d]}"></p><span>${app.feature_names[d]}</span></div><span value="ft_${d}" class="btn_delete_mini">✘</span>`));
     menu_selection.selectAll('.btn_delete_mini')
       .style('cursor', 'pointer')
       .on('click', function () {
@@ -816,7 +823,7 @@ export default class RadarChart3 {
     this.drawAxisGrid();
     this.drawArea();
     other_features.forEach((id) => {
-      if (this.current_ids.indexOf(id) > -1) {
+      if (this.current_ids.indexOf(id) > -1 && id !== this.id_my_region) {
         const a = prepare_data_radar_ft(this.ref_data, this.variables, id);
         this.add_element(a);
       }

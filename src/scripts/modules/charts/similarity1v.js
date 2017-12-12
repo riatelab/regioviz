@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, PropSizer, prepareTooltip2, getMean, Tooltipsify } from './../helpers';
+import { comp, math_round, math_abs, math_sqrt, math_pow, PropSizer, prepareTooltip2, getMean, Tooltipsify, formatNumber, _getPR } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim, color_highlight } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
@@ -38,6 +38,10 @@ export default class Similarity1plus {
       this.ratios.forEach((v) => {
         // eslint-disable-next-line no-param-reassign
         ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
+      });
+      this.ratios.forEach((v) => {
+        // eslint-disable-next-line no-param-reassign
+        ft[`PR_dist_${v}`] = _getPR(+this.my_region[v], this.data.map(el => +el[v])) - _getPR(+ft[v], this.data.map(el => +el[v]));
       });
     });
     this.current_ids = this.data.map(d => d.id);
@@ -93,6 +97,10 @@ export default class Similarity1plus {
       this.data.forEach((ft) => {
         // eslint-disable-next-line no-param-reassign
         ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`).map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
+        this.ratios.forEach((v) => {
+          // eslint-disable-next-line no-param-reassign
+          ft[`PR_dist_${v}`] = _getPR(+this.my_region[v], this.data.map(el => +el[v])) - _getPR(+ft[v], this.data.map(el => +el[v]));
+        });
       });
       this.data.sort((a, b) => a.dist - b.dist);
       this.data.forEach((el, i) => { el.rank = i; }); // eslint-disable-line no-param-reassign
@@ -209,7 +217,7 @@ export default class Similarity1plus {
       axis
         .transition()
         .duration(125)
-        .call(d3.axisBottom(xScale));
+        .call(d3.axisBottom(xScale).tickFormat(formatNumber));
 
       const bubbles1 = layer_other.selectAll('.bubble')
         .data(data.filter(d => app.colors[d.id] === undefined), d => d.id);
@@ -390,7 +398,10 @@ export default class Similarity1plus {
         const ratio_n = this.parentElement.parentElement.id.replace('l_', '');
         const unit_ratio = variables_info.find(ft => ft.id === ratio_n).unit;
         const rank = +this.getAttribute('rank');
-        content.push(`${ratio_n} : ${Math.round(d[ratio_n] * 10) / 10} ${unit_ratio}`);
+        content.push(`${ratio_n} : ${math_round(d[ratio_n] * 10) / 10} ${unit_ratio}`);
+        if (+rank > 0) { // No need to display that part if this is "my region":
+          content.push(`Écart absolu normalisé : ${math_abs(math_round(d[`PR_dist_${ratio_n}`] * 100) / 100)} %`);
+        }
         if (self.proportionnal_symbols) {
           _h += 20;
           const num_n = this.parentElement.parentElement.getAttribute('num');
@@ -398,7 +409,7 @@ export default class Similarity1plus {
           const unit_num = o.unit;
           let coef = +o.formula;
           coef = Number.isNaN(coef) || coef === 0 ? 1 : coef;
-          content.push(`${num_n} (numérateur) : ${Math.round(d[num_n] * coef * 10) / 10} ${unit_num}`);
+          content.push(`${num_n} (numérateur) : ${math_round(d[num_n] * coef * 10) / 10} ${unit_num}`);
         }
         if (!Number.isNaN(rank)) {
           if (+rank === 0) {
@@ -479,6 +490,10 @@ export default class Similarity1plus {
             // eslint-disable-next-line no-param-reassign
             ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
           });
+          this.ratios.forEach((v) => {
+            // eslint-disable-next-line no-param-reassign
+            ft[`PR_dist_${v}`] = _getPR(+this.my_region[v], this.data.map(el => +el[v])) - _getPR(+ft[v], this.data.map(el => +el[v]));
+          });
         });
       this.updateTableStat();
       this.update();
@@ -499,6 +514,10 @@ export default class Similarity1plus {
       this.ratios.forEach((v) => {
         // eslint-disable-next-line no-param-reassign
         ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
+      });
+      this.ratios.forEach((v) => {
+        // eslint-disable-next-line no-param-reassign
+        ft[`PR_dist_${v}`] = _getPR(+this.my_region[v], this.data.map(el => +el[v])) - _getPR(+ft[v], this.data.map(el => +el[v]));
       });
     });
     this.current_ids = this.data.map(d => d.id);
@@ -522,6 +541,11 @@ export default class Similarity1plus {
       this.ratios.forEach((v) => {
         // eslint-disable-next-line no-param-reassign
         ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
+      });
+      // eslint-disable-next-line no-param-reassign
+      this.ratios.forEach((v) => {
+        // eslint-disable-next-line no-param-reassign
+        ft[`PR_dist_${v}`] = _getPR(+this.my_region[v], this.data.map(el => +el[v])) - _getPR(+ft[v], this.data.map(el => +el[v]));
       });
       // eslint-disable-next-line no-param-reassign, no-restricted-properties
       ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`).map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
@@ -554,6 +578,11 @@ export default class Similarity1plus {
       this.ratios.forEach((v) => {
         // eslint-disable-next-line no-param-reassign
         ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
+      });
+      // eslint-disable-next-line no-param-reassign
+      this.ratios.forEach((v) => {
+        // eslint-disable-next-line no-param-reassign
+        ft[`PR_dist_${v}`] = _getPR(+this.my_region[v], this.data.map(el => +el[v])) - _getPR(+ft[v], this.data.map(el => +el[v]));
       });
       // eslint-disable-next-line no-param-reassign, no-restricted-properties
       ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`).map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
