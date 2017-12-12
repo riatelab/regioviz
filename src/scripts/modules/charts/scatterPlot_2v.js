@@ -162,10 +162,13 @@ export default class ScatterPlot2 {
     const groupe_line_mean = this.plot.append('g')
       .attr('clip-path', 'url(#clip)')
       .attr('class', 'mean');
+
+    // The actual red line for mean value on X axis:
     groupe_line_mean.append('line')
       .attr('clip-path', 'url(#clip)')
       .attrs({
         id: 'mean_x',
+        class: 'mean_line',
         x1: this.x(this.mean_variable1),
         x2: this.x(this.mean_variable1),
         y1: 0,
@@ -173,7 +176,21 @@ export default class ScatterPlot2 {
         'stroke-dasharray': '10, 5',
         'stroke-width': '2px',
       })
-      .style('stroke', 'red')
+      .style('stroke', 'red');
+
+    // Transparent line with a larger width (to access more easily the tooltip)
+    // for mean value on X axis:
+    groupe_line_mean.append('line')
+      .attrs({
+        id: 'mean_x',
+        class: 'transp_mean_line',
+        x1: this.x(this.mean_variable1),
+        x2: this.x(this.mean_variable1),
+        y1: 0,
+        y2: width,
+        'stroke-width': '14px',
+      })
+      .style('stroke', 'transparent')
       .on('mouseover', () => {
         clearTimeout(t);
         this.tooltip.style('display', null).select('.title').attr('class', 'title red');
@@ -202,10 +219,12 @@ export default class ScatterPlot2 {
             top: `${d3.event.pageY - _h}px` });
       });
 
+    // The actual red line for mean value on Y axis:
     groupe_line_mean.append('line')
       .style('stroke', 'red')
       .attrs({
         id: 'mean_y',
+        class: 'mean_line',
         x1: 0,
         x2: width,
         y1: this.y(this.mean_variable2),
@@ -213,10 +232,24 @@ export default class ScatterPlot2 {
         'clip-path': 'url(#clip)',
         'stroke-dasharray': '10, 5',
         'stroke-width': '2px',
+      });
+
+    // Transparent line with a larger width (to access more easily the tooltip)
+    // for mean value on Y axis:
+    groupe_line_mean.append('line')
+      .style('stroke', 'transparent')
+      .attrs({
+        id: 'mean_y',
+        class: 'transp_mean_line',
+        x1: 0,
+        x2: width,
+        y1: this.y(this.mean_variable2),
+        y2: this.y(this.mean_variable2),
+        'stroke-width': '14px',
       })
       .on('mouseover', () => {
         clearTimeout(t);
-        this.tooltip.style('display', null).select('.title').attr('class', 'title red');
+        this.tooltip.style('display', 'none').select('.title').attr('class', 'title red');
       })
       .on('mouseout', () => {
         clearTimeout(t);
@@ -755,14 +788,14 @@ export default class ScatterPlot2 {
         getMean(this.data.map(d => d[this.variable2])), this.data.map(d => d[this.variable2]));
     }
     const grp_mean = this.plot.select('g.mean');
-    grp_mean.select('#mean_x')
+    grp_mean.selectAll('#mean_x.mean_line, #mean_x.transp_mean_line')
       .transition()
       .duration(125)
       .attrs({
         x1: this.x(this.mean_variable1),
         x2: this.x(this.mean_variable1),
       });
-    grp_mean.select('#mean_y')
+    grp_mean.selectAll('#mean_y.mean_line, #mean_y.transp_mean_line')
       .transition()
       .duration(125)
       .attrs({

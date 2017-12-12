@@ -48,6 +48,8 @@ export const app = {
   // the filter key (if any) and the ratio(s) used in the current chart; filtered
   // to not contain feature with empty ratio values within the ratios in use).
   current_ids: [],
+  // The current version number (not used for now, except for displaying it):
+  version: '0.0.0',
 };
 
 function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NUTS1') {
@@ -556,6 +558,32 @@ function bindHelpMenu() {
   });
 }
 
+function bindCreditsSource() {
+  const credits_btn = document.querySelector('#link_credits_source');
+  credits_btn.onclick = function () {
+    // eslint-disable-next-line new-cap
+    const modal = new tingle.modal({
+      stickyFooter: false,
+      closeMethods: ['overlay', 'button', 'escape'],
+      closeLabel: 'Close',
+      onOpen() {
+        document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
+      },
+      onClose() {
+        modal.destroy();
+      },
+    });
+    modal.setContent(
+      `<p style="font-family: 'Signika',sans-serif;color: #4f81bd;font-size: 1.3rem;">Régioviz - À propos</p>
+      <br><br><br>
+      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></p>
+      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Version <b>${app.version}</b></p>
+      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Développement : ...</p>
+      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Financement : ...</p>`);
+    modal.open();
+  };
+}
+
 function loadData() {
   d3.queue(4)
     .defer(d3.csv, 'data/REGIOVIZ_DATA.csv')
@@ -598,6 +626,7 @@ function loadData() {
       setDefaultConfig(start_region, start_variable, 'N1');
       prepareGeomLayerId(nuts, app.current_config.id_field_geom);
       createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
+      bindCreditsSource();
       updateMenuStudyZones();
       bindHelpMenu();
       makeTopMenu();

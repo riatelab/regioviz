@@ -120,10 +120,13 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   img1.style.width = '8em';
   img1.style.float = 'right';
   const blabla = document.createElement('span');
+  blabla.id = 'link_credits_source';
+  blabla.className = 'link';
   blabla.style.margin = '0px 10px';
   blabla.style.fontSize = '0.5em';
   blabla.style.float = 'right';
-  blabla.innerHTML = '<a style="margin: 0 4px;" href="#">Crédits</a><a style="margin: 0 4px;" href="#">Plus d\'informations</a>';
+  blabla.style.cursor = 'pointer';
+  blabla.innerHTML = 'Crédits & informations supplémentaire';
   section5.appendChild(img2);
   section5.appendChild(img1);
   section5.appendChild(blabla);

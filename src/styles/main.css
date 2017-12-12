@@ -83,6 +83,10 @@ body {
   padding-top: 10px;
 }
 
+.noselect {
+  user-select: none;
+}
+
 /* Styles for the spinner displayed while the data is loading: */
 .spinner {
   margin: 100px auto !important;
@@ -198,6 +202,13 @@ div.tingle-modal-box__content {
   margin-bottom: 0.8em;
 }
 
+span.down_arrow {
+  float: right;
+  padding-right: 1px;
+  margin: 4px;
+  cursor: pointer;
+}
+
 span.square {
     height: 6px;
     border: 1px solid #4f81bd;
@@ -241,6 +252,17 @@ span.label_chk {
 span.label_chk.disabled {
   color: lightgray;
   cursor: not-allowed;
+}
+
+span.link {
+  cursor: pointer;
+  color:blue;
+  text-decoration:underline;
+}
+
+span.link:hover {
+     text-decoration:none;
+     text-shadow: 1px 1px 1px #555;
 }
 /* End on styles for left menu */
 
@@ -547,8 +569,6 @@ tr {
 }
 .slider-checkbox .label:before, .slider-checkbox .label:after {
   position: absolute;
-  /*-webkit-border-radius: 10px;
-  -moz-border-radius: 10px;*/
   border-radius: 10px;
   transition: background-color 0.3s, left 0.3s;
 }
@@ -822,6 +842,9 @@ span.arrow_right:before {
 .mini-legend-item > span {
   padding: 0 5px;
 }
+.btn_delete_mini {
+  margin-left: 5px;
+}
 /* End of styles for radar chart legend */
 
 /* Styles for input with autocompletion (left menu) */
@@ -886,20 +909,4 @@ h3 {
   padding: 3px;
   cursor: pointer;
   display: inline-block;
-}
-
-
-span.down_arrow {
-  float: right;
-  padding-right: 1px;
-  margin: 4px;
-  cursor: pointer;
-}
-
-.noselect {
-  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
-}
-
-.btn_delete_mini {
-  margin-left: 5px;
 }
