@@ -114,7 +114,6 @@ function makeMapLegend(legend_elems, size, translateY) {
   const grp_lgd = d3.select('#svg_legend')
     .attr('height', size)
     .append('g')
-    .attr('transform', `translate(50, ${translateY})`)
     .styles({ 'font-size': '11px', 'font-family': '\'Signika\', sans-serif' });
 
   const legends = grp_lgd.selectAll('.legend')
@@ -122,11 +121,7 @@ function makeMapLegend(legend_elems, size, translateY) {
     .enter()
     .append('g')
     .attr('class', 'legend')
-    .attr('transform', (d, i) => {
-      const tx = -2 * rect_size;
-      const ty = i * lgd_height - offset;
-      return `translate(${[tx, ty]})`;
-    });
+    .attr('transform', (d, i) => `translate(${[10, +translateY + i * lgd_height - offset]})`);
 
   legends.append('rect')
     .attrs({ width: rect_size, height: rect_size })
@@ -174,7 +169,8 @@ function getLegendElems(type) {
   return [
     [
       { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
-      { color: color_countries, text: 'Autres régions de l\'espace d\'étude, sélectionnables pour la comparaison' },
+      { color: color_countries, text: 'Autres régions de l\'espace d\'étude (sélectionnables)' },
+      // { color: color_countries, text: 'Autres régions de l\'espace d\'étude, sélectionnables pour la comparaison' },
     ],
     '60', '22.5',
   ];
@@ -332,6 +328,8 @@ class MapSelect {
   }
 
   bindBrushClick(chart) {
+    svg_map.on('.zoom', null);
+    this.resetZoom();
     if (chart.handleClickMap) {
       document.getElementById('img_map_select').classList.remove('disabled');
       document.getElementById('img_map_select').classList.add('active');

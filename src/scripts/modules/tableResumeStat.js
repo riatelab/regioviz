@@ -1,3 +1,5 @@
+import { formatNumber } from './helpers';
+
 export default class TableResumeStat {
   constructor(summary_features, options = {}) {
     const doc = document;
@@ -27,7 +29,8 @@ export default class TableResumeStat {
         const cell = doc.createElement('td');
         const col_name = column_names[j];
         if (col_name !== 'Variable') {
-          cell.innerHTML = Math.round(summary_features[i][col_name] * 10) / 10;
+          // cell.innerHTML = Math.round(summary_features[i][col_name] * 10) / 10;
+          cell.innerHTML = formatNumber(summary_features[i][col_name], 1);
         } else {
           cell.innerHTML = summary_features[i][col_name];
         }

@@ -193,11 +193,15 @@ export default class ScatterPlot2 {
       .style('stroke', 'transparent')
       .on('mouseover', () => {
         clearTimeout(t);
-        this.tooltip.style('display', null).select('.title').attr('class', 'title red');
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html('');
+        }, 250);
       })
       .on('mouseout', () => {
         clearTimeout(t);
-        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html('');
+        }, 250);
       })
       .on('mousemove mousedown', () => {
         clearTimeout(t);
@@ -211,7 +215,7 @@ export default class ScatterPlot2 {
           .attr('class', 'title red')
           .html(content.join(''));
         self.tooltip.select('.content')
-          .html([`Valeur (${this.variable1}): `, Math.round(this.mean_variable1 * 10) / 10, ' ', self.unit1].join(''));
+          .html([`Valeur (${this.variable1}): `, formatNumber(this.mean_variable1, 1), ' ', self.unit1].join(''));
         self.tooltip
           .styles({
             display: null,
@@ -249,11 +253,16 @@ export default class ScatterPlot2 {
       })
       .on('mouseover', () => {
         clearTimeout(t);
-        this.tooltip.style('display', 'none').select('.title').attr('class', 'title red');
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html('');
+        }, 250);
+        // this.tooltip.style('display', 'none').select('.title').attr('class', 'title red');
       })
       .on('mouseout', () => {
         clearTimeout(t);
-        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html('');
+        }, 250);
       })
       .on('mousemove mousedown', () => {
         clearTimeout(t);
@@ -267,7 +276,7 @@ export default class ScatterPlot2 {
           .attr('class', 'title red')
           .html(content.join(''));
         self.tooltip.select('.content')
-          .html([`Valeur (${this.variable2}): `, Math.round(this.mean_variable2 * 10) / 10, ' ', self.unit2].join(''));
+          .html([`Valeur (${this.variable2}): `, formatNumber(this.mean_variable2, 1), ' ', self.unit2].join(''));
         self.tooltip
           .styles({
             display: null,
@@ -714,7 +723,9 @@ export default class ScatterPlot2 {
     this.scatter.selectAll('.dot')
       .on('mouseover.tooltip', () => {
         clearTimeout(t);
-        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html('');
+        }, 250);
         // clearTimeout(t);
         // self.tooltip.style('display', null).select('.title').attr('class', 'title');
       })
@@ -727,17 +738,17 @@ export default class ScatterPlot2 {
         if (with_rank) {
           self.tooltip.select('.content')
             .html([
-              `${self.variable1} (rang) : ${Math.round(d[self.rank_variable1] * 10) / 10}/100`,
-              `${self.variable1} (valeur) : ${Math.round(d[self.variable1] * 10) / 10} ${self.unit1}`,
-              `${self.variable2} (rang) : ${Math.round(d[self.rank_variable2] * 10) / 10}/100`,
-              `${self.variable2} (valeur) : ${Math.round(d[self.variable2] * 10) / 10} ${self.unit2}`,
+              `${self.variable1} (rang) : ${formatNumber(d[self.rank_variable1], 1)}/100`,
+              `${self.variable1} (valeur) : ${formatNumber(d[self.variable1], 1)} ${self.unit1}`,
+              `${self.variable2} (rang) : ${formatNumber(d[self.rank_variable2], 1)}/100`,
+              `${self.variable2} (valeur) : ${formatNumber(d[self.variable2], 1)} ${self.unit2}`,
             ].join('<br>'));
           yoffset = 120;
         } else {
           self.tooltip.select('.content')
             .html([
-              `${self.variable1} (valeur) : ${Math.round(d[self.variable1] * 10) / 10} ${self.unit1}`,
-              `${self.variable2} (valeur) : ${Math.round(d[self.variable2] * 10) / 10} ${self.unit2}`,
+              `${self.variable1} (valeur) : ${formatNumber(d[self.variable1], 1)} ${self.unit1}`,
+              `${self.variable2} (valeur) : ${formatNumber(d[self.variable2], 1)} ${self.unit2}`,
             ].join('<br>'));
           yoffset = 85;
         }
@@ -750,7 +761,9 @@ export default class ScatterPlot2 {
       })
       .on('mouseout.tooltip', () => {
         clearTimeout(t);
-        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html('');
+        }, 250);
       });
   }
 

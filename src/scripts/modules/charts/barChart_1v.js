@@ -272,7 +272,8 @@ export default class BarChart1 {
       .style('stroke', 'transparent')
       .on('mouseover', () => {
         clearTimeout(t);
-        this.tooltip.style('display', null).select('.title').attr('class', 'title red');
+        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        // this.tooltip.style('display', null).select('.title').attr('class', 'title red');
       })
       .on('mouseout', () => {
         clearTimeout(t);
@@ -290,7 +291,7 @@ export default class BarChart1 {
           .attr('class', 'title red')
           .html(content.join(''));
         self.tooltip.select('.content')
-          .html(['Valeur : ', Math.round(self.mean_value * 10) / 10, ' ', self.unit].join(''));
+          .html(['Valeur : ', formatNumber(self.mean_value, 1), ' ', self.unit].join(''));
         self.tooltip
           .styles({
             display: null,
@@ -552,7 +553,9 @@ export default class BarChart1 {
       })
       .on('mouseout', () => {
         clearTimeout(t);
-        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html('');
+        }, 250);
       })
       .on('mousemove mousedown', (d) => {
         clearTimeout(t);
@@ -561,7 +564,7 @@ export default class BarChart1 {
           .html([d.name, ' (', d.id, ')'].join(''));
         self.tooltip.select('.content')
           .html([
-            self.ratio_to_use, ' : ', math_round(d[self.ratio_to_use] * 10) / 10, ' ', self.unit, '<br>',
+            self.ratio_to_use, ' : ', formatNumber(d[self.ratio_to_use], 1), ' ', self.unit, '<br>',
             'Rang : ', self.current_ids.indexOf(d.id) + 1, '/', self.current_ids.length,
           ].join(''));
         self.tooltip
@@ -862,7 +865,7 @@ export default class BarChart1 {
     this.mean_value = getMean(this.data.map(d => d[ratio_to_use]));
     grp_mean.select('text')
       .attr('y', y(this.mean_value) + 20)
-      .text(`Valeur moyenne : ${Math.round(this.mean_value * 10) / 10} ${this.unit}`);
+      .text(`Valeur moyenne : ${formatNumber(this.mean_value, 1)} ${this.unit}`);
     grp_mean.select('.mean_line')
       .attrs({ y1: y(this.mean_value), y2: y(this.mean_value) });
     grp_mean.select('.transp_mean_line')

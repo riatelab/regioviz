@@ -1,6 +1,7 @@
 import alertify from 'alertifyjs';
 import {
-  math_max, math_sin, math_cos, HALF_PI, computePercentileRank, getMean, Tooltipsify, prepareTooltip2 } from './../helpers';
+  math_max, math_sin, math_cos, HALF_PI, computePercentileRank, getMean,
+  Tooltipsify, prepareTooltip2, formatNumber } from './../helpers';
 import { color_disabled, color_countries, color_highlight } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info } from './../../main';
@@ -571,8 +572,8 @@ export default class RadarChart3 {
         self.tooltip.select('.content')
           .attr('class', 'content')
           .html([
-            `${self.Format(100 - d.value)} ${self.cfg.unit} régions ont une valeur ${direction}`,
-            `${code_variable} : ${Math.round(d.raw_value * 10) / 10} ${d.raw_value_unit}`,
+            `${formatNumber(100 - d.value, 1)} ${self.cfg.unit} des régions ont une valeur ${direction}`,
+            `${code_variable} : ${formatNumber(d.raw_value, 1)} ${d.raw_value_unit}`,
           ].join('<br>'));
         self.tooltip
           .styles({
@@ -614,6 +615,7 @@ export default class RadarChart3 {
         self.data.splice(ix, 1);
         self.displayed_ids = self.data.map(_d => _d.name);
         self.update();
+        self.updateMapRegio();
       });
   }
 

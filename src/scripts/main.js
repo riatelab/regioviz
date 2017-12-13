@@ -673,5 +673,5 @@ window.onresize = function () {
   svg_map.attr('height', `${height_map}px`);
   svg_map.select('#layers').attr('transform', `scale(${map_scale_value})`);
   svg_map.select('.brush_map').attr('transform', `scale(${map_scale_value})`);
-  d3.select('#svg_legend').attr('transform', `scale(${map_scale_value})`);
+  d3.select('#svg_legend > g').attr('transform', `scale(${map_scale_value})`);
 };
