@@ -9,6 +9,13 @@ export const color_highlight = 'yellow'; // Color for the reference feature ("Ma
 export const color_default_dissim = 'darkred'; // Neutral color for selected features when green/red can't be used
 
 /*
+* Options regarding the formatting of numbers as string
+*
+*/
+export const formatnb_decimal_sep = ',';
+export const formatnb_thousands_sep = ' ';
+
+/*
 *  Misc. options:
 */
 // The maximum number of variables that can be selected simultaneously:

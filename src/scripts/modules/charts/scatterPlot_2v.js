@@ -310,7 +310,9 @@ export default class ScatterPlot2 {
       })
       .on('click', () => {
         this.xInversed = !this.xInversed;
-        svg_container.select('#title-axis-x').style('fill', this.xInversed ? 'red' : 'black');
+        svg_container.select('#title-axis-x')
+          .attr('title-tooltip', `${this.pretty_name1} (axe inversé)`)
+          .style('fill', this.xInversed ? 'red' : 'black');
         if (this.last_map_selection) {
           this.map_elem.callBrush(this.last_map_selection);
         } else {
@@ -329,7 +331,9 @@ export default class ScatterPlot2 {
       })
       .on('click', () => {
         this.yInversed = !this.yInversed;
-        svg_container.select('#title-axis-y').style('fill', this.yInversed ? 'red' : 'black');
+        svg_container.select('#title-axis-y')
+          .attr('title-tooltip', `${this.pretty_name2} (axe inversé)`)
+          .style('fill', this.yInversed ? 'red' : 'black');
         if (this.last_map_selection) {
           this.map_elem.callBrush(this.last_map_selection);
         } else {

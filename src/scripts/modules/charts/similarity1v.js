@@ -142,8 +142,8 @@ export default class Similarity1plus {
           .attrs({
             x: 0,
             y: -7.5,
+            class: `title_axis ${selector_ratio_name} noselect`,
             fill: '#4f81bd',
-            class: 'noselect',
             'font-size': '11px',
             'font-weight': 'bold',
             'font-family': '"Signika",sans-serif',
@@ -159,11 +159,17 @@ export default class Similarity1plus {
             'xlink:href': 'img/reverse_plus.png',
             id: 'img_reverse',
           })
-          .on('click', () => {
+          .on('click', function () {
             if (self.inversedAxis.has(ratio_name)) {
+              const title_ax = this.previousSibling;
+              title_ax.setAttribute('title-tooltip', ratio_pretty_name);
+              title_ax.setAttribute('fill', '#4f81bd');
               self.inversedAxis.delete(ratio_name);
             } else {
               self.inversedAxis.add(ratio_name);
+              const title_ax = this.previousSibling;
+              title_ax.setAttribute('title-tooltip', `${ratio_pretty_name} (axe inversé)`);
+              title_ax.setAttribute('fill', 'red');
             }
             self.update();
           });

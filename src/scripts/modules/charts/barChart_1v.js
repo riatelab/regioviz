@@ -342,8 +342,15 @@ export default class BarChart1 {
       .on('click', () => {
         // this.data = app.current_data.slice();
         if (!this.serie_inversed) {
+          this.title_variable
+            .classed('inversed', true)
+            .attr('title-tooltip', `${this.title_variable.attr('title-tooltip')} (axe inversé)`);
           this.data.sort((a, b) => b[this.ratio_to_use] - a[this.ratio_to_use]);
         } else {
+          this.title_variable
+            .classed('inversed', false)
+            .attr('title-tooltip',
+              `${this.title_variable.attr('title-tooltip')}`.replace(' (axe inversé)', ''));
           this.data.sort((a, b) => a[this.ratio_to_use] - b[this.ratio_to_use]);
         }
         this.current_ids = this.data.map(d => d.id);
@@ -411,7 +418,7 @@ export default class BarChart1 {
     this.title_variable = header_bar_section.append('span')
       .attrs({
         class: 'title_variable',
-        // 'title-tooltip': app.current_config.ratio_pretty_name[0],
+        'title-tooltip': app.current_config.ratio_pretty_name[0],
       })
       .html(`${this.items_menu[0].name.replace(/\(/, '&&&').split('&&&').join('<br>(')}  &#x25BE;`)
       .on('click', function () {
@@ -947,8 +954,13 @@ export default class BarChart1 {
   changeVariable(code_variable, name_variable) {
     this.ratio_to_use = code_variable;
     this.unit = variables_info.find(ft => ft.id === code_variable).unit;
-    this.title_variable.html(
-      `${name_variable.replace(/\(/, '&&&').split('&&&').join('<br>(')} &#x25BE;`);
+    const content_tooltip = this.serie_inversed
+      ? `${name_variable} (axe inversé)`
+      : name_variable;
+    this.title_variable
+      .attr('title-tooltip', content_tooltip)
+      .html(
+        `${name_variable.replace(/\(/, '&&&').split('&&&').join('<br>(')} &#x25BE;`);
   }
 
   remove() {

@@ -1,4 +1,4 @@
-import { color_inf, color_sup } from './options';
+import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise,
 no-extend-native, prefer-rest-params, no-prototype-builtins */
@@ -496,26 +496,36 @@ const getRatioToWide = () => {
 };
 
 
-function addSpacesSeparator(value) {
+function addThousandsSeparator(value) {
   const reg = /(\d+)(\d{3})/;
   let val = `${value}`;
   while (reg.test(val)) {
-    val = val.replace(reg, '$1 $2');
+    val = val.replace(reg, `$1${formatnb_thousands_sep}$2`);
   }
   return val;
 }
 
-
+/**
+* Function to format a number using custom
+* decimal separator and thousands separator (defined in the 'options' file).
+*
+* @param {Number} value - The value to be formatted, as a number.
+* @param {Number} precision - The number of digits to the right of the decimal
+*         to keep (value will be rounded to that precision before formatting).
+*
+* @return {String} - The formatted number as a String, using the
+*         decimal separator and thousands separator defined in the 'options' file.
+*/
 function formatNumber(value, precision) {
   let val = `${value}`;
   if (!val.match(/^-?[0-9]*.?[0-9]*$/)) return false;
   if (precision) {
     const mult = +([1].concat(Array(precision).fill(0)).join(''));
-    val = `${Math.round(+val * mult) / mult}`;
+    val = `${math_round(+val * mult) / mult}`;
   }
   const values_list = val.split('.');
-  values_list[0] = addSpacesSeparator(values_list[0]);
-  return values_list.join(',');
+  values_list[0] = addThousandsSeparator(values_list[0]);
+  return values_list.join(formatnb_decimal_sep);
 }
 
 
