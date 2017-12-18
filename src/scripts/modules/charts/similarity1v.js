@@ -17,9 +17,11 @@ const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
   margin = { top: 20, right: 20, bottom: 40, left: 30 };
   bbox_svg = svg_bar.node().getBoundingClientRect();
-  width = +bbox_svg.width - margin.left - margin.right;
+  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
   height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attr('height', `${500 * app.ratioToWide}px`);
+  svg_bar.attrs({
+    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
+  });
   svg_container = svg_bar.append('g').attr('class', 'container');
 };
 
@@ -629,7 +631,7 @@ export default class Similarity1plus {
     this.map_elem = null;
     this.table_stats.remove();
     this.table_stats = null;
-    svg_bar.html('');
+    svg_bar.text('').html('');
   }
 
   bindMap(map_elem) {

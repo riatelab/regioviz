@@ -38,9 +38,11 @@ function updateDimensions() {
     bottom: (500 * app.ratioToWide) / 40,
     left: 45,
   };
-  width = +bbox_svg.width - margin.left - margin.right;
+  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
   height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attr('height', `${500 * app.ratioToWide}px`);
+  svg_bar.attrs({
+    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
+  });
   height2 = 500 * app.ratioToWide - margin2.top - margin2.bottom;
   svg_container = svg_bar.append('g').attr('class', 'container');
 }
@@ -971,7 +973,7 @@ export default class BarChart1 {
     this.table_stats = null;
     this.map_elem.unbindBrushClick();
     this.map_elem = null;
-    d3.select('#svg_bar').html('');
+    d3.select('#svg_bar').text('').html('');
   }
 
   bindMap(map_elem) {

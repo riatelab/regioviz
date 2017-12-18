@@ -20,9 +20,11 @@ const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
   margin = { top: 60, right: 70, bottom: 60, left: 70 };
   bbox_svg = svg_bar.node().getBoundingClientRect();
-  width = +bbox_svg.width - margin.left - margin.right;
+  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
   height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attr('height', `${500 * app.ratioToWide}px`);
+  svg_bar.attrs({
+    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
+  });
   svg_bar = svg_bar.append('g').attr('class', 'container');
 };
 
@@ -805,7 +807,7 @@ export default class RadarChart3 {
     this.map_elem.layers.selectAll('.cloned').remove();
     this.map_elem.unbindBrushClick();
     this.map_elem = null;
-    d3.select('#svg_bar').html('');
+    d3.select('#svg_bar').text('').html('');
   }
 
   updateChangeRegion() {

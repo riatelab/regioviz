@@ -18,9 +18,11 @@ const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   bbox_svg = svg_bar.node().getBoundingClientRect();
-  width = +bbox_svg.width - margin.left - margin.right;
+  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
   height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attr('height', `${500 * app.ratioToWide}px`);
+  svg_bar.attrs({
+    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
+  });
   svg_container = svg_bar.append('g').attr('class', 'container');
 };
 /** Class representing a scatterplot */
@@ -980,7 +982,7 @@ export default class ScatterPlot2 {
     this.table_stats.remove();
     this.map_elem.unbindBrushClick();
     this.map_elem = null;
-    svg_bar.html('');
+    svg_bar.text('').html('');
   }
 
   bindMap(map_elem) {

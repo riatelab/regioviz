@@ -6,11 +6,9 @@ import { filterLevelGeom } from './prepare_data';
 
 
 const svg_map = d3.select('svg#svg_map');
-let bbox_svg = svg_map.node().getBoundingClientRect();
-let width_map = +bbox_svg.width;
-let height_map = width_map * (1 / RATIO_WH_MAP);
-svg_map.attr('height', `${height_map}px`);
-
+let bbox_svg;
+let width_map;
+let height_map;
 let styles;
 let projection;
 let path;
@@ -181,9 +179,11 @@ class MapSelect {
   constructor(nuts, other_layers, user_styles, filter = 'N1') {
     styles = Object.assign({}, user_styles);
     bbox_svg = svg_map.node().getBoundingClientRect();
-    width_map = +bbox_svg.width;
+    // width_map = +bbox_svg.width || (500 * app.ratioToWide);
+    width_map = ((+document.getElementById('map_section').getBoundingClientRect().width * 98) / 100) * app.ratioToWide;
     height_map = width_map * (1 / RATIO_WH_MAP);
-    svg_map.attr('height', `${height_map}px`);
+    svg_map.attr('height', `${height_map}px`)
+      .attr('width', `${width_map}px`);
     app.mapDrawRatio = app.ratioToWide;
     projection = d3.geoIdentity()
       .fitExtent([[0, 0], [width_map, height_map]], other_layers.get('frame'))
