@@ -133,6 +133,16 @@ export function makeHeaderMapSection() {
     .text('-');
 }
 
+function clickDlMetadata(event) {
+  console.log(event);
+  this.href = '#';
+  window.open('data/Metadonnees_Regioviz.pdf');
+  event.preventDefault();
+  // eslint-disable-next-line no-param-reassign
+  event.returnValue = false;
+  this.href = 'data/Metadonnees_Regioviz.pdf';
+  return false;
+}
 
 /**
 * Function to prepare the icons displayed on the top of the chart.
@@ -178,25 +188,39 @@ export function makeHeaderChart() {
       setTimeout(() => {
         modal.setContent(`<h3>Téléchargements</h3><div style="text-align:center;">
 <p><a class="buttonDownload large" id="dl_data" href="#">Table de données (.csv)</a></p>
-<p><a class="buttonDownload large disabled" id="dl_metadata" href="#">Métadonnées (.csv)</a></p>
-<p><a class="buttonDownload large" id="dl_geolayer" href="data/CGET_nuts_all.geojson" download>Fond de carte (.geojson)</a></p></div>`);
-        d3.select('#dl_data')
-          .on('click', () => {
-            const columns = Object.keys(app.current_data[0]);
-            const table_content = [
-              columns.join(','), '\r\n',
-              app.current_data.map(d => columns.map(c => d[c]).join(',')).join('\r\n'),
-            ].join('');
+<p><a class="buttonDownload large" id="dl_metadata" href="data/Metadonnees_Regioviz.pdf">Fiche de métadonnées (.pdf)</a></p>
+<p><a class="buttonDownload large" id="dl_geolayer" href="#" download>Fond de carte (.geojson)</a></p></div>`);
+        document.getElementById('dl_metadata').onclick = clickDlMetadata;
+        document.getElementById('dl_data').onclick = () => {
+          const columns = Object.keys(app.current_data[0]);
+          const table_content = [
+            columns.join(','), '\r\n',
+            app.current_data.map(d => columns.map(c => d[c]).join(',')).join('\r\n'),
+          ].join('');
+          const elem = document.createElement('a');
+          elem.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(table_content)}`);
+          elem.setAttribute('download', 'Regioviz_export.csv');
+          elem.style.display = 'none';
+          document.body.appendChild(elem);
+          elem.click();
+          document.body.removeChild(elem);
+        };
+        document.getElementById('dl_geolayer').onclick = () => {
+          d3.request('data/CGET_nuts_all.geojson', (error, result) => {
+            if (error) throw error;
             const elem = document.createElement('a');
-            elem.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(table_content)}`);
-            elem.setAttribute('download', 'Regioviz_export.csv');
+            elem.setAttribute('href', `data:application/geo+json;charset=utf-8,${encodeURIComponent(result.response)}`);
+            elem.setAttribute('download', 'CGET_nuts_all.geojson');
             elem.style.display = 'none';
             document.body.appendChild(elem);
             elem.click();
-            document.body.removeChild(elem);
+            document.body.removeAttribute(elem);
           });
+          // window.open('data/CGET_nuts_all.geojson');
+        };
       }, 1000);
     });
+// onclick="this.href='#'; window.open('data/Metadonnees_Regioviz.pdf'); event.preventDefault(); event.returnValue = false; this.href='data/Metadonnees_Regioviz.pdf';return false;"
 
   header_bar_section.insert('img')
     .attrs({
