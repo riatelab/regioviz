@@ -574,7 +574,7 @@ export default class BarChart1 {
         self.tooltip.select('.content')
           .html([
             self.ratio_to_use, ' : ', formatNumber(d[self.ratio_to_use], 1), ' ', self.unit, '<br>',
-            'Rang : ', self.current_ids.indexOf(d.id) + 1, '/', self.current_ids.length,
+            'Rang : ', nbFt - self.current_ids.indexOf(d.id), '/', self.current_ids.length,
           ].join(''));
         self.tooltip
           .styles({
@@ -586,7 +586,7 @@ export default class BarChart1 {
 
     svg_container.select('.brush_top')
       .on('mousemove mousedown', () => {
-        const elems = getElementsFromPoint(d3.event.pageX, d3.event.pageY);
+        const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
         const elem = elems.find(e => e.className.baseVal === 'bar' || e.className.baseVal === 'transp_mean_line');
         if (elem) {
           const new_click_event = new MouseEvent('mousemove', {

@@ -109,6 +109,9 @@ export default class ScatterPlot2 {
         res[this.variable2] = d[this.variable2];
         return res;
       });
+    const tmp_my_region = this.data.splice(
+      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+    this.data.push(tmp_my_region);
     this.current_ids = this.data.map(d => d.id);
     resetColors(this.current_ids);
     this.nbFt = this.data.length;
@@ -132,10 +135,8 @@ export default class ScatterPlot2 {
 
     this.xInversed = false;
     this.yInversed = false;
-    this.ref_value1 = this.data.find(
-      d => d.id === app.current_config.my_region)[this.variable1];
-    this.ref_value2 = this.data.find(
-      d => d.id === app.current_config.my_region)[this.variable2];
+    this.ref_value1 = tmp_my_region[this.variable1];
+    this.ref_value2 = tmp_my_region[this.variable2];
 
     this.plot = svg_container.append('g')
       .attr('transform', `translate(${[margin.left, margin.top]})`);
@@ -207,22 +208,43 @@ export default class ScatterPlot2 {
       })
       .on('mousemove mousedown', () => {
         clearTimeout(t);
-        const content = ['Moyenne de l\'espace d\'étude'];
-        let _h = 65;
-        if (app.current_config.my_category) {
-          content.push('<br>', ' (', app.current_config.my_category, ')');
-          _h += 20;
+        if (self.type === 'value') {
+          const content = ['Moyenne de l\'espace d\'étude'];
+          let _h = 65;
+          if (app.current_config.my_category) {
+            content.push('<br>', ' (', app.current_config.my_category, ')');
+            _h += 20;
+          }
+          self.tooltip.select('.title')
+            .attr('class', 'title red')
+            .html(content.join(''));
+          self.tooltip.select('.content')
+            .html([`Valeur (${this.variable1}): `, formatNumber(this.mean_variable1, 1), ' ', self.unit1].join(''));
+          self.tooltip
+            .styles({
+              display: null,
+              left: `${window.scrollX + d3.event.clientX - 5}px`,
+              top: `${window.scrollY + d3.event.clientY - _h}px`,
+            });
+        } else if (self.type === 'rank') {
+          const content = ['Médiane de l\'espace d\'étude'];
+          let _h = 65;
+          if (app.current_config.my_category) {
+            content.push('<br>', ' (', app.current_config.my_category, ')');
+            _h += 20;
+          }
+          self.tooltip.select('.title')
+            .attr('class', 'title red')
+            .html(content.join(''));
+          self.tooltip.select('.content')
+            .html([`Valeur (${this.variable1}): `, formatNumber(this.mean_variable1, 1)].join(''));
+          self.tooltip
+            .styles({
+              display: null,
+              left: `${window.scrollX + d3.event.clientX - 5}px`,
+              top: `${window.scrollY + d3.event.clientY - _h}px`,
+            });
         }
-        self.tooltip.select('.title')
-          .attr('class', 'title red')
-          .html(content.join(''));
-        self.tooltip.select('.content')
-          .html([`Valeur (${this.variable1}): `, formatNumber(this.mean_variable1, 1), ' ', self.unit1].join(''));
-        self.tooltip
-          .styles({
-            display: null,
-            left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - _h}px` });
       });
 
     // The actual red line for mean value on Y axis:
@@ -268,22 +290,43 @@ export default class ScatterPlot2 {
       })
       .on('mousemove mousedown', () => {
         clearTimeout(t);
-        const content = ['Moyenne de l\'espace d\'étude'];
-        let _h = 65;
-        if (app.current_config.my_category) {
-          content.push('<br>', ' (', app.current_config.my_category, ')');
-          _h += 20;
+        if (self.type === 'value') {
+          const content = ['Moyenne de l\'espace d\'étude'];
+          let _h = 65;
+          if (app.current_config.my_category) {
+            content.push('<br>', ' (', app.current_config.my_category, ')');
+            _h += 20;
+          }
+          self.tooltip.select('.title')
+            .attr('class', 'title red')
+            .html(content.join(''));
+          self.tooltip.select('.content')
+            .html([`Valeur (${this.variable2}): `, formatNumber(this.mean_variable2, 1), ' ', self.unit2].join(''));
+          self.tooltip
+            .styles({
+              display: null,
+              left: `${window.scrollX + d3.event.clientX - 5}px`,
+              top: `${window.scrollY + d3.event.clientY - _h}px`,
+            });
+        } else if (self.type === 'rank') {
+          const content = ['Médiane de l\'espace d\'étude'];
+          let _h = 65;
+          if (app.current_config.my_category) {
+            content.push('<br>', ' (', app.current_config.my_category, ')');
+            _h += 20;
+          }
+          self.tooltip.select('.title')
+            .attr('class', 'title red')
+            .html(content.join(''));
+          self.tooltip.select('.content')
+            .html([`Valeur (${this.variable2}): `, formatNumber(this.mean_variable2, 1)].join(''));
+          self.tooltip
+            .styles({
+              display: null,
+              left: `${window.scrollX + d3.event.clientX - 5}px`,
+              top: `${window.scrollY + d3.event.clientY - _h}px`,
+            });
         }
-        self.tooltip.select('.title')
-          .attr('class', 'title red')
-          .html(content.join(''));
-        self.tooltip.select('.content')
-          .html([`Valeur (${this.variable2}): `, formatNumber(this.mean_variable2, 1), ' ', self.unit2].join(''));
-        self.tooltip
-          .styles({
-            display: null,
-            left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - _h}px` });
       });
 
     this.plot.append('g')
@@ -546,6 +589,7 @@ export default class ScatterPlot2 {
   update() {
     const self = this;
     const data = self.data;
+    console.log(data);
     const dots = this.scatter.selectAll('.dot')
       .data(data, d => d.id);
 
@@ -553,13 +597,13 @@ export default class ScatterPlot2 {
       const rank_variable1 = this.rank_variable1;
       const rank_variable2 = this.rank_variable2;
       const range_x = this.xInversed
-        ? d3.extent(this.data, d => d[rank_variable1]).reverse()
-        : d3.extent(this.data, d => d[rank_variable1]);
+        ? d3.extent(data, d => d[rank_variable1]).reverse()
+        : d3.extent(data, d => d[rank_variable1]);
       const range_y = this.yInversed
-        ? d3.extent(this.data, d => d[rank_variable2]).reverse()
-        : d3.extent(this.data, d => d[rank_variable2]);
-      const serie_x = this.data.map(d => d[this.variable1]);
-      const serie_y = this.data.map(d => d[this.variable2]);
+        ? d3.extent(data, d => d[rank_variable2]).reverse()
+        : d3.extent(data, d => d[rank_variable2]);
+      const serie_x = data.map(d => d[this.variable1]);
+      const serie_y = data.map(d => d[this.variable2]);
       this.x.domain(range_x).nice();
       this.y.domain(range_y).nice();
       this.mean_variable1 = _getPR(
@@ -588,7 +632,7 @@ export default class ScatterPlot2 {
         });
 
       dots.enter()
-        .insert('circle')
+        .append('circle')
         .transition()
         .duration(125)
         .styles(d => ({
@@ -608,8 +652,8 @@ export default class ScatterPlot2 {
     } else if (this.type === 'value') {
       const variable1 = this.variable1;
       const variable2 = this.variable2;
-      const serie_x = this.data.map(d => d[variable1]);
-      const serie_y = this.data.map(d => d[variable2]);
+      const serie_x = data.map(d => d[variable1]);
+      const serie_y = data.map(d => d[variable2]);
       const range_x = this.xInversed
         ? d3.extent(serie_x).reverse()
         : d3.extent(serie_x);
@@ -645,7 +689,7 @@ export default class ScatterPlot2 {
         });
 
       dots.enter()
-        .insert('circle')
+        .append('circle')
         .transition()
         .duration(125)
         .styles(d => ({
@@ -661,10 +705,10 @@ export default class ScatterPlot2 {
         .on('end', () => {
           self.bindTooltips(false);
         });
-
       dots.exit().transition().duration(125).remove();
     }
-    this.updateMeanValue();
+    dots.order();
+    this.updateMeanMedianValue();
     this.updateAxisGrid();
   }
 
@@ -762,8 +806,8 @@ export default class ScatterPlot2 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - yoffset}px` });
+            left: `${window.scrollX + d3.event.clientX - 5}px`,
+            top: `${window.scrollY + d3.event.clientY - yoffset}px` });
       })
       .on('mouseout.tooltip', () => {
         clearTimeout(t);
@@ -796,15 +840,17 @@ export default class ScatterPlot2 {
     this.updateLight();
   }
 
-  updateMeanValue() {
+  updateMeanMedianValue() {
     if (this.type === 'value') {
       this.mean_variable1 = getMean(this.data.map(d => d[this.variable1]));
       this.mean_variable2 = getMean(this.data.map(d => d[this.variable2]));
     } else if (this.type === 'rank') {
-      this.mean_variable1 = _getPR(
-        getMean(this.data.map(d => d[this.variable1])), this.data.map(d => d[this.variable1]));
-      this.mean_variable2 = _getPR(
-        getMean(this.data.map(d => d[this.variable2])), this.data.map(d => d[this.variable2]));
+      // this.mean_variable1 = _getPR(
+      //   getMean(this.data.map(d => d[this.variable1])), this.data.map(d => d[this.variable1]));
+      // this.mean_variable2 = _getPR(
+      //   getMean(this.data.map(d => d[this.variable2])), this.data.map(d => d[this.variable2]));
+      this.mean_variable1 = 50;
+      this.mean_variable2 = 50;
     }
     const grp_mean = this.plot.select('g.mean');
     grp_mean.selectAll('#mean_x.mean_line, #mean_x.transp_mean_line')
@@ -827,10 +873,11 @@ export default class ScatterPlot2 {
     if (app.current_config.filter_key !== undefined) {
       this.changeStudyZone();
     } else {
-      this.ref_value1 = this.data.find(
-        d => d.id === app.current_config.my_region)[this.variable1];
-      this.ref_value2 = this.data.find(
-        d => d.id === app.current_config.my_region)[this.variable2];
+      const tmp_my_region = this.data.splice(
+        this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+      this.data.push(tmp_my_region);
+      this.ref_value1 = tmp_my_region[this.variable1];
+      this.ref_value2 = tmp_my_region[this.variable2];
       this.map_elem.removeRectBrush();
       this.map_elem.updateLegend();
       this.map_elem.resetColors(this.current_ids);
@@ -839,6 +886,7 @@ export default class ScatterPlot2 {
   }
 
   changeStudyZone() {
+    // Fetch the new data subset for this study zone and theses variables:
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {
         const res = { id: d.id, name: d.name };
@@ -846,15 +894,23 @@ export default class ScatterPlot2 {
         res[this.variable2] = d[this.variable2];
         return res;
       });
+    // Put "my region" at the end of the serie so it will be displayed on
+    // the top of the chart:
+    const tmp_my_region = this.data.splice(
+      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+    this.data.push(tmp_my_region);
+
     this.current_ids = this.data.map(d => d.id);
     resetColors();
     this.nbFt = this.data.length;
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
 
+    // Reset the axis orientation:
     this.xInversed = false;
     this.yInversed = false;
-    const tmp_my_region = this.data.filter(d => d.id === app.current_config.my_region)[0];
+
+    // Store the value of my region for the two selected variables:
     this.ref_value1 = tmp_my_region[this.variable1];
     this.ref_value2 = tmp_my_region[this.variable2];
 
@@ -884,13 +940,16 @@ export default class ScatterPlot2 {
         res[this.variable2] = d[this.variable2];
         return res;
       });
+    const tmp_my_region = this.data.splice(
+      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+    this.data.push(tmp_my_region);
+
     this.current_ids = this.data.map(d => d.id);
     resetColors();
     this.nbFt = this.data.length;
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
-    this.ref_value1 = this.data.find(
-      d => d.id === app.current_config.my_region)[this.variable1];
+    this.ref_value1 = tmp_my_region[this.variable1];
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -915,13 +974,17 @@ export default class ScatterPlot2 {
         res[this.variable2] = d[this.variable2];
         return res;
       });
+
+    const tmp_my_region = this.data.splice(
+      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+    this.data.push(tmp_my_region);
+
     this.current_ids = this.data.map(d => d.id);
     resetColors();
     this.nbFt = this.data.length;
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
-    this.ref_value2 = this.data.find(
-      d => d.id === app.current_config.my_region)[this.variable2];
+    this.ref_value2 = tmp_my_region[this.variable2];
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();

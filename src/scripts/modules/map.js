@@ -353,7 +353,7 @@ class MapSelect {
 
       svg_map.select('.brush_map')
         .on('mousemove mousedown', () => {
-          const elems = getElementsFromPoint(d3.event.pageX, d3.event.pageY);
+          const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
           const elem = elems.find(e => e.className.baseVal === 'tg_ft');
           if (elem) {
             const new_click_event = new MouseEvent('mousemove', {

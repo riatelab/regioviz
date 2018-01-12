@@ -111,14 +111,14 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   section4.style.maxHeight = '20%';
   const img2 = document.createElement('img');
   img2.src = 'img/Marianne_CGET_RVB.png';
-  img2.style.margin = '10px';
+  img2.style.margin = '20px 10px';
   img2.style.width = '8em';
   img2.style.float = 'left';
-  const img1 = document.createElement('img');
-  img1.src = 'img/logo_riate.png';
-  img1.style.margin = '20px 10px';
-  img1.style.width = '8em';
-  img1.style.float = 'right';
+  const logo_regioviz = document.createElement('img');
+  logo_regioviz.src = 'img/logo_regioviz.png';
+  logo_regioviz.style.margin = '10px';
+  logo_regioviz.style.width = '8em';
+  logo_regioviz.style.float = 'right';
   const blabla = document.createElement('span');
   blabla.id = 'link_credits_source';
   blabla.className = 'link';
@@ -127,11 +127,17 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   blabla.style.float = 'right';
   blabla.style.cursor = 'pointer';
   blabla.innerHTML = 'Crédits & informations supplémentaire';
+  const img1 = document.createElement('img');
+  img1.src = 'img/logo_riate.png';
+  img1.style.margin = '20px 10px';
+  img1.style.width = '8em';
+  img1.style.float = 'right';
   section5.appendChild(img2);
-  section5.appendChild(img1);
+  section5.appendChild(logo_regioviz);
   section5.appendChild(blabla);
+  section5.appendChild(img1);
 
-  // The actual menu containing these 4 sections:
+  // The actual menu containing these 5 sections:
   const menu = document.getElementById('menu');
   menu.id = 'menu';
   menu.style.float = 'left';

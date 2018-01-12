@@ -98,7 +98,7 @@ export default class Similarity1plus {
           .map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
       });
       this.data.sort((a, b) => a.dist - b.dist);
-      this.data.forEach((el, i) => { el.rank = i; }); // eslint-disable-line no-param-reassign
+      this.data.forEach((el, i) => { el.globalrank = i; }); // eslint-disable-line no-param-reassign
       this.highlight_selection = this.data.slice(1, nb + 1);
     } else {
       this.highlight_selection = [];
@@ -185,6 +185,9 @@ export default class Similarity1plus {
       let _min;
       let _max;
       this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
+      this.data.forEach((ft, _ix) => {
+        ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
+      });
       if (highlight_selection.length > 0) {
         const dist_axis = Math.max(
           math_abs(my_region_value - +d3.min(highlight_selection, d => d[ratio_name])),
@@ -231,7 +234,7 @@ export default class Similarity1plus {
           if (x_value > width) x_value = width + 200;
           else if (x_value < 0) x_value = -200;
           return {
-            rank: d.rank,
+            globalrank: d.globalrank,
             cx: x_value,
             cy: 10,
             r: size_func(d[num_name]),
@@ -262,7 +265,7 @@ export default class Similarity1plus {
           if (x_value > width) x_value = width + 200;
           else if (x_value < 0) x_value = -200;
           return {
-            rank: d.rank,
+            globalrank: d.globalrank,
             id: d.id,
             class: 'bubble',
             cx: x_value,
@@ -284,7 +287,7 @@ export default class Similarity1plus {
           if (x_value > width) x_value = width + 200;
           else if (x_value < 0) x_value = -200;
           return {
-            rank: d.rank,
+            globalrank: d.globalrank,
             cx: x_value,
             cy: 10,
             r: size_func(d[num_name]),
@@ -315,7 +318,7 @@ export default class Similarity1plus {
           if (x_value > width) x_value = width + 200;
           else if (x_value < 0) x_value = -200;
           return {
-            rank: d.rank,
+            globalrank: d.globalrank,
             id: d.id,
             class: 'bubble',
             cx: x_value,
@@ -398,12 +401,19 @@ export default class Similarity1plus {
         let _h = 65;
         const ratio_n = this.parentElement.parentElement.id.replace('l_', '');
         const unit_ratio = variables_info.find(ft => ft.id === ratio_n).unit;
-        const rank = +this.getAttribute('rank');
+        const globalrank = +this.getAttribute('globalrank');
+        const indic_rank = self.current_ids.length - +d[`rank_${ratio_n}`];
         content.push(`${ratio_n} : ${formatNumber(d[ratio_n], 1)} ${unit_ratio}`);
-        if (+rank > 0) { // No need to display that part if this is "my region":
+        if (+globalrank > 0) { // No need to display that part if this is "my region":
+          _h += 25;
           content.push(
             `Écart absolu normalisé : ${formatNumber(
               math_abs(100 * (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
+          if (+indic_rank === 1) {
+            content.push('(Région la plus proche sur cet indicateur)');
+          } else {
+            content.push(`(${indic_rank - 1}ème région la plus proche sur cet indicateur)`);
+          }
         }
         if (self.proportionnal_symbols) {
           _h += 20;
@@ -414,13 +424,13 @@ export default class Similarity1plus {
           coef = Number.isNaN(coef) || coef === 0 ? 1 : coef;
           content.push(`${num_n} (numérateur) : ${formatNumber(d[num_n] * coef, 1)} ${unit_num}`);
         }
-        if (!Number.isNaN(rank)) {
-          if (+rank === 0) {
+        if (!Number.isNaN(globalrank)) {
+          if (+globalrank === 0) {
             content.push('(Ma région)');
-          } else if (+rank === 1) {
-            content.push('(Région la plus proche)');
+          } else if (+globalrank === 1) {
+            content.push(`(Région la plus proche sur ces ${self.ratios.length} indicateurs)`);
           } else {
-            content.push(`(${rank}ème région la plus proche)`);
+            content.push(`(${globalrank}ème région la plus proche sur ces ${self.ratios.length} indicateurs)`);
           }
         }
         clearTimeout(t);
@@ -431,8 +441,8 @@ export default class Similarity1plus {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - _h}px` });
+            left: `${window.scrollX + d3.event.clientX - 5}px`,
+            top: `${window.scrollY + d3.event.clientY - _h}px` });
       })
       .on('click', function (d) {
         if (this.style.fill !== color_countries) {
@@ -543,7 +553,7 @@ export default class Similarity1plus {
     });
     this.data.sort((a, b) => a.dist - b.dist);
     // eslint-disable-next-line no-param-reassign
-    this.data.forEach((el, i) => { el.rank = i; });
+    this.data.forEach((el, i) => { el.globalrank = i; });
 
     // To keep the same selection :
     // this.highlight_selection = this.highlight_selection.map((d) => {
@@ -576,7 +586,7 @@ export default class Similarity1plus {
     });
     this.data.sort((a, b) => a.dist - b.dist);
     // eslint-disable-next-line no-param-reassign
-    this.data.forEach((el, i) => { el.rank = i; });
+    this.data.forEach((el, i) => { el.globalrank = i; });
     this.highlight_selection = this.highlight_selection
       .map(d => this.data.find(el => el.id === d.id))
       .filter(d => !!d);

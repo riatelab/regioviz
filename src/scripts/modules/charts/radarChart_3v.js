@@ -580,8 +580,8 @@ export default class RadarChart3 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - self.tooltip.node().getBoundingClientRect().height}px` });
+            left: `${window.scrollX + d3.event.clientX - 5}px`,
+            top: `${window.scrollY + d3.event.clientY - self.tooltip.node().getBoundingClientRect().height}px` });
       });
   }
 
