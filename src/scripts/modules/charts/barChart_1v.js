@@ -341,32 +341,34 @@ export default class BarChart1 {
         'xlink:href': 'img/reverse_plus.png',
         id: 'img_reverse',
       })
-      .on('click', () => {
+      .on('click', function () {
         // this.data = app.current_data.slice();
-        if (!this.serie_inversed) {
-          this.title_variable
+        if (!self.serie_inversed) {
+          this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_moins.png');
+          self.title_variable
             .classed('inversed', true)
-            .attr('title-tooltip', `${this.title_variable.attr('title-tooltip')} (axe inversé)`);
-          this.data.sort((a, b) => b[this.ratio_to_use] - a[this.ratio_to_use]);
+            .attr('title-tooltip', `${self.title_variable.attr('title-tooltip')} (axe inversé)`);
+          self.data.sort((a, b) => b[self.ratio_to_use] - a[self.ratio_to_use]);
         } else {
-          this.title_variable
+          this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
+          self.title_variable
             .classed('inversed', false)
             .attr('title-tooltip',
-              `${this.title_variable.attr('title-tooltip')}`.replace(' (axe inversé)', ''));
-          this.data.sort((a, b) => a[this.ratio_to_use] - b[this.ratio_to_use]);
+              `${self.title_variable.attr('title-tooltip')}`.replace(' (axe inversé)', ''));
+          self.data.sort((a, b) => a[self.ratio_to_use] - b[self.ratio_to_use]);
         }
-        this.current_ids = this.data.map(d => d.id);
-        this.serie_inversed = !this.serie_inversed;
-        x.domain(this.data.slice(current_range[0], current_range[1]).map(ft => ft.id));
-        x2.domain(this.data.map(ft => ft.id));
+        self.current_ids = self.data.map(d => d.id);
+        self.serie_inversed = !self.serie_inversed;
+        x.domain(self.data.slice(current_range[0], current_range[1]).map(ft => ft.id));
+        x2.domain(self.data.map(ft => ft.id));
         // svg_container.select(".zoom").call(zoom.transform, d3.zoomIdentity
         //     .scale(width / (current_range[1] - current_range[0]))
         //     .translate(-current_range[0], 0));
-        this.update();
+        self.update();
         // this.updateMiniBars();
-        this.updateContext(current_range[0], current_range[1]);
+        self.updateContext(current_range[0], current_range[1]);
         svg_container.select('.brush_top').call(brush_top.move, null);
-        this.map_elem.removeRectBrush();
+        self.map_elem.removeRectBrush();
         svg_container.select('.brush_bottom').call(brush_bottom.move, x.range());
       });
 

@@ -353,15 +353,24 @@ export default class ScatterPlot2 {
         'xlink:href': 'img/reverse_plus.png',
         id: 'img_reverse_x',
       })
-      .on('click', () => {
-        this.xInversed = !this.xInversed;
-        svg_container.select('#title-axis-x')
-          .attr('title-tooltip', `${this.pretty_name1} (axe inversé)`)
-          .style('fill', this.xInversed ? 'red' : 'black');
-        if (this.last_map_selection) {
-          this.map_elem.callBrush(this.last_map_selection);
+      .on('click', function () {
+        if (!self.xInversed) {
+          self.xInversed = true;
+          this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_moins.png');
+          svg_container.select('#title-axis-x')
+            .attr('title-tooltip', `${self.pretty_name1} (axe inversé)`)
+            .style('fill', 'red');
         } else {
-          this.update();
+          self.xInversed = false;
+          this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
+          svg_container.select('#title-axis-x')
+            .attr('title-tooltip', `${self.pretty_name1})`)
+            .style('fill', 'black');
+        }
+        if (self.last_map_selection) {
+          self.map_elem.callBrush(self.last_map_selection);
+        } else {
+          self.update();
         }
       });
 
@@ -374,15 +383,24 @@ export default class ScatterPlot2 {
         'xlink:href': 'img/reverse_plus.png',
         id: 'img_reverse_y',
       })
-      .on('click', () => {
-        this.yInversed = !this.yInversed;
-        svg_container.select('#title-axis-y')
-          .attr('title-tooltip', `${this.pretty_name2} (axe inversé)`)
-          .style('fill', this.yInversed ? 'red' : 'black');
-        if (this.last_map_selection) {
-          this.map_elem.callBrush(this.last_map_selection);
+      .on('click', function () {
+        if (!self.yInversed) {
+          self.yInversed = true;
+          this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_moins.png');
+          svg_container.select('#title-axis-y')
+            .attr('title-tooltip', `${self.pretty_name2} (axe inversé)`)
+            .style('fill', 'red');
         } else {
-          this.update();
+          self.yInversed = false;
+          this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
+          svg_container.select('#title-axis-y')
+            .attr('title-tooltip', `${self.pretty_name2}`)
+            .style('fill', 'black');
+        }
+        if (self.last_map_selection) {
+          self.map_elem.callBrush(self.last_map_selection);
+        } else {
+          self.update();
         }
       });
 

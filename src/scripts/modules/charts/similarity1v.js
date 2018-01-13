@@ -163,11 +163,13 @@ export default class Similarity1plus {
           })
           .on('click', function () {
             if (self.inversedAxis.has(ratio_name)) {
+              this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
               const title_ax = this.previousSibling;
               title_ax.setAttribute('title-tooltip', ratio_pretty_name);
               title_ax.setAttribute('fill', '#4f81bd');
               self.inversedAxis.delete(ratio_name);
             } else {
+              this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_moins.png');
               self.inversedAxis.add(ratio_name);
               const title_ax = this.previousSibling;
               title_ax.setAttribute('title-tooltip', `${ratio_pretty_name} (axe inversé)`);
