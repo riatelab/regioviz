@@ -140,9 +140,10 @@ export default class Similarity1plus {
             class: `axis axis--x ${selector_ratio_name}`,
             transform: 'translate(0, 10)',
           });
-        const txt = g.append('text')
+        g.append('text')
           .attrs({
-            x: 0,
+            // x: 0,
+            x: 20,
             y: -7.5,
             class: `title_axis ${selector_ratio_name} noselect`,
             fill: '#4f81bd',
@@ -154,7 +155,8 @@ export default class Similarity1plus {
           .text(ratio_name);
         g.append('image')
           .attrs({
-            x: txt.node().getBoundingClientRect().width + 5,
+            x: 0,
+            // x: txt.node().getBoundingClientRect().width + 5,
             y: -18,
             width: 14,
             height: 14,
@@ -177,6 +179,48 @@ export default class Similarity1plus {
             }
             self.update();
           });
+
+        g.append('image')
+          .attrs({
+            // x: txt.node().getBoundingClientRect().width + 22.5,
+            x: -17,
+            y: 0,
+            width: 8,
+            height: 10,
+            'xlink:href': 'img/Up-Arrow.svg',
+            id: 'up_arrow',
+          })
+          .on('click', function () {
+            const that_ratio = this.parentElement.id.slice(2);
+            const current_position = self.ratios.indexOf(that_ratio);
+            if (current_position === 0) { return; }
+            self.ratios.splice(current_position, 1);
+            self.ratios.splice(current_position - 1, 0, that_ratio);
+            self.removeLines();
+            self.update();
+          });
+
+
+        g.append('image')
+          .attrs({
+            // x: txt.node().getBoundingClientRect().width + 22.5,
+            x: -17,
+            y: 12,
+            width: 8,
+            height: 10,
+            'xlink:href': 'img/Down-Arrow.svg',
+            id: 'down_arrow',
+          })
+          .on('click', function () {
+            const that_ratio = this.parentElement.id.slice(2);
+            const current_position = self.ratios.indexOf(that_ratio);
+            if (current_position === self.ratios.length) { return; }
+            self.ratios.splice(current_position, 1);
+            self.ratios.splice(current_position + 1, 0, that_ratio);
+            self.removeLines();
+            self.update();
+          });
+
         layer_other = g.append('g').attr('class', 'otherfeature');
         layer_highlighted = g.append('g').attr('class', 'highlighted');
       } else {
@@ -330,7 +374,8 @@ export default class Similarity1plus {
         });
 
       bubbles2.exit().transition().duration(125).remove();
-
+      bubbles1.order();
+      bubbles2.order();
       height_to_use += offset;
     }
     setTimeout(() => { this.makeTooltips(); }, 125);
@@ -400,25 +445,14 @@ export default class Similarity1plus {
       })
       .on('mousemove mousedown', function (d) {
         const content = [];
-        let _h = 65;
+        let _h = 75;
         const ratio_n = this.parentElement.parentElement.id.replace('l_', '');
         const unit_ratio = variables_info.find(ft => ft.id === ratio_n).unit;
         const globalrank = +this.getAttribute('globalrank');
         const indic_rank = self.current_ids.length - +d[`rank_${ratio_n}`];
         content.push(`${ratio_n} : ${formatNumber(d[ratio_n], 1)} ${unit_ratio}`);
-        if (+globalrank > 0) { // No need to display that part if this is "my region":
-          _h += 25;
-          content.push(
-            `Écart absolu normalisé : ${formatNumber(
-              math_abs(100 * (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
-          if (+indic_rank === 1) {
-            content.push('(Région la plus proche sur cet indicateur)');
-          } else {
-            content.push(`(${indic_rank - 1}ème région la plus proche sur cet indicateur)`);
-          }
-        }
         if (self.proportionnal_symbols) {
-          _h += 20;
+          _h += 25;
           const num_n = this.parentElement.parentElement.getAttribute('num');
           const o = variables_info.find(ft => ft.id === num_n);
           const unit_num = o.unit;
@@ -426,17 +460,29 @@ export default class Similarity1plus {
           coef = Number.isNaN(coef) || coef === 0 ? 1 : coef;
           content.push(`${num_n} (numérateur) : ${formatNumber(d[num_n] * coef, 1)} ${unit_num}`);
         }
+        if (+globalrank > 0) { // No need to display that part if this is "my region":
+          _h += 35;
+          content.push(
+            `Écart absolu normalisé : ${formatNumber(
+              math_abs(100 * (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
+          if (+indic_rank === 2) {
+            content.push('<b>Région la plus proche</b> sur cet indicateur');
+          } else {
+            content.push(`<b>${indic_rank - 1}ème</b> région la plus proche sur cet indicateur`);
+          }
+        }
         if (!Number.isNaN(globalrank)) {
           if (+globalrank === 0) {
-            content.push('(Ma région)');
+            content.push('<b>Ma région</b>');
           } else if (+globalrank === 1) {
-            content.push(`(Région la plus proche sur ces ${self.ratios.length} indicateurs)`);
+            content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
-            content.push(`(${globalrank}ème région la plus proche sur ces ${self.ratios.length} indicateurs)`);
+            content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
         clearTimeout(t);
         self.tooltip.select('.title')
+          .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));
         self.tooltip.select('.content')
           .html(content.join('<br>'));
@@ -469,13 +515,14 @@ export default class Similarity1plus {
   displayLine(id_region) {
     if (this.ratios.length === 1) return;
     const coords = [];
-    svg_container.selectAll('.grp_var')
-      .selectAll(`#${id_region}.bubble`)
-      .each(function () {
-        const ty = +this.parentElement.parentElement.getAttribute('transform').split('translate(0')[1].replace(',', '').replace(')', '').trim();
-        coords.push([this.cx.baseVal.value, this.cy.baseVal.value + ty]);
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.grp_var'),
+      (el) => {
+        const ty = +el.getAttribute('transform').split('translate(0')[1].replace(',', '').replace(')', '').trim();
+        const bubble = el.querySelector(`#${id_region}.bubble`);
+        coords.push([bubble.cx.baseVal.value, bubble.cy.baseVal.value + ty]);
       });
-
+    coords.sort((a, b) => a[1] - b[1]);
     const l = this.draw_group.append('path')
       .datum(coords)
       .attrs({

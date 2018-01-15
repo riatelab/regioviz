@@ -180,7 +180,7 @@ class MapSelect {
     styles = Object.assign({}, user_styles);
     bbox_svg = svg_map.node().getBoundingClientRect();
     // width_map = +bbox_svg.width || (500 * app.ratioToWide);
-    width_map = ((+document.getElementById('map_section').getBoundingClientRect().width * 98) / 100) * app.ratioToWide;
+    width_map = ((+document.getElementById('map_section').getBoundingClientRect().width * 95) / 100);
     height_map = width_map * (1 / RATIO_WH_MAP);
     svg_map.attr('height', `${height_map}px`)
       .attr('width', `${width_map}px`);

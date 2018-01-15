@@ -15,6 +15,7 @@ let bbox_svg;
 let width;
 let height;
 let t;
+let tm;
 
 const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
@@ -71,46 +72,6 @@ const updateDimensions = () => {
 //   // container_div.appendChild(myTable);
 //   return myTable;
 // };
-
-const wrap = (_text, _width) => {
-  _text.each(function () {
-    const text = d3.select(this);
-    const words = text.text().split(/\s+/).reverse();
-    const lineHeight = 1.4;
-    const x = +text.attr('x');
-    const dy = parseFloat(text.attr('dy'));
-    const nb_var = app.current_config.ratio.length;
-    const id = +text.attr('id');
-    let y = +text.attr('y');
-    let line = [];
-    let lineNumber = 0;
-    // if (y > height / 2 - 35) {
-    //   y -= 40;
-    // }
-    if (id === 0) y += 12;
-    if (id === nb_var / 2) y -= 12;
-    let tspan = text.text(null)
-      .append('tspan')
-      .attr('x', x)
-      .attr('y', y)
-      .attr('dy', `${dy}em`);
-    let word = words.pop();
-    while (word) {
-      line.push(word);
-      tspan.text(line.join(' '));
-      if (tspan.node().getComputedTextLength() > _width) {
-        line.pop();
-        tspan.text(line.join(' '));
-        line = [word];
-        lineNumber += 1;
-        tspan = text.append('tspan')
-          .attrs({ x: 'x', y: 'y', dy: `${lineNumber * lineHeight + dy}em` })
-          .text(word);
-      }
-      word = words.pop();
-    }
-  });
-};
 
 const move = function move(array, from, to) {
   array.splice(to, 0, array.splice(from, 1)[0]);
@@ -243,16 +204,119 @@ export default class RadarChart3 {
     this.updateLegend();
   }
 
+  wrap(_text, _width) {
+    const self = this;
+
+    const swapAxis = function swapAxis() {
+      const ix = +this.parentElement.id;
+      if (ix + 1 === self.allAxis.length) {
+        for (let i = 0; i < self.data.length; i++) {
+          swap(self.data[i].axes, ix, 0);
+        }
+      } else {
+        const new_ix = ix + 1;
+        for (let i = 0; i < self.data.length; i++) {
+          move(self.data[i].axes, ix, new_ix);
+        }
+      }
+      self.update();
+    };
+
+    const reverseAxis = function reverseAxis(label) {
+      if (self.inversedAxis.has(label)) {
+        self.inversedAxis.delete(label);
+        this.style.fill = 'black';
+      } else {
+        self.inversedAxis.add(label);
+        this.style.fill = 'red';
+      }
+      d3.event.stopPropagation();
+      d3.event.preventDefault();
+      self.inverse_data(label);
+    };
+
+    _text.each(function () {
+      const text = d3.select(this);
+      const words = text.text().split(/\s+/).reverse();
+      const lineHeight = 1.4;
+      const x = +text.attr('x');
+      const dy = parseFloat(text.attr('dy'));
+      const nb_var = app.current_config.ratio.length;
+      const id = +text.attr('id');
+      let y = +text.attr('y');
+      let line = [];
+      let lineNumber = 0;
+      // if (y > height / 2 - 35) {
+      //   y -= 40;
+      // }
+      if (id === 0) y += 12;
+      if (id === nb_var / 2) y -= 12;
+      let tspan = text.text(null)
+        .append('tspan')
+        .attr('x', x)
+        .attr('y', y)
+        .attr('dy', `${dy}em`);
+      let word = words.pop();
+      while (word) {
+        line.push(word);
+        tspan.text(line.join(' '));
+        if (tspan.node().getComputedTextLength() > _width) {
+          line.pop();
+          tspan.text(line.join(' '));
+          line = [word];
+          lineNumber += 1;
+          tspan = text.append('tspan')
+            .attrs({ x: 'x', y: 'y', dy: `${lineNumber * lineHeight + dy}em` })
+            .text(word);
+        }
+        word = words.pop();
+      }
+    });
+    svg_bar.selectAll('.img_reverse')
+      .attrs(function () {
+        const el = this.parentElement.querySelector('tspan');
+        const x = +el.getAttribute('x') - 20;
+        const y = +el.getAttribute('y') + 15;
+        return { x, y };
+      })
+      .on('click', self.cfg.allowInverseData ? reverseAxis : null);
+
+    svg_bar.selectAll('.img_reverse2')
+      .attrs(function () {
+        const el = this.parentElement.querySelector('tspan');
+        const x = +el.getAttribute('x');
+        const y = +el.getAttribute('y') + 15;
+        return { x, y };
+      })
+      .on('click', swapAxis);
+
+    svg_bar.selectAll('.rectlabel')
+      .attrs(function () {
+        const el = this.parentElement.querySelector('tspan');
+        const bbox = el.getBoundingClientRect();
+        const x = +el.getAttribute('x') - 25;
+        const y = +el.getAttribute('y') - 10;
+        const _h = 45;
+        const _w = bbox.width + 10;
+        return { x, y, height: _h, width: _w };
+      });
+  }
+
   add_element(elem) {
     // const n_axis = elem.axes.map(i => i.axis);
     // if (!(JSON.stringify(n_axis.sort()) === JSON.stringify(this.allAxis.sort()))) {
     //   throw new Error('Expected element with same axes name than existing data.');
     // }
+    const axes_reordered = [];
     elem.axes.forEach((ft) => {
       if (this.inversedAxis.has(ft.axis)) {
         ft.value = 100 - ft.value; // eslint-disable-line no-param-reassign
       }
     });
+    this.data[0].axes.forEach((n) => {
+      axes_reordered.push(elem.axes.find(ft => ft.axis === n.axis));
+    });
+    elem.axes = axes_reordered;
     this.data.push(elem);
     const colors_in_use = Object.keys(app.colors).map(k => app.colors[k]);
     for (let j = 0; j < this.data.length; j++) {
@@ -432,34 +496,6 @@ export default class RadarChart3 {
     const rScale = this.rScale;
     const angleSlice = this.angleSlice;
 
-    const labelClicked = function labelClicked() {
-      const ix = +this.id;
-      if (ix + 1 === self.allAxis.length) {
-        for (let i = 0; i < self.data.length; i++) {
-          swap(self.data[i].axes, ix, 0);
-        }
-      } else {
-        const new_ix = ix + 1;
-        for (let i = 0; i < self.data.length; i++) {
-          move(self.data[i].axes, ix, new_ix);
-        }
-      }
-      self.update();
-    };
-
-    const labelCtxMenu = function labelCtxMenu(label) {
-      if (self.inversedAxis.has(label)) {
-        self.inversedAxis.delete(label);
-        this.style.fill = 'black';
-      } else {
-        self.inversedAxis.add(label);
-        this.style.fill = 'red';
-      }
-      d3.event.stopPropagation();
-      d3.event.preventDefault();
-      self.inverse_data(label);
-    };
-
     const axisGrid = g.append('g').attr('class', 'axisWrapper');
 
     // Draw the background circles
@@ -489,18 +525,6 @@ export default class RadarChart3 {
         };
       });
 
-    // // Text indicating at what % each level is
-    // axisGrid.selectAll('.axisLabel')
-    //   .data(d3.range(1, (cfg.levels + 1)).reverse())
-    //   .enter().append('text')
-    //   .attr('class', 'axisLabel')
-    //   .attr('x', 4)
-    //   .attr('y', d => -d * radius / cfg.levels)
-    //   .attr('dy', '0.4em')
-    //   .style('font-size', '10px')
-    //   .attr('fill', '#737373')
-    //   .text(d => Format(maxValue * d / cfg.levels) + cfg.unit);
-
     // Create the straight lines radiating outward from the center
     const axis = axisGrid.selectAll('.axis')
       .data(this.allAxis)
@@ -509,30 +533,76 @@ export default class RadarChart3 {
       .attr('class', 'axis');
     // Append the lines
     axis.append('line')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', (d, i) => rScale(maxValue * 1.1) * math_cos(angleSlice * i - HALF_PI))
-      .attr('y2', (d, i) => rScale(maxValue * 1.1) * math_sin(angleSlice * i - HALF_PI))
-      .attr('class', 'line')
-      .style('stroke', 'white')
-      .style('stroke-width', '2px');
+      .attrs((d, i) => ({
+        x1: 0,
+        y1: 0,
+        x2: rScale(maxValue * 1.1) * math_cos(angleSlice * i - HALF_PI),
+        y2: rScale(maxValue * 1.1) * math_sin(angleSlice * i - HALF_PI),
+        class: 'line',
+      }))
+      .styles({ stroke: 'white', 'stroke-width': '2px' });
 
     // Append the labels at each axis
-    axis.append('text')
-      .attr('class', 'legend')
-      .style('font-size', '11px')
+    const gp_axis_label = axis.append('g')
       .attr('id', (d, i) => i)
-      .attr('text-anchor', 'middle')
-      .attr('dy', '0.35em')
-      .attr('x', (d, i) => rScale(maxValue * cfg.labelFactor) * math_cos(angleSlice * i - HALF_PI))
-      .attr('y', (d, i) => rScale(maxValue * cfg.labelFactor) * math_sin(angleSlice * i - HALF_PI))
-      .attr('title-tooltip', d => variables_info.find(ft => ft.id === d).name)
-      .style('fill', d => (self.inversedAxis.has(d) ? 'red' : 'black'))
-      .style('cursor', 'pointer')
-      .text(d => d)
-      .on('click', labelClicked)
-      .on('contextmenu', cfg.allowInverseData ? labelCtxMenu : null)
-      .call(wrap, cfg.wrapWidth);
+      .style('pointer-events', 'all');
+
+    gp_axis_label.append('rect')
+      .attrs({ class: 'rectlabel', fill: 'transparent' });
+
+    const texts = gp_axis_label.append('text')
+      .attrs((d, i) => ({
+        id: i,
+        class: 'legend',
+        dy: '0.35em',
+        'text-anchor': 'middle',
+        'title-tooltip': variables_info.find(ft => ft.id === d).name,
+        x: rScale(maxValue * cfg.labelFactor) * math_cos(angleSlice * i - HALF_PI),
+        y: rScale(maxValue * cfg.labelFactor) * math_sin(angleSlice * i - HALF_PI),
+      }))
+      .styles(d => ({
+        'font-size': '11px',
+        fill: (self.inversedAxis.has(d) ? 'red' : 'black'),
+      }))
+      .text(d => d);
+
+    gp_axis_label.append('image')
+      .attrs({
+        width: 15, height: 15, 'xlink:href': 'img/reverse_plus.png', class: 'img_reverse',
+      })
+      .styles({ cursor: 'pointer', display: 'none' });
+
+    gp_axis_label.append('image')
+      .attrs({
+        width: 15, height: 15, 'xlink:href': 'img/reverse_blue.png', class: 'img_reverse2',
+      })
+      .styles({ cursor: 'pointer', display: 'none' });
+
+    texts.call(d => this.wrap(d, cfg.wrapWidth));
+
+    gp_axis_label
+      .on('mouseover mousemove', function () {
+        clearTimeout(tm);
+        d3.select(this)
+          .selectAll('image')
+          .style('display', null)
+          .attr('y', function () {
+            return +this.parentElement.querySelector('tspan').getAttribute('y') + 15;
+          });
+        tm = setTimeout(() => {
+          d3.select(this)
+            .selectAll('image')
+            .style('display', 'none');
+        }, 5000);
+      })
+      .on('mouseout', function () {
+        clearTimeout(tm);
+        tm = setTimeout(() => {
+          d3.select(this)
+            .selectAll('image')
+            .style('display', 'none');
+        }, 250);
+      });
 
     // Filter for the outside glow
     const filter = g.append('defs')
@@ -569,7 +639,7 @@ export default class RadarChart3 {
 
         clearTimeout(t);
         self.tooltip.select('.title')
-          .attr('class', 'title')
+          .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([app.feature_names[id_feature], ' (', id_feature, ')'].join(''));
         self.tooltip.select('.content')
           .attr('class', 'content')
@@ -729,7 +799,11 @@ export default class RadarChart3 {
       .transition()
       .duration(225);
 
-    update_axis.select('text.legend')
+    const _g = update_axis.select('g');
+    _g.select('.rectlabel').attr('class', 'rectlabel');
+    _g.select('.img_reverse').style('display', 'none');
+    _g.select('.img_reverse2').style('display', 'none');
+    _g.select('text.legend')
       .attrs((d, i) => ({
         'title-tooltip': variables_info.find(ft => ft.id === d).name,
         id: i,
@@ -739,7 +813,7 @@ export default class RadarChart3 {
       .style('fill', d => (this.inversedAxis.has(d) ? 'red' : 'black'))
       .style('cursor', 'pointer')
       .text(d => d)
-      .call(wrap, cfg.wrapWidth);
+      .call(d => this.wrap(d, cfg.wrapWidth));
 
     const update_blobWrapper = this.g.selectAll('.radarWrapper')
       .data(this.data, d => d.name);

@@ -213,6 +213,24 @@ function prepareTooltip2(parent, before, classname = 'tooltip') {
 }
 
 /**
+* Function to get the computed style value of an element.
+*
+*
+*
+*
+*/
+const getStyle = el => (window.getComputedStyle ? getComputedStyle(el, null) : el.currentStyle);
+
+/**
+* Function to get the computed style value of an element.
+*
+*
+*
+*
+*/
+const getStyleProperty = (elem, prop) => getStyle(elem)[prop];
+
+/**
 * Function to bind a tooltip (on mousedown/mousemove)
 * on each element described by the given 'selector'.
 * Options can contains the name of attribute containing
@@ -631,4 +649,6 @@ export {
   getElementsFromPoint,
   getRatioToWide,
   formatNumber,
+  getStyle,
+  getStyleProperty,
 };

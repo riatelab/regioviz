@@ -124,10 +124,10 @@ export default class ScatterPlot2 {
     this.y = d3.scaleLinear()
       .range([height, 0])
       .nice();
-    this.xAxis = d3.axisBottom(this.x).ticks(12).tickFormat(formatNumber);
-    this.yAxis = d3.axisLeft(this.y).ticks(12 * height / width).tickFormat(formatNumber);
-    this.xAxis2 = d3.axisBottom(this.x).ticks(12).tickFormat(formatNumber);
-    this.yAxis2 = d3.axisLeft(this.y).ticks(12 * height / width).tickFormat(formatNumber);
+    this.xAxis = d3.axisBottom(this.x).ticks(10).tickFormat(formatNumber);
+    this.yAxis = d3.axisLeft(this.y).ticks(10 * height / width).tickFormat(formatNumber);
+    this.xAxis2 = d3.axisBottom(this.x).ticks(10).tickFormat(formatNumber);
+    this.yAxis2 = d3.axisLeft(this.y).ticks(10 * height / width).tickFormat(formatNumber);
 
     this.brush = d3.brush()
       .extent([[0, 0], [width, height]])
@@ -214,6 +214,13 @@ export default class ScatterPlot2 {
           if (app.current_config.my_category) {
             content.push('<br>', ' (', app.current_config.my_category, ')');
             _h += 20;
+          } else if (app.current_config.filter_key) {
+            content.push(
+              '<br>',
+              ' (Régions dans un voisinage de ',
+              document.getElementById('dist_filter').value,
+              'km)');
+            _h += 20;
           }
           self.tooltip.select('.title')
             .attr('class', 'title red')
@@ -231,6 +238,13 @@ export default class ScatterPlot2 {
           let _h = 65;
           if (app.current_config.my_category) {
             content.push('<br>', ' (', app.current_config.my_category, ')');
+            _h += 20;
+          } else if (app.current_config.filter_key) {
+            content.push(
+              '<br>',
+              ' (Régions dans un voisinage de ',
+              document.getElementById('dist_filter').value,
+              'km)');
             _h += 20;
           }
           self.tooltip.select('.title')
@@ -296,6 +310,13 @@ export default class ScatterPlot2 {
           if (app.current_config.my_category) {
             content.push('<br>', ' (', app.current_config.my_category, ')');
             _h += 20;
+          } else if (app.current_config.filter_key) {
+            content.push(
+              '<br>',
+              ' (Régions dans un voisinage de ',
+              document.getElementById('dist_filter').value,
+              'km)');
+            _h += 20;
           }
           self.tooltip.select('.title')
             .attr('class', 'title red')
@@ -313,6 +334,13 @@ export default class ScatterPlot2 {
           let _h = 65;
           if (app.current_config.my_category) {
             content.push('<br>', ' (', app.current_config.my_category, ')');
+            _h += 20;
+          } else if (app.current_config.filter_key) {
+            content.push(
+              '<br>',
+              ' (Régions dans un voisinage de ',
+              document.getElementById('dist_filter').value,
+              'km)');
             _h += 20;
           }
           self.tooltip.select('.title')
@@ -607,27 +635,26 @@ export default class ScatterPlot2 {
   update() {
     const self = this;
     const data = self.data;
-    console.log(data);
     const dots = this.scatter.selectAll('.dot')
       .data(data, d => d.id);
 
     if (this.type === 'rank') {
       const rank_variable1 = this.rank_variable1;
       const rank_variable2 = this.rank_variable2;
-      const range_x = this.xInversed
-        ? d3.extent(data, d => d[rank_variable1]).reverse()
-        : d3.extent(data, d => d[rank_variable1]);
-      const range_y = this.yInversed
-        ? d3.extent(data, d => d[rank_variable2]).reverse()
-        : d3.extent(data, d => d[rank_variable2]);
-      const serie_x = data.map(d => d[this.variable1]);
-      const serie_y = data.map(d => d[this.variable2]);
-      this.x.domain(range_x).nice();
-      this.y.domain(range_y).nice();
-      this.mean_variable1 = _getPR(
-        getMean(serie_x), serie_x);
-      this.mean_variable2 = _getPR(
-        getMean(serie_y), serie_y);
+      const range_x = this.xInversed ? [101, -1] : [-1, 101];
+      const range_y = this.yInversed ? [101, -1] : [-1, 101];
+      // const range_x = this.xInversed
+      //   ? d3.extent(data, d => d[rank_variable1]).reverse()
+      //   : d3.extent(data, d => d[rank_variable1]);
+      // const range_y = this.yInversed
+      //   ? d3.extent(data, d => d[rank_variable2]).reverse()
+      //   : d3.extent(data, d => d[rank_variable2]);
+      // const serie_x = data.map(d => d[this.variable1]);
+      // const serie_y = data.map(d => d[this.variable2]);
+      this.x.domain(range_x);
+      this.y.domain(range_y);
+      this.mean_variable1 = 50;
+      this.mean_variable2 = 50;
 
       const x = this.x;
       const y = this.y;
@@ -686,9 +713,6 @@ export default class ScatterPlot2 {
       const x = this.x;
       const y = this.y;
       const default_color = 'gray';
-
-      this.plot.select('#axis--x').transition().duration(125).call(this.xAxis);
-      this.plot.select('#axis--y').transition().duration(125).call(this.yAxis);
 
       dots
         .transition()
@@ -800,7 +824,7 @@ export default class ScatterPlot2 {
       .on('mousemove.tooltip', (d) => {
         clearTimeout(t);
         self.tooltip.select('.title')
-          .attr('class', 'title')
+          .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));
         let yoffset;
         if (with_rank) {

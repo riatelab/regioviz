@@ -288,6 +288,13 @@ export default class BarChart1 {
         if (app.current_config.my_category) {
           content.push('<br>', ' (', app.current_config.my_category, ')');
           _h += 20;
+        } else if (app.current_config.filter_key) {
+          content.push(
+            '<br>',
+            ' (Régions dans un voisinage de ',
+            document.getElementById('dist_filter').value,
+            'km)');
+          _h += 20;
         }
         self.tooltip.select('.title')
           .attr('class', 'title red')
@@ -313,16 +320,18 @@ export default class BarChart1 {
         width: 20,
         height: height2,
         x: x2(this.current_ids[0]) - 12,
-        'xlink:href': 'img/left-handle.png',
-      });
+        'xlink:href': 'img/left-handle2.png',
+      })
+      .style('cursor', 'col-resize');
 
     const context_right_handle = g_brush_bottom.insert('image', '.handle')
       .attrs({
         width: 20,
         height: height2,
         x: x2(this.current_ids[this.current_ids.length - 1]) - 7,
-        'xlink:href': 'img/right-handle.png',
-      });
+        'xlink:href': 'img/right-handle2.png',
+      })
+      .style('cursor', 'col-resize');
 
     g_brush_top.call(brush_top.move, null);
     g_brush_bottom.call(brush_bottom.move, x.range());
@@ -571,7 +580,7 @@ export default class BarChart1 {
       .on('mousemove mousedown', (d) => {
         clearTimeout(t);
         self.tooltip.select('.title')
-          .attr('class', 'title')
+          .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));
         self.tooltip.select('.content')
           .html([
