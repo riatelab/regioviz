@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css?family=Signika|Courgette');
 
+html, body {
+  margin:0;height: 100%;
+}
+
 @media only screen and (max-width: 959px) {
   body {
     font-size: 10px;
@@ -9,7 +13,7 @@
   }
   #mainframe {
     width: 540px;
-    height: auto;
+    height: 100%;
   }
 }
 
@@ -22,7 +26,7 @@
   }
   #mainframe {
     width: 960px;
-    height: auto;
+    height: 100%;
   }
 }
 
@@ -35,7 +39,7 @@
   }
   #mainframe {
     width: 1160px;
-    height: auto;
+    height: 100%;
   }
 }
 
@@ -48,7 +52,7 @@
   }
   #mainframe {
     width: 1350px;
-    height: auto;
+    height: 100%;
   }
 }
 
@@ -61,7 +65,7 @@
   }
   #mainframe {
     width: 1550px;
-    height: auto;
+    height: 100%;
   }
 }
 

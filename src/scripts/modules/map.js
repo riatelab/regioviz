@@ -202,6 +202,13 @@ class MapSelect {
 
     svg_map.call(this.zoom_map);
 
+    const fn_attrs_layers = d => ({
+      class: 'tg_ft',
+      title: `${d.properties[app.current_config.name_field]} (${d.id})`,
+      fill: (d.id !== app.current_config.my_region ? color_countries : color_highlight),
+      d: path,
+    });
+
     const layer_list = Object.keys(styles);
     for (let i = 0, n_layer = layer_list.length; i < n_layer; i++) {
       const name_lyr = layer_list[i];
@@ -213,10 +220,7 @@ class MapSelect {
           .data(filterLevelGeom(this.nuts.features, filter), d => d.id)
           .enter()
           .append('path')
-          .attr('class', 'tg_ft')
-          .attr('title', d => `${d.properties[app.current_config.name_field]} (${d.id})`)
-          .attr('fill', d => (d.id !== app.current_config.my_region ? color_countries : color_highlight))
-          .attr('d', path);
+          .attrs(fn_attrs_layers);
       } else {
         layers.append('g')
           .attrs(style_layer)
@@ -224,7 +228,7 @@ class MapSelect {
           .data(other_layers.get(name_lyr).features)
           .enter()
           .append('path')
-          .attrs({ d: path });
+          .attr('d', path);
       }
     }
     layers.append('g')
@@ -425,17 +429,18 @@ class MapSelect {
 
 function makeSourceSection() {
   const parent = svg_map.node().parentElement;
+  const bbox = svg_map.node().getBoundingClientRect();
   const elem = document.createElement('p');
   elem.style.fontSize = '0.45em';
   elem.style.position = 'relative';
-  elem.innerHTML = 'Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA';
-  parent.insertBefore(elem, parent.querySelector('#header_map'));
-  elem.style.left = '49%';
-  elem.style.paddingLeft = '2em';
-  elem.style.top = '32%';
+  elem.style.right = '-50%';
+  elem.style.top = `${bbox.top + bbox.height / 2}px`;
   elem.style.margin = 'auto';
   elem.style.width = '100%';
+  elem.style.textAlign = 'center';
   elem.className = 'rotate';
+  elem.innerHTML = 'Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA';
+  parent.insertBefore(elem, parent.querySelector('#header_map'));
 }
 
 export {

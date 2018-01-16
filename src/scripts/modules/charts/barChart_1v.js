@@ -526,14 +526,17 @@ export default class BarChart1 {
         width: this.x.bandwidth(),
         height: height - this.y(d[ratio_to_use]),
       }))
-      .style('fill', d => app.colors[d.id] || color_countries)
-      .style('display', (d) => {
+      .styles((d) => {
         const to_display = this.x(d.id) != null;
         if (to_display) {
           displayed += 1;
           return 'initial';
         }
-        return 'none';
+
+        return {
+          display: 'none',
+          fill: app.colors[d.id] || color_countries,
+        };
       });
 
     bar.enter()

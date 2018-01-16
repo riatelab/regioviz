@@ -153,8 +153,10 @@ export default class ScatterPlot2 {
       });
 
     this.scatter = this.plot.append('g')
-      .attr('id', 'scatterplot')
-      .attr('clip-path', 'url(#clip)');
+      .attrs({
+        id: 'scatterplot',
+        'clip-path': 'url(#clip)',
+      });
 
     this.scatter.append('g')
       .attr('class', 'brush')
@@ -163,12 +165,13 @@ export default class ScatterPlot2 {
     this.makeGrid();
 
     const groupe_line_mean = this.plot.append('g')
-      .attr('clip-path', 'url(#clip)')
-      .attr('class', 'mean');
+      .attrs({
+        class: 'mean',
+        'clip-path': 'url(#clip)',
+      });
 
     // The actual red line for mean value on X axis:
     groupe_line_mean.append('line')
-      .attr('clip-path', 'url(#clip)')
       .attrs({
         id: 'mean_x',
         class: 'mean_line',
@@ -178,6 +181,7 @@ export default class ScatterPlot2 {
         y2: width,
         'stroke-dasharray': '10, 5',
         'stroke-width': '2px',
+        'clip-path': 'url(#clip)',
       })
       .style('stroke', 'red');
 

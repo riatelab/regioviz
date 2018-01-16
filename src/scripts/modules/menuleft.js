@@ -41,7 +41,8 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   section2.id = 'menu_variables';
   section2.className = 'box';
   section2.style.overflow = 'auto';
-  section2.style.height = '25%';
+  section2.style.height = 'auto';
+  section2.style.maxHeight = '35%';
 
   // Filter the "variables" variable to fetch the group names :
   const groups_var = removeDuplicates(variables.map(d => d.group).filter(d => d !== 'Num/dénom'));

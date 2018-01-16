@@ -316,6 +316,7 @@ export default class RadarChart3 {
     this.data[0].axes.forEach((n) => {
       axes_reordered.push(elem.axes.find(ft => ft.axis === n.axis));
     });
+    // eslint-disable-next-line no-param-reassign
     elem.axes = axes_reordered;
     this.data.push(elem);
     const colors_in_use = Object.keys(app.colors).map(k => app.colors[k]);
@@ -343,16 +344,16 @@ export default class RadarChart3 {
 
     const blobWrapper = this.g
       .insert('g', '.radarCircleWrapper')
-      .attr('id', elem.name.indexOf(' ') > -1 ? 'ctx' : elem.name)
-      .attr('class', 'radarWrapper');
+      .attrs({
+        id: elem.name.indexOf(' ') > -1 ? 'ctx' : elem.name,
+        class: 'radarWrapper',
+      });
 
     // Append the backgrounds
     blobWrapper
       .append('path')
-      .attr('class', 'radarArea')
-      .attr('d', this.radarLine(elem.axes))
-      .style('fill', app.colors[elem.name])
-      .style('fill-opacity', cfg.opacityArea)
+      .attrs({ class: 'radarArea', d: this.radarLine(elem.axes) })
+      .styles({ fill: app.colors[elem.name], 'fill-opacity': cfg.opacityArea })
       .on('mouseover', function () {
         // Dim all blobs
         self.g.selectAll('.radarArea')
@@ -389,24 +390,29 @@ export default class RadarChart3 {
 
     // Create the outlines
     blobWrapper.append('path')
-      .attr('class', 'radarStroke')
-      .attr('d', this.radarLine(elem.axes))
-      .style('stroke-width', `${cfg.strokeWidth}px`)
-      .style('stroke', app.colors[elem.name])
-      .style('fill', 'none')
-      .style('filter', 'url(#glow)');
+      .attrs({ class: 'radarStroke', d: this.radarLine(elem.axes) })
+      .styles({
+        fill: 'none',
+        stroke: app.colors[elem.name],
+        filter: 'url(#glow)',
+        'stroke-width': `${cfg.strokeWidth}px`,
+      });
 
     // Append the circles
     blobWrapper.selectAll('.radarCircle')
       .data(elem.axes)
       .enter()
       .append('circle')
-      .attr('class', 'radarCircle')
-      .attr('r', cfg.dotRadius)
-      .attr('cx', (d, i) => this.rScale(d.value) * math_cos(this.angleSlice * i - HALF_PI))
-      .attr('cy', (d, i) => this.rScale(d.value) * math_sin(this.angleSlice * i - HALF_PI))
-      .style('fill', app.colors[elem.name])
-      .style('fill-opacity', 0.8);
+      .attrs((d, i) => ({
+        class: 'radarCircle',
+        r: cfg.dotRadius,
+        cx: this.rScale(d.value) * math_cos(this.angleSlice * i - HALF_PI),
+        cy: this.rScale(d.value) * math_sin(this.angleSlice * i - HALF_PI),
+      }))
+      .styles({
+        fill: app.colors[elem.name],
+        'fill-opacity': 0.8,
+      });
 
     blobWrapper.node().__data__ = elem;
 
@@ -427,12 +433,16 @@ export default class RadarChart3 {
       .data(elem.axes)
       .enter()
       .append('circle')
-      .attr('class', 'radarInvisibleCircle')
-      .attr('r', cfg.dotRadius * 1.5)
-      .attr('cx', (d, i) => this.rScale(d.value) * math_cos(this.angleSlice * i - HALF_PI))
-      .attr('cy', (d, i) => this.rScale(d.value) * math_sin(this.angleSlice * i - HALF_PI))
-      .style('fill', 'none')
-      .style('pointer-events', 'all');
+      .attrs((d, i) => ({
+        class: 'radarInvisibleCircle',
+        r: cfg.dotRadius * 1.5,
+        cx: this.rScale(d.value) * math_cos(this.angleSlice * i - HALF_PI),
+        cy: this.rScale(d.value) * math_sin(this.angleSlice * i - HALF_PI),
+      }))
+      .styles({
+        fill: 'none',
+        'pointer-events': 'all',
+      });
 
     this.makeTooltips();
   }
@@ -730,24 +740,32 @@ export default class RadarChart3 {
 
     // Create the outlines
     blobWrapper.append('path')
-      .attr('class', 'radarStroke')
-      .attr('d', d => this.radarLine(d.axes))
-      .style('stroke-width', `${cfg.strokeWidth}px`)
-      .style('stroke', d => app.colors[d.name])
-      .style('fill', 'none')
-      .style('filter', 'url(#glow)');
+      .attrs(d => ({
+        class: 'radarStroke',
+        d: this.radarLine(d.axes),
+      }))
+      .styles({
+        fill: 'none',
+        stroke: app.colors[d.name],
+        filter: 'url(#glow)',
+        'stroke-width': `${cfg.strokeWidth}px`
+      });
 
     // Append the circles
     blobWrapper.selectAll('.radarCircle')
       .data(d => d.axes)
       .enter()
       .append('circle')
-      .attr('class', 'radarCircle')
-      .attr('r', cfg.dotRadius)
-      .attr('cx', (d, i) => rScale(d.value) * math_cos(angleSlice * i - HALF_PI))
-      .attr('cy', (d, i) => rScale(d.value) * math_sin(angleSlice * i - HALF_PI))
-      .style('fill', d => app.colors[d.id])
-      .style('fill-opacity', 0.8);
+      .attrs((d, i) => ({
+        class: 'radarCircle',
+        r: cfg.dotRadius,
+        cx: rScale(d.value) * math_cos(angleSlice * i - HALF_PI),
+        cy: rScale(d.value) * math_sin(angleSlice * i - HALF_PI),
+      }))
+      .styles(d => ({
+        fill: app.colors[d.id],
+        'fill-opacity': 0.8,
+      }));
 
     // ///////////////////////////////////////////////////////
     // ////// Append invisible circles for tooltip ///////////
@@ -766,12 +784,16 @@ export default class RadarChart3 {
       .data(d => d.axes)
       .enter()
       .append('circle')
-      .attr('class', 'radarInvisibleCircle')
-      .attr('r', cfg.dotRadius * 1.5)
-      .attr('cx', (d, i) => rScale(d.value) * math_cos(angleSlice * i - HALF_PI))
-      .attr('cy', (d, i) => rScale(d.value) * math_sin(angleSlice * i - HALF_PI))
-      .style('fill', 'none')
-      .style('pointer-events', 'all');
+      .attrs((d, i) => ({
+        class: 'radarInvisibleCircle',
+        r: cfg.dotRadius * 1.5,
+        cx: rScale(d.value) * math_cos(angleSlice * i - HALF_PI),
+        cy: rScale(d.value) * math_sin(angleSlice * i - HALF_PI),
+      }))
+      .styles({
+        fill: 'none',
+        'pointer-events': 'all',
+      });
 
     this.makeTooltips();
   }
@@ -1002,11 +1024,22 @@ export default class RadarChart3 {
   updateMapRegio() {
     if (!this.map_elem) return;
     this.map_elem.target_layer.selectAll('path')
-      .attr('fill', d => (d.id === this.id_my_region
-        ? color_highlight
-        : this.current_ids.indexOf(d.id) > -1
-          ? (this.displayed_ids.indexOf(d.id) > -1
-            ? app.colors[d.id] : color_countries) : color_disabled));
+      .attr('fill', (d) => {
+        if (d.id === this.id_my_region) {
+          return color_highlight;
+        } else if (this.current_ids.indexOf(d.id) > -1) {
+          if (this.displayed_ids.indexOf(d.id) > -1) {
+            return app.colors[d.id];
+          }
+          return color_countries;
+        }
+        return color_disabled;
+      });
+    // .attr('fill', d => (d.id === this.id_my_region
+    //   ? color_highlight
+    //   : this.current_ids.indexOf(d.id) > -1
+    //     ? (this.displayed_ids.indexOf(d.id) > -1
+    //       ? app.colors[d.id] : color_countries) : color_disabled));
   }
 
   updateTableStat() {
