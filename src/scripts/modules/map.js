@@ -1,14 +1,13 @@
 import centroid from '@turf/centroid';
 import { app } from './../main';
-import { color_disabled, color_countries, color_sup, color_inf, color_highlight, RATIO_WH_MAP } from './options';
-import { getSvgPathType, svgPathToCoords, euclidian_distance, prepareTooltip2, getElementsFromPoint } from './helpers';
+import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './options';
+import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, prepareTooltip2, getElementsFromPoint } from './helpers';
 import { filterLevelGeom } from './prepare_data';
 
 
 const svg_map = d3.select('svg#svg_map');
-let bbox_svg;
-let width_map;
-let height_map;
+const width_map = fixed_dimension.map.width;
+const height_map = fixed_dimension.map.height;
 let styles;
 let projection;
 let path;
@@ -30,7 +29,7 @@ function get_bbox_layer_path(name) {
 function fitLayer() {
   projection.scale(1).translate([0, 0]);
   const b = get_bbox_layer_path('frame');
-  const s = 1 / Math.max((b[1][0] - b[0][0]) / width_map, (b[1][1] - b[0][1]) / height_map);
+  const s = 1 / math_max((b[1][0] - b[0][0]) / width_map, (b[1][1] - b[0][1]) / height_map);
   const t = [(width_map - s * (b[1][0] + b[0][0])) / 2, (height_map - s * (b[1][1] + b[0][1])) / 2];
   projection.scale(s).translate(t);
   svg_map.selectAll('path').attr('d', path);
@@ -109,8 +108,12 @@ function makeMapLegend(legend_elems, size, translateY) {
   const lgd_height = rect_size + spacing;
   const offset = lgd_height * legend_elems.length / 2;
 
+  const width_value_map = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
+  d3.select('.cont_svg.clgd')
+    .style('padding-top', `${(size / fixed_dimension.legend.width) * width_value_map}px`);
+
   const grp_lgd = d3.select('#svg_legend')
-    .attr('height', size)
+    .attr('viewBox', `0 0 ${fixed_dimension.legend.width} ${size}`)
     .append('g')
     .styles({ 'font-size': '11px', 'font-family': '\'Signika\', sans-serif' });
 
@@ -178,15 +181,15 @@ function getLegendElems(type) {
 class MapSelect {
   constructor(nuts, other_layers, user_styles, filter = 'N1') {
     styles = Object.assign({}, user_styles);
-    bbox_svg = svg_map.node().getBoundingClientRect();
+    // bbox_svg = svg_map.node().getBoundingClientRect();
     // width_map = +bbox_svg.width || (500 * app.ratioToWide);
-    width_map = ((+document.getElementById('map_section').getBoundingClientRect().width * 95) / 100);
-    height_map = width_map * (1 / RATIO_WH_MAP);
-    svg_map.attr('height', `${height_map}px`)
-      .attr('width', `${width_map}px`);
-    app.mapDrawRatio = app.ratioToWide;
+    const width_value = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
+    d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value}px`);
+    // svg_map.attr('height', `${height_map}px`)
+    //   .attr('width', `${width_map}px`);
+    // app.mapDrawRatio = app.ratioToWide;
     projection = d3.geoIdentity()
-      .fitExtent([[0, 0], [width_map, height_map]], other_layers.get('frame'))
+      .fitExtent([[0, 0], [fixed_dimension.map.width, fixed_dimension.map.height]], other_layers.get('frame'))
       .reflectY(true);
 
     path = d3.geoPath().projection(projection);
@@ -429,16 +432,23 @@ class MapSelect {
 
 function makeSourceSection() {
   const parent = svg_map.node().parentElement;
-  const bbox = svg_map.node().getBoundingClientRect();
+  // const bbox = svg_map.node().getBoundingClientRect();
   const elem = document.createElement('p');
   elem.style.fontSize = '0.45em';
-  elem.style.position = 'relative';
-  elem.style.right = '-50%';
-  elem.style.top = `${bbox.top + bbox.height / 2}px`;
-  elem.style.margin = 'auto';
-  elem.style.width = '100%';
+  elem.style.position = 'absolute';
+  elem.style.right = '0';
   elem.style.textAlign = 'center';
-  elem.className = 'rotate';
+  elem.style.bottom = '0';
+  elem.style.left = '0';
+
+  // elem.style.fontSize = '0.45em';
+  // elem.style.position = 'relative';
+  // elem.style.right = '-50%';
+  // elem.style.top = `${bbox.top + bbox.height / 2}px`;
+  // elem.style.margin = 'auto';
+  // elem.style.width = '100%';
+  // elem.style.textAlign = 'center';
+  // elem.className = 'rotate';
   elem.innerHTML = 'Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA';
   parent.insertBefore(elem, parent.querySelector('#header_map'));
 }

@@ -1,5 +1,5 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, PropSizer, prepareTooltip2, getMean, Tooltipsify, formatNumber } from './../helpers';
-import { color_disabled, color_countries, color_default_dissim, color_highlight } from './../options';
+import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, prepareTooltip2, getMean, Tooltipsify, formatNumber } from './../helpers';
+import { color_disabled, color_countries, color_default_dissim, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
 import TableResumeStat from './../tableResumeStat';
@@ -7,7 +7,6 @@ import CompletudeSection from './../completude';
 
 let svg_bar;
 let margin;
-let bbox_svg;
 let width;
 let height;
 let svg_container;
@@ -15,21 +14,17 @@ let t;
 
 const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
-  margin = { top: 20, right: 20, bottom: 40, left: 30 };
-  bbox_svg = svg_bar.node().getBoundingClientRect();
-  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
-  height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attrs({
-    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
-  });
+  margin = { top: 20, right: 20, bottom: 40, left: 50 };
+  width = fixed_dimension.chart.width - margin.left - margin.right;
+  height = fixed_dimension.chart.height - margin.top - margin.bottom;
+  const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
+  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
   svg_container = svg_bar.append('g').attr('class', 'container');
 };
-
 
 export default class Similarity1plus {
   constructor(ref_data) {
     updateDimensions();
-    app.chartDrawRatio = app.ratioToWide;
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 1;
     this.ratios = app.current_config.ratio;
@@ -64,7 +59,7 @@ export default class Similarity1plus {
 
     // Create the section containing the input element allowing to chose
     // how many "close" regions we want to highlight.
-    const menu_selection = d3.select(svg_bar.node().parentElement)
+    const menu_selection = d3.select('#bar_section')
       .append('div')
       .attr('id', 'menu_selection')
       .styles({ position: 'relative', color: '#4f81bd', 'text-align': 'center' });
@@ -122,7 +117,6 @@ export default class Similarity1plus {
       const ratio_pretty_name = app.current_config.ratio_pretty_name[i];
       const num_name = self.nums[i];
       const my_region_value = self.my_region[ratio_name];
-      const ratio_values = this.data.map(d => d[ratio_name]);
       let g = this.draw_group.select(`#${selector_ratio_name}`);
       let axis = this.draw_group.select(`g.axis--x.${selector_ratio_name}`);
       let layer_other;
@@ -200,7 +194,6 @@ export default class Similarity1plus {
             self.update();
           });
 
-
         g.append('image')
           .attrs({
             // x: txt.node().getBoundingClientRect().width + 22.5,
@@ -235,7 +228,7 @@ export default class Similarity1plus {
         ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
       });
       if (highlight_selection.length > 0) {
-        const dist_axis = Math.max(
+        const dist_axis = math_max(
           math_abs(my_region_value - +d3.min(highlight_selection, d => d[ratio_name])),
           math_abs(+d3.max(highlight_selection, d => d[ratio_name]) - my_region_value));
         const margin_min_max = math_round(dist_axis) / 8;
@@ -243,7 +236,8 @@ export default class Similarity1plus {
         _max = my_region_value + dist_axis + margin_min_max;
         // if (_min > _max) { [_min, _max] = [_max, _min]; }
       } else {
-        const dist_axis = Math.max(
+        const ratio_values = this.data.map(d => d[ratio_name]);
+        const dist_axis = math_max(
           math_abs(my_region_value - d3.min(ratio_values)),
           math_abs(d3.max(ratio_values) - my_region_value));
         const margin_min_max = math_round(dist_axis) / 8;

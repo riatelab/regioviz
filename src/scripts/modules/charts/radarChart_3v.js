@@ -1,8 +1,8 @@
 import alertify from 'alertifyjs';
 import {
-  math_max, math_sin, math_cos, HALF_PI, computePercentileRank, getMean,
-  Tooltipsify, prepareTooltip2, formatNumber } from './../helpers';
-import { color_disabled, color_countries, color_highlight } from './../options';
+  math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
+  getMean, Tooltipsify, prepareTooltip2, formatNumber } from './../helpers';
+import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info } from './../../main';
 import CompletudeSection from './../completude';
@@ -11,7 +11,6 @@ import TableResumeStat from './../tableResumeStat';
 
 let svg_bar;
 let margin;
-let bbox_svg;
 let width;
 let height;
 let t;
@@ -20,13 +19,10 @@ let tm;
 const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
   margin = { top: 60, right: 70, bottom: 60, left: 70 };
-  bbox_svg = svg_bar.node().getBoundingClientRect();
-  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
-  height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attrs({
-    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
-  });
-  svg_bar = svg_bar.append('g').attr('class', 'container');
+  width = fixed_dimension.chart.width - margin.left - margin.right;
+  height = fixed_dimension.chart.height - margin.top - margin.bottom;
+  const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
+  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
 };
 
 // const makeTableTooltip = (data_feature) => {
@@ -73,16 +69,42 @@ const updateDimensions = () => {
 //   return myTable;
 // };
 
+/**
+* Move an element from an array to a specific position
+*
+* @param {Array} array - The array to work on.
+* @param {Number} from - The index of the element to be moved.
+* @param {Number} to - The targeted index for this element.
+* @return {Array} - The input array after the element has been moved.
+*
+*/
 const move = function move(array, from, to) {
   array.splice(to, 0, array.splice(from, 1)[0]);
   return array;
 };
 
+/**
+* Swap two features of an array.
+*
+* @param {Array} array - The array to work on.
+* @param {Number} ix1 - The index of the first feature.
+* @param {Number} ix2 - The index of the second feature.
+* @return {Array} - The input array after the element has been swaped.
+*
+*/
 const swap = function swap(array, ix1, ix2) {
   [array[ix1], array[ix2]] = [array[ix2], array[ix1]]; // eslint-disable-line no-param-reassign
   return array;
 };
 
+/**
+* Prepare the data for "my region"
+*
+* @param {Array} data - The whole subset of the dataset we are currently working on.
+* @param {Array} variables - The variables currently selected.
+* @return {Object} - An object containing the data prepared in order to feed the radar.
+*
+*/
 const prepare_data_radar_default = (data, variables) => {
   // Prepare the data for "My Région":
   const v_my_region = data.find(d => d.id === app.current_config.my_region);
@@ -100,6 +122,15 @@ const prepare_data_radar_default = (data, variables) => {
   return ojb_my_region;
 };
 
+/**
+* Prepare the data for a region.
+*
+* @param {Array} data - The whole subset of the dataset we are currently working on.
+* @param {Array} variables - The variables currently selected.
+* @param {String} ft - The ID of the region for which we are preparing this object.
+* @return {Object} - An object containing the data prepared in order to feed the radar.
+*
+*/
 const prepare_data_radar_ft = (data, variables, ft) => {
   const ft_values = data.find(d => d.id === ft);
   if (!ft_values) {
@@ -119,7 +150,15 @@ const prepare_data_radar_ft = (data, variables, ft) => {
   return obj;
 };
 
+/** Class representing a Radar (spider) chart */
 export default class RadarChart3 {
+  /**
+   * Create a Radar chart on the `svg_bar` svg element previously defined
+   * @param {Array} data - A reference to the subset of the dataset to be used
+   * to create the radar (should contain at least three fields flagged as ratio
+   * in the `app.current_config.ratio` Object).
+   * @param {Object} options - Options regarding the style of the radar to be draw.
+   */
   constructor(data, options) {
     updateDimensions();
     const cfg = {
@@ -196,7 +235,7 @@ export default class RadarChart3 {
       };
     }
     this.makeTableStat();
-    d3.select(svg_bar.node().parentElement.parentElement)
+    d3.select('#bar_section')
       .append('div')
       .attr('id', 'menu_selection')
       .styles({ position: 'relative', 'text-align': 'left', 'padding-left': '5em', top: '-2em' });
@@ -483,7 +522,7 @@ export default class RadarChart3 {
     this.maxValue = math_max(this.cfg.maxValue, maxValue);
     this.allAxis = this.data[0].axes.map(i => i.axis); // Names of each axis
     this.total = this.allAxis.length; // The number of different axes
-    this.radius = Math.min(this.cfg.w / 2, this.cfg.h / 2); // Radius of the outermost circle
+    this.radius = math_min(this.cfg.w / 2, this.cfg.h / 2); // Radius of the outermost circle
     this.Format = d3.format(this.cfg.format); // Formatting
     this.angleSlice = Math.PI * 2 / this.total; // The width in radians of each "slice"
     // Scale for the radius
@@ -718,10 +757,14 @@ export default class RadarChart3 {
     // Append the backgrounds
     blobWrapper
       .append('path')
-      .attr('class', 'radarArea')
-      .attr('d', d => this.radarLine(d.axes))
-      .style('fill', d => app.colors[d.name])
-      .style('fill-opacity', cfg.opacityArea)
+      .attrs(d => ({
+        class: 'radarArea',
+        d: this.radarLine(d.axes),
+      }))
+      .styles(d => ({
+        fill: app.colors[d.name],
+        'fill-opacity': cfg.opacityArea,
+      }))
       .on('mouseover', function () {
         // Dim all blobs
         g.selectAll('.radarArea')
@@ -744,12 +787,12 @@ export default class RadarChart3 {
         class: 'radarStroke',
         d: this.radarLine(d.axes),
       }))
-      .styles({
+      .styles(d => ({
         fill: 'none',
         stroke: app.colors[d.name],
         filter: 'url(#glow)',
-        'stroke-width': `${cfg.strokeWidth}px`
-      });
+        'stroke-width': `${cfg.strokeWidth}px`,
+      }));
 
     // Append the circles
     blobWrapper.selectAll('.radarCircle')
@@ -776,8 +819,10 @@ export default class RadarChart3 {
       .data(this.data, d => d.name)
       .enter()
       .append('g')
-      .attr('id', d => (d.name.indexOf(' ') > -1 ? 'ctx' : d.name))
-      .attr('class', 'radarCircleWrapper');
+      .attrs(d => ({
+        id: (d.name.indexOf(' ') > -1 ? 'ctx' : d.name),
+        class: 'radarCircleWrapper',
+      }));
 
     // Append a set of invisible circles on top for the mouseover pop-up
     blobCircleWrapper.selectAll('.radarInvisibleCircle')
@@ -832,8 +877,10 @@ export default class RadarChart3 {
         x: rScale(maxValue * cfg.labelFactor) * math_cos(angleSlice * i - HALF_PI),
         y: rScale(maxValue * cfg.labelFactor) * math_sin(angleSlice * i - HALF_PI),
       }))
-      .style('fill', d => (this.inversedAxis.has(d) ? 'red' : 'black'))
-      .style('cursor', 'pointer')
+      .styles(d => ({
+        fill: this.inversedAxis.has(d) ? 'red' : 'black',
+        cursor: 'pointer',
+      }))
       .text(d => d)
       .call(d => this.wrap(d, cfg.wrapWidth));
 

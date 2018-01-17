@@ -8,7 +8,7 @@ import '../styles/semantic.min.css';
 import { createMenu, handleInputRegioName } from './modules/menuleft';
 import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
 import { MapSelect, makeSourceSection, svg_map, zoomClick } from './modules/map';
-import { color_highlight, MAX_VARIABLES, RATIO_WH_MAP } from './modules/options';
+import { color_highlight, MAX_VARIABLES, fixed_dimension } from './modules/options';
 import BarChart1 from './modules/charts/barChart_1v';
 import ScatterPlot2 from './modules/charts/scatterPlot_2v';
 import RadarChart3 from './modules/charts/radarChart_3v';
@@ -658,20 +658,9 @@ function loadData() {
 loadData();
 
 window.onresize = function () {
-  const previous_ratio = app.ratioToWide;
-  const new_ratio = getRatioToWide();
-  if (previous_ratio === new_ratio) return;
-  app.ratioToWide = new_ratio;
-  const chart_scale_value = new_ratio / app.chartDrawRatio;
-  d3.select('#svg_bar').attr('height', `${500 * app.ratioToWide}px`);
-  d3.select('#svg_bar > g.container').attr('transform', `scale(${chart_scale_value})`);
-
-  const bbox_svg = svg_map.node().getBoundingClientRect();
-  const width_map = +bbox_svg.width;
-  const height_map = width_map * (1 / RATIO_WH_MAP);
-  const map_scale_value = new_ratio / app.mapDrawRatio;
-  svg_map.attr('height', `${height_map}px`);
-  svg_map.select('#layers').attr('transform', `scale(${map_scale_value})`);
-  svg_map.select('.brush_map').attr('transform', `scale(${map_scale_value})`);
-  d3.select('#svg_legend > g').attr('transform', `scale(${map_scale_value})`);
+  const width_value_map = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
+  const width_value_chart = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
+  d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value_map}px`);
+  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value_chart}px`);
+  d3.select('.cont_svg.clgd').style('padding-top', `${(fixed_dimension.legend.height / fixed_dimension.legend.width) * width_value_map}px`);
 };

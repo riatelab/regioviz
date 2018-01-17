@@ -69,7 +69,7 @@ export function makeTopMenu() {
 */
 export function makeHeaderMapSection() {
   const header_map_section = d3.select('#map_section')
-    .insert('div', '#svg_map')
+    .insert('div', '.cont_svg.cmap')
     .attr('id', 'header_map');
 
   header_map_section.append('div')
@@ -154,7 +154,7 @@ function clickDlMetadata(event) {
 */
 export function makeHeaderChart() {
   const header_bar_section = d3.select('#bar_section')
-    .insert('p', 'svg')
+    .insert('p', '.cont_svg.cchart')
     .attr('id', 'header_chart')
     .style('margin-bottom', '0')
     .style('clear', 'both');

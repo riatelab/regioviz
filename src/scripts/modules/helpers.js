@@ -150,6 +150,7 @@ const math_pow = Math.pow;
 const math_abs = Math.abs;
 const math_round = Math.round;
 const math_max = Math.max;
+const math_min = Math.min;
 const math_sin = Math.sin;
 const math_cos = Math.cos;
 const math_sqrt = Math.sqrt;
@@ -622,6 +623,7 @@ export {
   comp2,
   math_abs,
   math_round,
+  math_min,
   math_sin,
   math_cos,
   math_max,

@@ -1,23 +1,20 @@
 import debug from 'debug';
 import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber } from './../helpers';
-import { color_disabled, color_countries, color_sup, color_inf, color_highlight } from './../options';
+import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
 
-const log = debug('App:BarChart');
-debug.enable('*');
 let svg_bar = d3.select('svg#svg_bar');
-let margin = { top: 10, right: 20, bottom: 100, left: 45 };
-let margin2 = { top: 430, right: 20, bottom: 15, left: 45 };
-let bbox_svg = svg_bar.node().getBoundingClientRect();
-let width = +bbox_svg.width - margin.left - margin.right;
-let height = +bbox_svg.height - margin.top - margin.bottom;
-let height2 = +bbox_svg.height - margin2.top - margin2.bottom;
+let margin = { top: 10, right: 20, bottom: 100, left: 60 };
+let margin2 = { top: 430, right: 20, bottom: 15, left: 60 };
+let width = fixed_dimension.chart.width - margin.left - margin.right;
+let height = fixed_dimension.chart.height - margin.top - margin.bottom;
+let height2 = fixed_dimension.chart.height - margin2.top - margin2.bottom;
 let svg_container;
-
+let t;
 let nbFt;
 let current_range_brush = [0, 0];
 let current_range = [0, 0];
@@ -25,28 +22,35 @@ let displayed;
 
 function updateDimensions() {
   svg_bar = d3.select('svg#svg_bar');
-  bbox_svg = svg_bar.node().getBoundingClientRect();
   margin = {
     top: 10,
     right: 20,
-    bottom: (500 * app.ratioToWide) / 5,
-    left: 45,
+    bottom: 100,
+    left: 60,
   };
   margin2 = {
-    top: (500 * app.ratioToWide) * 0.86,
+    top: math_round(fixed_dimension.chart.height - margin.top - margin.bottom + 25),
     right: 20,
-    bottom: (500 * app.ratioToWide) / 40,
-    left: 45,
+    bottom: 12.5,
+    left: 60,
   };
-  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
-  height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attrs({
-    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
-  });
-  height2 = 500 * app.ratioToWide - margin2.top - margin2.bottom;
+  width = fixed_dimension.chart.width - margin.left - margin.right;
+  height = fixed_dimension.chart.height - margin.top - margin.bottom;
+  height2 = fixed_dimension.chart.height - margin2.top - margin2.bottom;
+  const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
+  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
   svg_container = svg_bar.append('g').attr('class', 'container');
 }
 
+/**
+* Get the rank corresponding to the mean value
+* (or any value for which we may be interested in knowning its rank)
+*
+* @param {Number} mean_value - The mean value.
+* @param {String} ratio_to_use - The name of the variable currently in use.
+* @return {Number} - The rank corresponding to the input value.
+*
+*/
 function getMeanRank(mean_value, ratio_to_use) {
   let mean_rank = app.current_data.map(
     (d, i) => [d[ratio_to_use], math_abs(mean_value - d[ratio_to_use]), i]);
@@ -60,14 +64,20 @@ function getMeanRank(mean_value, ratio_to_use) {
   return mean_rank;
 }
 
-let t;
-
+/** Class representing a scatterplot */
 export default class BarChart1 {
+  /**
+   * Create a bar chart on the `svg_bar` svg element previously defined.
+   *
+   * @param {Array} ref_data - A reference to the subset of the dataset to be used
+   * to create the scatterplot (should contain at least one field flagged as ratio
+   * in the `app.current_config.ratio` Object).
+   */
+
   constructor(ref_data) {
     this.brushed = () => {
       if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
       if (!this.x) {
-        log('a');
         return;
       }
       const s = d3.event.selection || this.x2.range();
@@ -138,7 +148,7 @@ export default class BarChart1 {
           });
         // this.update();
         if (this.reset_state_button === true) {
-          d3.selectAll('#menu_selection > button').attr('class', 'button_blue');
+          d3.select('#menu_selection').selectAll('button').attr('class', 'button_blue');
         }
         this.updateMapRegio();
       } else {
@@ -152,12 +162,11 @@ export default class BarChart1 {
         this._focus.selectAll('.bar')
           .style('fill', d => app.colors[d.id] || color_countries);
         if (this.reset_state_button === true) {
-          d3.selectAll('#menu_selection > button').attr('class', 'button_blue');
+          d3.select('#menu_selection').selectAll('button').attr('class', 'button_blue');
         }
       }
     };
     updateDimensions();
-    app.chartDrawRatio = app.ratioToWide;
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 1;
     const x = d3.scaleBand().range([0, width]).padding(0.1);
@@ -196,12 +205,14 @@ export default class BarChart1 {
       .append('rect')
       .attrs({ width, height });
 
+    // Focus is the 'big' bar chart, located on the top:
     const focus = svg_container.append('g')
       .attrs({
         class: 'focus',
         transform: `translate(${margin.left}, ${margin.top})`,
       });
 
+    // Focus is the 'small' bar chart, located on the bottom:
     const context = svg_container.append('g')
       .attrs({
         class: 'context',
@@ -322,7 +333,10 @@ export default class BarChart1 {
         x: x2(this.current_ids[0]) - 12,
         'xlink:href': 'img/left-handle2.png',
       })
-      .style('cursor', 'col-resize');
+      .styles({
+        cursor: 'col-resize',
+        'pointer-events': 'none',
+      });
 
     const context_right_handle = g_brush_bottom.insert('image', '.handle')
       .attrs({
@@ -331,7 +345,10 @@ export default class BarChart1 {
         x: x2(this.current_ids[this.current_ids.length - 1]) - 7,
         'xlink:href': 'img/right-handle2.png',
       })
-      .style('cursor', 'col-resize');
+      .styles({
+        cursor: 'col-resize',
+        'pointer-events': 'none',
+      });
 
     g_brush_top.call(brush_top.move, null);
     g_brush_bottom.call(brush_bottom.move, x.range());
@@ -458,7 +475,9 @@ export default class BarChart1 {
       .styles({ margin: '10px 0px 2px 0px' })
       .html('Sélection des régions ayant des valeurs...');
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_above_mean' })
       .text('inférieures à la moyenne')
       .on('click', function () {
@@ -467,7 +486,9 @@ export default class BarChart1 {
         self.selectBelowMean();
       });
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_above_my_region' })
       .text('inférieurs à ma région')
       .on('click', function () {
@@ -476,7 +497,9 @@ export default class BarChart1 {
         self.selectBelowMyRegion();
       });
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_below_mean' })
       .text('supérieures à la moyenne')
       .on('click', function () {
@@ -485,7 +508,9 @@ export default class BarChart1 {
         self.selectAboveMean();
       });
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_below_my_region' })
       .text('supérieures à ma région')
       .on('click', function () {
@@ -516,7 +541,7 @@ export default class BarChart1 {
       .data(this.data);
 
     if (this.reset_state_button === true) {
-      d3.selectAll('#menu_selection > button').attr('class', 'button_blue');
+      d3.select('#menu_selection').selectAll('button').attr('class', 'button_blue');
     }
 
     bar
@@ -527,14 +552,15 @@ export default class BarChart1 {
         height: height - this.y(d[ratio_to_use]),
       }))
       .styles((d) => {
-        const to_display = this.x(d.id) != null;
+        let to_display = this.x(d.id) != null;
         if (to_display) {
           displayed += 1;
-          return 'initial';
+          to_display = 'initial';
+        } else {
+          to_display = 'none';
         }
-
         return {
-          display: 'none',
+          display: to_display,
           fill: app.colors[d.id] || color_countries,
         };
       });

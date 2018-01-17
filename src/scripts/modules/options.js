@@ -22,3 +22,10 @@ export const formatnb_thousands_sep = ' ';
 export const MAX_VARIABLES = 7;
 // xxx:
 export const RATIO_WH_MAP = 0.879;
+
+//
+export const fixed_dimension = {
+  map: { width: 470, height: 534 },
+  chart: { width: 600, height: 569 },
+  legend: { width: 470, height: 90 },
+};

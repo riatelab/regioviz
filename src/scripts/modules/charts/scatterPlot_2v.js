@@ -1,5 +1,5 @@
-import { Rect, comp2, prepareTooltip2, svgPathToCoords, _getPR, computePercentileRank, getMean, formatNumber } from './../helpers';
-import { color_disabled, color_countries, color_highlight } from './../options';
+import { Rect, comp2, prepareTooltip2, svgPathToCoords, computePercentileRank, getMean, formatNumber } from './../helpers';
+import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors } from './../../main';
 import ContextMenu from './../contextMenu';
@@ -8,7 +8,6 @@ import TableResumeStat from './../tableResumeStat';
 
 let svg_bar;
 let margin;
-let bbox_svg;
 let width;
 let height;
 let svg_container;
@@ -16,21 +15,20 @@ let t;
 
 const updateDimensions = () => {
   svg_bar = d3.select('#svg_bar');
-  margin = { top: 20, right: 20, bottom: 40, left: 50 };
-  bbox_svg = svg_bar.node().getBoundingClientRect();
-  width = (+bbox_svg.width || (500 * app.ratioToWide)) - margin.left - margin.right;
-  height = 500 * app.ratioToWide - margin.top - margin.bottom;
-  svg_bar.attrs({
-    height: `${500 * app.ratioToWide}px`, width: `${+bbox_svg.width || (500 * app.ratioToWide)}px`,
-  });
+  margin = { top: 20, right: 20, bottom: 40, left: 60 };
+  width = fixed_dimension.chart.width - margin.left - margin.right;
+  height = fixed_dimension.chart.height - margin.top - margin.bottom;
+  const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
+  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
   svg_container = svg_bar.append('g').attr('class', 'container');
 };
+
 /** Class representing a scatterplot */
 export default class ScatterPlot2 {
   /**
-   * Create a the scatterplot on the `svg_bar` svg element previously defined
+   * Create a scatterplot on the `svg_bar` svg element previously defined
    * @param {Array} ref_data - A reference to the subset of the dataset to be used
-   * to create the scatterplot (should contain at least two field flagged as ratio
+   * to create the scatterplot (should contain at least two fields flagged as ratio
    * in the `app.current_config.ratio` Object).
    */
   constructor(ref_data) {
@@ -89,7 +87,6 @@ export default class ScatterPlot2 {
       this.map_elem.removeRectBrush();
     };
     updateDimensions();
-    app.chartDrawRatio = app.ratioToWide;
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 2;
     const self = this;
@@ -408,7 +405,7 @@ export default class ScatterPlot2 {
 
     svg_container.append('image')
       .attrs({
-        x: margin.left / 2 - 20,
+        x: margin.left / 3 - 20,
         y: margin.top + (height / 2) + svg_container.select('#title-axis-y').node().getBoundingClientRect().height / 2 + 5,
         width: 15,
         height: 15,
@@ -460,7 +457,7 @@ export default class ScatterPlot2 {
     //   }
     // };
 
-    const menu_selection = d3.select(svg_bar.node().parentElement)
+    const menu_selection = d3.select('#bar_section')
       .append('div')
       .attr('id', 'menu_selection')
       .styles({ position: 'relative', 'text-align': 'center' });
@@ -486,7 +483,9 @@ export default class ScatterPlot2 {
       .styles({ margin: '10px 0px 2px 0px' })
       .html('Sur les deux indicateurs, sélection des régions ayant des valeurs...');
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_above_mean' })
       .text('inférieures à la moyenne')
       .on('click', function () {
@@ -495,7 +494,9 @@ export default class ScatterPlot2 {
         self.selectBelowMean();
       });
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_above_my_region' })
       .text('inférieurs à ma région')
       .on('click', function () {
@@ -504,7 +505,9 @@ export default class ScatterPlot2 {
         self.selectBelowMyRegion();
       });
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_below_mean' })
       .text('supérieures à la moyenne')
       .on('click', function () {
@@ -513,7 +516,9 @@ export default class ScatterPlot2 {
         self.selectAboveMean();
       });
 
-    menu_selection.append('button')
+    menu_selection.append('div')
+      .attr('class', 'cont_btn')
+      .append('button')
       .attrs({ class: 'button_blue', id: 'btn_below_my_region' })
       .text('supérieures à ma région')
       .on('click', function () {
@@ -610,9 +615,9 @@ export default class ScatterPlot2 {
       .attrs({
         id: 'title-axis-y',
         class: 'title-axis noselect',
-        x: margin.left / 2,
+        x: margin.left / 3,
         y: margin.top + (height / 2) - 10,
-        transform: `rotate(-90, ${margin.left / 2}, ${margin.top + (height / 2)})`,
+        transform: `rotate(-90, ${margin.left / 3}, ${margin.top + (height / 2)})`,
         'title-tooltip': this.pretty_name2,
       })
       .html(`${this.variable2}  &#x25BE;`)

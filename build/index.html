@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Regioviz</title>
 <body class='loading'>
   <div class="spinner"><div class="cube1"></div><div class="cube2"></div></div>
@@ -7,11 +8,17 @@
   <div id="mainframe" class="noselect">
     <div id="menu" class="t1 noselect"></div>
     <div id="map_section" class="t3">
-      <svg id="svg_map" width="98%" height="48%"></svg>
-      <svg id="svg_legend" width="98%" height="10%"></svg>
+      <div class="cont_svg cmap">
+        <svg id="svg_map" viewBox="0 0 470 534" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="cont_svg clgd">
+        <svg id="svg_legend" viewBox="0 0 470 90" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
     </div>
     <div id="bar_section" class="t2">
-      <svg id="svg_bar" width="100%"></svg>
+      <div class="cont_svg cchart">
+        <svg id="svg_bar" viewBox="0 0 600 569" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
     </div>
   </div>
   <script src="vendor/d3.v4.min.js"></script>
