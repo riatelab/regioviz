@@ -519,7 +519,7 @@ function bindHelpMenu() {
           modal.destroy();
         },
       });
-      let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b> (${filter_id})</p>
+      let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
 <p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
       const id_doc_pdf = o.id.split('N1')[0];
       if (['TypoGDP', 'TypoPop', 'TypoEcoSpe', 'TypoUrb'].indexOf(id_doc_pdf) > -1) {
@@ -576,7 +576,7 @@ function bindCreditsSource() {
       },
     });
     modal.setContent(
-      `<p style="color: #4f81bd;font-size: 1.2rem;">Régioviz - À propos</p>
+      `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Regioviz</b> - À propos</p>
       <br><br><br>
       <p style="text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></p>
       <p style="text-align: justify;">Version <b>${app.version}</b></p>

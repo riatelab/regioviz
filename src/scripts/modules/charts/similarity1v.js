@@ -157,6 +157,7 @@ export default class Similarity1plus {
             'xlink:href': 'img/reverse_plus.png',
             id: 'img_reverse',
           })
+          .style('cursor', 'pointer')
           .on('click', function () {
             if (self.inversedAxis.has(ratio_name)) {
               this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
@@ -178,12 +179,14 @@ export default class Similarity1plus {
           .attrs({
             // x: txt.node().getBoundingClientRect().width + 22.5,
             x: -17,
-            y: 0,
-            width: 8,
-            height: 10,
+            y: -1,
+            width: 11,
+            height: 13,
             'xlink:href': 'img/Up-Arrow.svg',
             id: 'up_arrow',
+            title: 'Changer l\'ordre des axes (vers le haut)',
           })
+          .style('cursor', 'pointer')
           .on('click', function () {
             const that_ratio = this.parentElement.id.slice(2);
             const current_position = self.ratios.indexOf(that_ratio);
@@ -198,12 +201,14 @@ export default class Similarity1plus {
           .attrs({
             // x: txt.node().getBoundingClientRect().width + 22.5,
             x: -17,
-            y: 12,
-            width: 8,
-            height: 10,
+            y: 13,
+            width: 11,
+            height: 13,
             'xlink:href': 'img/Down-Arrow.svg',
             id: 'down_arrow',
+            title: 'Changer l\'ordre des axes (vers le bas)',
           })
+          .style('cursor', 'pointer')
           .on('click', function () {
             const that_ratio = this.parentElement.id.slice(2);
             const current_position = self.ratios.indexOf(that_ratio);
@@ -234,7 +239,6 @@ export default class Similarity1plus {
         const margin_min_max = math_round(dist_axis) / 8;
         _min = my_region_value - dist_axis - margin_min_max;
         _max = my_region_value + dist_axis + margin_min_max;
-        // if (_min > _max) { [_min, _max] = [_max, _min]; }
       } else {
         const ratio_values = this.data.map(d => d[ratio_name]);
         const dist_axis = math_max(
@@ -456,18 +460,18 @@ export default class Similarity1plus {
         }
         if (+globalrank > 0) { // No need to display that part if this is "my region":
           _h += 35;
-          content.push(
-            `Écart absolu normalisé : ${formatNumber(
-              math_abs(100 * (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
+          // content.push(
+          //   `Écart absolu normalisé : ${formatNumber(
+          //     math_abs(100 * (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
           if (+indic_rank === 2) {
-            content.push('<b>Région la plus proche</b> sur cet indicateur');
+            content.push('<br><b>Région la plus proche</b> sur cet indicateur');
           } else {
-            content.push(`<b>${indic_rank - 1}ème</b> région la plus proche sur cet indicateur`);
+            content.push(`<br><b>${indic_rank - 1}ème</b> région la plus proche sur cet indicateur`);
           }
         }
         if (!Number.isNaN(globalrank)) {
           if (+globalrank === 0) {
-            content.push('<b>Ma région</b>');
+            content.push('<br><b>Ma région</b>');
           } else if (+globalrank === 1) {
             content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
@@ -484,7 +488,8 @@ export default class Similarity1plus {
           .styles({
             display: null,
             left: `${window.scrollX + d3.event.clientX - 5}px`,
-            top: `${window.scrollY + d3.event.clientY - _h}px` });
+            top: `${window.scrollY + d3.event.clientY - _h}px`,
+          });
       })
       .on('click', function (d) {
         if (this.style.fill !== color_countries) {

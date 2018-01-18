@@ -366,7 +366,9 @@ export default class BarChart1 {
         height: 15,
         'xlink:href': 'img/reverse_plus.png',
         id: 'img_reverse',
+        title: 'Inverser l\'ordre de classement de l\'indicateur',
       })
+      .style('cursor', 'pointer')
       .on('click', function () {
         // this.data = app.current_data.slice();
         if (!self.serie_inversed) {

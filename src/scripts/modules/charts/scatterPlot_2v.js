@@ -381,7 +381,9 @@ export default class ScatterPlot2 {
         height: 15,
         'xlink:href': 'img/reverse_plus.png',
         id: 'img_reverse_x',
+        title: 'Inverser l\'ordre de classement de l\'indicateur',
       })
+      .style('cursor', 'pointer')
       .on('click', function () {
         if (!self.xInversed) {
           self.xInversed = true;
@@ -411,7 +413,9 @@ export default class ScatterPlot2 {
         height: 15,
         'xlink:href': 'img/reverse_plus.png',
         id: 'img_reverse_y',
+        title: 'Inverser l\'ordre de classement de l\'indicateur',
       })
+      .style('cursor', 'pointer')
       .on('click', function () {
         if (!self.yInversed) {
           self.yInversed = true;
@@ -979,10 +983,16 @@ export default class ScatterPlot2 {
     const var_info = variables_info.find(ft => ft.id === code_variable);
     this.pretty_name1 = var_info.name;
     this.unit1 = var_info.unit;
+    // Update the name of the axis and the tooltip value:
     svg_container.select('#title-axis-x')
       .attr('title-tooltip', this.pretty_name1)
       .html(`${code_variable} &#x25BE;`);
-    // TODO: Also change the position of the button alowing to inverse the serie
+    // Update the position of the reverse button:
+    svg_container.select('#img_reverse_x')
+      .attrs({
+        x: margin.left + width / 2 - 20 - svg_container.select('#title-axis-x').node().getBoundingClientRect().width / 2,
+        y: margin.top + height + margin.bottom / 2 + 5,
+      });
     this.updateItemsCtxMenu();
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {
@@ -1013,10 +1023,17 @@ export default class ScatterPlot2 {
     const var_info = variables_info.find(ft => ft.id === code_variable);
     this.pretty_name2 = var_info.name;
     this.unit2 = var_info.unit;
+    // Update the name of the axis and the tooltip value:
     svg_container.select('#title-axis-y')
       .attr('title-tooltip', this.pretty_name2)
       .html(`${code_variable} &#x25BE;`);
-    // TODO: Also change the position of the button alowing to inverse the serie
+    // Update the position of the reverse button:
+    svg_container.select('#img_reverse_y')
+      .attrs({
+        x: margin.left / 3 - 20,
+        y: margin.top + (height / 2) + svg_container.select('#title-axis-y').node().getBoundingClientRect().height / 2 + 5,
+      });
+
     this.updateItemsCtxMenu();
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {

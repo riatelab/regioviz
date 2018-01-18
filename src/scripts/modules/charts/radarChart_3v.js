@@ -262,13 +262,17 @@ export default class RadarChart3 {
     };
 
     const reverseAxis = function reverseAxis(label) {
+      const id_axis = this.id;
       if (self.inversedAxis.has(label)) {
         self.inversedAxis.delete(label);
+        self.g.select(`g#${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_plus.png');
         this.style.fill = 'black';
       } else {
         self.inversedAxis.add(label);
+        self.g.select(`g#${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_moins.png');
         this.style.fill = 'red';
       }
+
       d3.event.stopPropagation();
       d3.event.preventDefault();
       self.inverse_data(label);
@@ -617,13 +621,21 @@ export default class RadarChart3 {
 
     gp_axis_label.append('image')
       .attrs({
-        width: 15, height: 15, 'xlink:href': 'img/reverse_plus.png', class: 'img_reverse',
+        class: 'img_reverse',
+        width: 15,
+        height: 15,
+        'xlink:href': 'img/reverse_plus.png',
+        title: 'Inverser l\'ordre de classement de l\'indicateur',
       })
       .styles({ cursor: 'pointer', display: 'none' });
 
     gp_axis_label.append('image')
       .attrs({
-        width: 15, height: 15, 'xlink:href': 'img/reverse_blue.png', class: 'img_reverse2',
+        width: 15,
+        height: 15,
+        'xlink:href': 'img/reverse_blue.png',
+        class: 'img_reverse2',
+        title: 'Inverser l\'ordre de classement de l\'indicateur',
       })
       .styles({ cursor: 'pointer', display: 'none' });
 
