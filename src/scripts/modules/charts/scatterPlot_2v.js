@@ -231,8 +231,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${window.scrollX + d3.event.clientX - 5}px`,
-              top: `${window.scrollY + d3.event.clientY - _h}px`,
+              left: `${d3.event.clientX - window.scrollX - 5}px`,
+              top: `${d3.event.clientY - window.scrollY - _h}px`,
             });
         } else if (self.type === 'rank') {
           const content = ['Médiane de l\'espace d\'étude'];
@@ -256,8 +256,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${window.scrollX + d3.event.clientX - 5}px`,
-              top: `${window.scrollY + d3.event.clientY - _h}px`,
+              left: `${d3.event.clientX - window.scrollX - 5}px`,
+              top: `${d3.event.clientY - window.scrollY - _h}px`,
             });
         }
       });
@@ -327,8 +327,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${window.scrollX + d3.event.clientX - 5}px`,
-              top: `${window.scrollY + d3.event.clientY - _h}px`,
+              left: `${d3.event.clientX - window.scrollX - 5}px`,
+              top: `${d3.event.clientY - window.scrollY - _h}px`,
             });
         } else if (self.type === 'rank') {
           const content = ['Médiane de l\'espace d\'étude'];
@@ -352,8 +352,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${window.scrollX + d3.event.clientX - 5}px`,
-              top: `${window.scrollY + d3.event.clientY - _h}px`,
+              left: `${d3.event.clientX - window.scrollX - 5}px`,
+              top: `${d3.event.clientY - window.scrollY - _h}px`,
             });
         }
       });
@@ -857,8 +857,8 @@ export default class ScatterPlot2 {
         self.tooltip
           .styles({
             display: null,
-            left: `${window.scrollX + d3.event.clientX - 5}px`,
-            top: `${window.scrollY + d3.event.clientY - yoffset}px` });
+            left: `${d3.event.clientX - window.scrollX - 5}px`,
+            top: `${d3.event.clientY - window.scrollY - yoffset}px` });
       })
       .on('mouseout.tooltip', () => {
         clearTimeout(t);
@@ -1117,8 +1117,9 @@ export default class ScatterPlot2 {
         }
         self.type = 'value';
         this.classList.add('active');
-        menu.select('#ind_ranks')
-          .attr('class', 'choice_ind noselect');
+        menu.select('#ind_ranks').attr('class', 'choice_ind noselect');
+        menu.select('#btn_above_mean').text('inférieures à la moyenne');
+        menu.select('#btn_below_mean').text('supérieures à la moyenne');
         self.update();
       });
 
@@ -1129,8 +1130,9 @@ export default class ScatterPlot2 {
         }
         self.type = 'rank';
         this.classList.add('active');
-        menu.select('#ind_raw_values')
-          .attr('class', 'choice_ind noselect');
+        menu.select('#ind_raw_values').attr('class', 'choice_ind noselect');
+        menu.select('#btn_above_mean').text('inférieures à la médianne');
+        menu.select('#btn_below_mean').text('supérieures à la médianne');
         self.update();
       });
   }

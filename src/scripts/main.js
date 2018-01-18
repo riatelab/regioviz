@@ -493,10 +493,10 @@ function bindHelpMenu() {
         },
       });
       modal.setContent(
-        `<p style="font-family: 'Signika',sans-serif;color: #4f81bd;font-size: 1.3rem;">Description de l'indicateur</p>
-        <p style="font-family: 'Signika',sans-serif;text-align: justify;">${o.methodo.split('\n').join('<br>')}</p>
-        <p style="font-family: 'Signika',sans-serif;font-size: 0.8em">${o.source}</p>
-        <p style="font-family: 'Signika',sans-serif;font-size: 0.8em">Date de téléchargement de la donnée : ${o.last_update}</p>`);
+        `<p style="color: #4f81bd;font-size: 1.2rem;">Description de l'indicateur</p>
+        <p style="text-align: justify;">${o.methodo.split('\n').join('<br>')}</p>
+        <p>${o.source}</p>
+        <p>Date de téléchargement de la donnée : ${o.last_update}</p>`);
       modal.open();
     };
   });
@@ -505,9 +505,8 @@ function bindHelpMenu() {
   Array.prototype.slice.call(helps_buttons_study_zone).forEach((btn_i) => {
     // eslint-disable-next-line no-param-reassign, func-names
     btn_i.onclick = function () {
-      const filter_name = this.previousSibling.previousSibling.getAttribute('filter-value');
-      const o = study_zones.find(d => d.id === filter_name);
-
+      const filter_id = this.previousSibling.previousSibling.getAttribute('filter-value');
+      const o = study_zones.find(d => d.id === filter_id);
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
         stickyFooter: false,
@@ -520,11 +519,13 @@ function bindHelpMenu() {
           modal.destroy();
         },
       });
-      modal.setContent(
-        `<p style="font-family: 'Signika',sans-serif;color: #4f81bd;font-size: 1.3rem;">Méthodologie</p>
-        <p style="font-family: 'Signika',sans-serif;text-align: justify;">${filter_name}</p>
-        <p style="font-family: 'Signika',sans-serif;text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>
-        `);
+      let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b> (${filter_id})</p>
+<p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
+      const id_doc_pdf = o.id.split('N1')[0];
+      if (['TypoGDP', 'TypoPop', 'TypoEcoSpe', 'TypoUrb'].indexOf(id_doc_pdf) > -1) {
+        content += `<p><a class="buttonDownload" href="data/Doc_${id_doc_pdf}.pdf">Méthodologie détaillée (.pdf)</a></p>`;
+      }
+      modal.setContent(content);
       modal.open();
     };
   });
@@ -533,8 +534,8 @@ function bindHelpMenu() {
   Array.prototype.slice.call(helps_buttons_territ_unit).forEach((btn_i) => {
     // eslint-disable-next-line no-param-reassign, func-names
     btn_i.onclick = function () {
-      const territ_level_name = this.previousSibling.previousSibling.getAttribute('value');
-      const o = territorial_mesh.find(d => d.id === territ_level_name);
+      const territ_level_id = this.previousSibling.previousSibling.getAttribute('value');
+      const o = territorial_mesh.find(d => d.id === territ_level_id);
 
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
@@ -548,11 +549,12 @@ function bindHelpMenu() {
           modal.destroy();
         },
       });
-      modal.setContent(`
-        <p style="font-family: 'Signika',sans-serif; color: #4f81bd;font-size: 1.3rem;">Titre</p>
-        <p style="font-family: 'Signika',sans-serif;text-align: justify;">${territ_level_name}</p>
-        <p style="font-family: 'Signika',sans-serif;text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>
-        `);
+      let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
+<p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
+      if (o.id === 'N12_POL') {
+        content += '<p><a class="buttonDownload" href="data/Doc_Maille_infranationale_decision.pdf">Méthodologie détaillée (.pdf)</a></p>';
+      }
+      modal.setContent(content);
       modal.open();
     };
   });
@@ -574,12 +576,12 @@ function bindCreditsSource() {
       },
     });
     modal.setContent(
-      `<p style="font-family: 'Signika',sans-serif;color: #4f81bd;font-size: 1.3rem;">Régioviz - À propos</p>
+      `<p style="color: #4f81bd;font-size: 1.2rem;">Régioviz - À propos</p>
       <br><br><br>
-      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></p>
-      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Version <b>${app.version}</b></p>
-      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Développement : ...</p>
-      <p style="font-family: 'Signika',sans-serif;text-align: justify;">Financement : ...</p>`);
+      <p style="text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></p>
+      <p style="text-align: justify;">Version <b>${app.version}</b></p>
+      <p style="text-align: justify;">Développement : ...</p>
+      <p style="text-align: justify;">Financement : ...</p>`);
     modal.open();
   };
 }

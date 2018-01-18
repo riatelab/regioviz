@@ -315,8 +315,8 @@ export default class BarChart1 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - _h}px`,
+            left: `${d3.event.clientX - window.scrollX - 5}px`,
+            top: `${d3.event.clientY - window.scrollY - _h}px`,
           });
       });
 

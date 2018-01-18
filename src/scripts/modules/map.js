@@ -291,14 +291,14 @@ class MapSelect {
         // clearTimeout(t);
         self.tooltip.select('.title').html(this.getAttribute('title'));
         const b = self.tooltip.select('.title').node().getBoundingClientRect();
-        const left = d3.event.pageX < (window.innerWidth - (b.width + 20))
-          ? d3.event.pageX - 5
-          : d3.event.pageX - b.width;
+        const left = d3.event.clientX < (window.innerWidth - (b.width + 20))
+          ? d3.event.clientX - 5
+          : d3.event.clientX - b.width;
         self.tooltip
           .styles({
             display: null,
             left: `${left}px`,
-            top: `${d3.event.pageY - b.height - 20}px`,
+            top: `${d3.event.clientY - b.height - 20}px`,
           });
       });
   }

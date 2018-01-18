@@ -86,7 +86,7 @@ export function makeHeaderMapSection() {
 
   header_map_section.insert('img')
     .attrs({
-      class: 'map_button active',
+      class: 'map_button active img_scale',
       width: 20,
       height: 20,
       src: 'img/gimp-tool-rect-select.png',
@@ -96,7 +96,7 @@ export function makeHeaderMapSection() {
 
   header_map_section.insert('img')
     .attrs({
-      class: 'map_button',
+      class: 'map_button img_scale',
       width: 20,
       height: 20,
       src: 'img/gimp-tool-zoom.png',
@@ -106,7 +106,7 @@ export function makeHeaderMapSection() {
 
   header_map_section.insert('img')
     .attrs({
-      class: 'map_button',
+      class: 'map_button img_scale',
       width: 20,
       height: 20,
       src: 'img/gimp-cursor.png',
@@ -166,6 +166,7 @@ export function makeHeaderChart() {
       src: 'img/picto_download2.png',
       id: 'img_table',
       title: 'Téléchargement des données',
+      class: 'img_scale',
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
     .on('click', () => {
@@ -229,6 +230,7 @@ export function makeHeaderChart() {
       src: 'img/picto_report2.png',
       id: 'img_printer',
       title: 'Export d\'un rapport',
+      class: 'img_scale',
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
     .on('click', () => {
@@ -261,6 +263,7 @@ export function makeHeaderChart() {
       src: 'img/picto_information2.png',
       id: 'img_info',
       title: 'Aide',
+      class: 'img_scale',
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
     .on('click', () => {

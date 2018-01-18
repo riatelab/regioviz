@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Signika|Courgette');
+@import url('https://fonts.googleapis.com/css?family=Signika|Courgette|Ubuntu|Poppins');
 
 html, body {
   margin:0;height: 100%;
@@ -15,6 +15,12 @@ html, body {
     width: 540px;
     height: 100%;
   }
+  .img_scale_logo {
+    width: 5.5em;
+  }
+  .img_scale {
+    transform: scale(0.6);
+  }
 }
 
 @media only screen and (min-width: 960px) and (max-width: 1160px) {
@@ -27,6 +33,12 @@ html, body {
   #mainframe {
     width: 960px;
     height: 100%;
+  }
+  .img_scale_logo {
+    width: 6em;
+  }
+  .img_scale {
+    transform: scale(0.75);
   }
 }
 
@@ -41,6 +53,12 @@ html, body {
     width: 1160px;
     height: 100%;
   }
+  .img_scale_logo {
+    width: 7em;
+  }
+  .img_scale {
+    transform: scale(0.75);
+  }
 }
 
 @media only screen and (min-width: 1361px) and (max-width: 1560px) {
@@ -53,6 +71,9 @@ html, body {
   #mainframe {
     width: 1350px;
     height: 100%;
+  }
+  .img_scale_logo {
+    width: 8em;
   }
 }
 
@@ -67,6 +88,9 @@ html, body {
     width: 1550px;
     height: 100%;
   }
+  .img_scale_logo {
+    width: 8em;
+  }
 }
 
 @media only screen and (min-width: 2001px) {
@@ -79,6 +103,9 @@ html, body {
   #mainframe {
     width: 1850px;
     height: 100%;
+  }
+  .img_scale_logo {
+    width: 8em;
   }
 }
 
@@ -963,4 +990,10 @@ h3 {
 
 .title_variable.inversed {
   color: red;
+}
+
+
+.tingle-modal-box__content {
+  font-size: 0.8em;
+  font-family: 'Poppins', sans-serif;
 }
