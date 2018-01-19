@@ -21,7 +21,7 @@ let current_range = [0, 0];
 let displayed;
 
 function updateDimensions() {
-  svg_bar = d3.select('svg#svg_bar');
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
   margin = {
     top: 10,
     right: 20,
@@ -621,8 +621,8 @@ export default class BarChart1 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - 5}px`,
-            top: `${d3.event.pageY - 85}px`,
+            left: `${d3.event.pageX - window.scrollX - 5}px`,
+            top: `${d3.event.pageY - window.scrollY - 85}px`,
           });
       });
 

@@ -5,7 +5,7 @@ import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, prepareT
 import { filterLevelGeom } from './prepare_data';
 
 
-const svg_map = d3.select('svg#svg_map');
+const svg_map = d3.select('svg#svg_map').on('contextmenu', null);
 const width_map = fixed_dimension.map.width;
 const height_map = fixed_dimension.map.height;
 let styles;

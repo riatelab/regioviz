@@ -13,7 +13,7 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('#svg_bar');
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -134,6 +134,7 @@ export default class Similarity1plus {
             class: `axis axis--x ${selector_ratio_name}`,
             transform: 'translate(0, 10)',
           });
+
         g.append('text')
           .attrs({
             // x: 0,
@@ -147,6 +148,7 @@ export default class Similarity1plus {
             'title-tooltip': ratio_pretty_name,
           })
           .text(ratio_name);
+
         g.append('image')
           .attrs({
             x: 0,
@@ -179,14 +181,20 @@ export default class Similarity1plus {
           .attrs({
             // x: txt.node().getBoundingClientRect().width + 22.5,
             x: -17,
-            y: -1,
-            width: 11,
-            height: 13,
+            y: -6,
+            width: 12,
+            height: 15,
             'xlink:href': 'img/Up-Arrow.svg',
             id: 'up_arrow',
             title: 'Changer l\'ordre des axes (vers le haut)',
           })
           .style('cursor', 'pointer')
+          .on('mousedown', function () {
+            this.style.filter = 'drop-shadow(1px 1px 0.2px #000)';
+          })
+          .on('mouseup mouseout', function () {
+            this.style.filter = '';
+          })
           .on('click', function () {
             const that_ratio = this.parentElement.id.slice(2);
             const current_position = self.ratios.indexOf(that_ratio);
@@ -202,13 +210,19 @@ export default class Similarity1plus {
             // x: txt.node().getBoundingClientRect().width + 22.5,
             x: -17,
             y: 13,
-            width: 11,
-            height: 13,
+            width: 12,
+            height: 15,
             'xlink:href': 'img/Down-Arrow.svg',
             id: 'down_arrow',
             title: 'Changer l\'ordre des axes (vers le bas)',
           })
           .style('cursor', 'pointer')
+          .on('mousedown', function () {
+            this.style.filter = 'drop-shadow(1px 1px 0.2px #000)';
+          })
+          .on('mouseup mouseout', function () {
+            this.style.filter = '';
+          })
           .on('click', function () {
             const that_ratio = this.parentElement.id.slice(2);
             const current_position = self.ratios.indexOf(that_ratio);
@@ -225,7 +239,13 @@ export default class Similarity1plus {
         layer_other = g.select('g.otherfeature');
         layer_highlighted = g.select('g.highlighted');
       }
-      g.attr('transform', `translate(0, ${height_to_use})`);
+      // g.attr('transform', `translate(0, ${height_to_use})`);
+      const _trans = this.draw_group.select(`#${selector_ratio_name}`)
+        .transition()
+        .duration(225);
+      g = this.draw_group.select(`#${selector_ratio_name}`).transition(_trans).attr('transform', `translate(0, ${height_to_use})`);
+      g.select('#up_arrow').transition(_trans).transition(225).style('display', i === 0 ? 'none' : '');
+      g.select('#down_arrow').transition(_trans).transition(225).style('display', i === nb_variables - 1 ? 'none' : '');
       let _min;
       let _max;
       this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
@@ -459,7 +479,7 @@ export default class Similarity1plus {
           content.push(`${num_n} (numérateur) : ${formatNumber(d[num_n] * coef, 1)} ${unit_num}`);
         }
         if (+globalrank > 0) { // No need to display that part if this is "my region":
-          _h += 35;
+          _h += 30;
           // content.push(
           //   `Écart absolu normalisé : ${formatNumber(
           //     math_abs(100 * (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
@@ -470,6 +490,7 @@ export default class Similarity1plus {
           }
         }
         if (!Number.isNaN(globalrank)) {
+          _h += 30;
           if (+globalrank === 0) {
             content.push('<br><b>Ma région</b>');
           } else if (+globalrank === 1) {
@@ -487,8 +508,8 @@ export default class Similarity1plus {
         self.tooltip
           .styles({
             display: null,
-            left: `${window.scrollX + d3.event.clientX - 5}px`,
-            top: `${window.scrollY + d3.event.clientY - _h}px`,
+            left: `${d3.event.pageX - window.scrollX - 5}px`,
+            top: `${d3.event.pageY - window.scrollY - _h}px`,
           });
       })
       .on('click', function (d) {

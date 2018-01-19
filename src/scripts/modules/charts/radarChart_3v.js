@@ -17,7 +17,7 @@ let t;
 let tm;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('#svg_bar');
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
   margin = { top: 60, right: 70, bottom: 60, left: 70 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -337,10 +337,10 @@ export default class RadarChart3 {
       .attrs(function () {
         const el = this.parentElement.querySelector('tspan');
         const bbox = el.getBoundingClientRect();
-        const x = +el.getAttribute('x') - 25;
-        const y = +el.getAttribute('y') - 10;
-        const _h = 45;
-        const _w = bbox.width + 10;
+        const x = +el.getAttribute('x') - bbox.width / 2 - 20;
+        const y = +el.getAttribute('y') - 15;
+        const _h = 60;
+        const _w = bbox.width + 40;
         return { x, y, height: _h, width: _w };
       });
   }
@@ -711,8 +711,9 @@ export default class RadarChart3 {
         self.tooltip
           .styles({
             display: null,
-            left: `${window.scrollX + d3.event.clientX - 5}px`,
-            top: `${window.scrollY + d3.event.clientY - self.tooltip.node().getBoundingClientRect().height}px` });
+            left: `${d3.event.pageX - window.scrollX - 5}px`,
+            top: `${d3.event.pageY - window.scrollY - self.tooltip.node().getBoundingClientRect().height - 5}px`,
+          });
       });
   }
 

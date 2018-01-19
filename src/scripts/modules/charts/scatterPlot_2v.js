@@ -14,7 +14,7 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('#svg_bar');
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
   margin = { top: 20, right: 20, bottom: 40, left: 60 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -231,8 +231,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.clientX - window.scrollX - 5}px`,
-              top: `${d3.event.clientY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - window.scrollX - 5}px`,
+              top: `${d3.event.pageY - window.scrollY - _h}px`,
             });
         } else if (self.type === 'rank') {
           const content = ['Médiane de l\'espace d\'étude'];
@@ -256,8 +256,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.clientX - window.scrollX - 5}px`,
-              top: `${d3.event.clientY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - window.scrollX - 5}px`,
+              top: `${d3.event.pageY - window.scrollY - _h}px`,
             });
         }
       });
@@ -327,8 +327,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.clientX - window.scrollX - 5}px`,
-              top: `${d3.event.clientY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - window.scrollX - 5}px`,
+              top: `${d3.event.pageY - window.scrollY - _h}px`,
             });
         } else if (self.type === 'rank') {
           const content = ['Médiane de l\'espace d\'étude'];
@@ -352,8 +352,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.clientX - window.scrollX - 5}px`,
-              top: `${d3.event.clientY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - window.scrollX - 5}px`,
+              top: `${d3.event.pageY - window.scrollY - _h}px`,
             });
         }
       });
@@ -556,6 +556,9 @@ export default class ScatterPlot2 {
   }
 
 
+  /**
+  * Update both axis and grid.
+  */
   updateAxisGrid() {
     this.plot.select('.grid-x')
       .transition()
@@ -634,6 +637,9 @@ export default class ScatterPlot2 {
       });
   }
 
+  /**
+  * Recolor the dots without calling the `update` method.
+  */
   updateLight() {
     const default_color = 'gray';
     this.scatter.selectAll('.dot')
@@ -645,6 +651,9 @@ export default class ScatterPlot2 {
       }));
   }
 
+  /**
+  * Redraw the scatterplot.
+  */
   update() {
     const self = this;
     const data = self.data;
@@ -767,12 +776,19 @@ export default class ScatterPlot2 {
     this.updateAxisGrid();
   }
 
+  /**
+  * Update the completness value (displayed on the top of the map),
+  * computed for the current study area and the two displayed variables.
+  */
   updateCompletude() {
     this.completude.update(
       calcCompletudeSubset(app, [this.variable1, this.variable2], 'array'),
       calcPopCompletudeSubset(app, [this.variable1, this.variable2]));
   }
 
+  /**
+  * Update the map linked to this chart to sync the colors in use.
+  */
   updateMapRegio() {
     if (!this.map_elem) return;
     this.map_elem.target_layer.selectAll('path')
@@ -781,6 +797,10 @@ export default class ScatterPlot2 {
         : color_disabled));
   }
 
+  /**
+  * Handle a brush event on the map and recolor the appropriate features
+  * on the scatterplot.
+  */
   handle_brush_map(event) {
     if (!event || !event.selection) {
       this.last_map_selection = undefined;
@@ -823,6 +843,9 @@ export default class ScatterPlot2 {
     self.updateLight();
   }
 
+  /**
+  * Binds the tooltip on the new/updated dots.
+  */
   bindTooltips(with_rank) {
     const self = this;
     this.scatter.selectAll('.dot')
@@ -861,8 +884,8 @@ export default class ScatterPlot2 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.clientX - window.scrollX - 5}px`,
-            top: `${d3.event.clientY - window.scrollY - yoffset}px` });
+            left: `${d3.event.pageX - window.scrollX - 5}px`,
+            top: `${d3.event.pageY - window.scrollY - yoffset}px` });
       })
       .on('mouseout.tooltip', () => {
         clearTimeout(t);
@@ -872,6 +895,9 @@ export default class ScatterPlot2 {
       });
   }
 
+  /**
+  * Handle a click on the map, used for selecting features.
+  */
   handleClickMap(d, parent) {
     const id = d.id;
     if (this.current_ids.indexOf(id) < 0 || id === app.current_config.my_region) return;
@@ -895,6 +921,10 @@ export default class ScatterPlot2 {
     this.updateLight();
   }
 
+  /**
+  * Update the line created for the mean or median value (after changing the variables in user_data
+  * or after changing the kind of chart between 'rank' and 'raw values').
+  */
   updateMeanMedianValue() {
     if (this.type === 'value') {
       this.mean_variable1 = getMean(this.data.map(d => d[this.variable1]));
@@ -924,6 +954,9 @@ export default class ScatterPlot2 {
       });
   }
 
+  /**
+  * Action triggered when the user change the reference region ("Ma région").
+  */
   updateChangeRegion() {
     if (app.current_config.filter_key !== undefined) {
       this.changeStudyZone();
@@ -1148,8 +1181,8 @@ export default class ScatterPlot2 {
         self.type = 'rank';
         this.classList.add('active');
         menu.select('#ind_raw_values').attr('class', 'choice_ind noselect');
-        menu.select('#btn_above_mean').text('inférieures à la médianne');
-        menu.select('#btn_below_mean').text('supérieures à la médianne');
+        menu.select('#btn_above_mean').text('inférieures à la médiane');
+        menu.select('#btn_below_mean').text('supérieures à la médiane');
         self.update();
       });
   }
