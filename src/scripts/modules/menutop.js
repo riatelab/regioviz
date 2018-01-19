@@ -1,6 +1,6 @@
 import tingle from 'tingle.js';
 import { app } from './../main';
-
+import { exportHtmlRapport } from './helpers';
 
 /**
 * Function to prepare the menu, located on the top of the window, allowing to choose
@@ -234,6 +234,10 @@ export function makeHeaderChart() {
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
     .on('click', () => {
+      const html_doc = exportHtmlRapport();
+      // d3.select('body')
+      //   .append('div')
+      //   .text(html_doc);
       const content = `<div id="prep_rapport"><h3>Rapport en cours de préparation...</h3>
 <div class="spinner"><div class="cube1"></div><div class="cube2"></div></div></div>`;
       // eslint-disable-next-line new-cap

@@ -627,6 +627,44 @@ function noContextMenu() {
   d3.event.preventDefault();
 }
 
+function exportHtmlRapport() {
+  const targetSvgMap = document.getElementById('svg_map');
+  const targetSvgChart = document.getElementById('svg_bar');
+  const serializer = new XMLSerializer();
+  const sources = [
+    serializer.serializeToString(targetSvgMap),
+    serializer.serializeToString(targetSvgChart),
+  ];
+  sources.forEach((source) => {
+    if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+      // eslint-disable-next-line no-param-reassign
+      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+    if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+      // eslint-disable-next-line no-param-reassign
+      source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+    }
+    // // eslint-disable-next-line no-param-reassign
+    // source = ['<?xml version="1.0" standalone="no"?>\r\n', source].join('');
+  });
+  const new_html_doc = `
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Regioviz</title>
+<body>
+  <div style="display: flex;">
+    <div style="width: 35%;">${sources[0]}</div>
+    <div style="width: 35%;>${sources[1]}</div>
+  </div>
+  <div style="text-align: justify;">
+  Bla blablsdkflsdklfsdlflsdkfl blalblalfdldslgf Bla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgf
+  </div>
+</body>
+`;
+  return new_html_doc;
+}
+
 export {
   comp,
   comp2,
@@ -663,4 +701,5 @@ export {
   getStyle,
   getStyleProperty,
   noContextMenu,
+  exportHtmlRapport,
 };
