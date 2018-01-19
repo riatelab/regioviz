@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, prepareTooltip2, getMean, Tooltipsify, formatNumber } from './../helpers';
+import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, prepareTooltip2, getMean, Tooltipsify, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
@@ -13,7 +13,7 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', noContextMenu);
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -180,7 +180,7 @@ export default class Similarity1plus {
         g.append('image')
           .attrs({
             // x: txt.node().getBoundingClientRect().width + 22.5,
-            x: -17,
+            x: -19,
             y: -6,
             width: 12,
             height: 15,
@@ -208,7 +208,7 @@ export default class Similarity1plus {
         g.append('image')
           .attrs({
             // x: txt.node().getBoundingClientRect().width + 22.5,
-            x: -17,
+            x: -19,
             y: 13,
             width: 12,
             height: 15,
@@ -243,9 +243,15 @@ export default class Similarity1plus {
       const _trans = this.draw_group.select(`#${selector_ratio_name}`)
         .transition()
         .duration(225);
-      g = this.draw_group.select(`#${selector_ratio_name}`).transition(_trans).attr('transform', `translate(0, ${height_to_use})`);
-      g.select('#up_arrow').transition(_trans).transition(225).style('display', i === 0 ? 'none' : '');
-      g.select('#down_arrow').transition(_trans).transition(225).style('display', i === nb_variables - 1 ? 'none' : '');
+      g = this.draw_group.select(`#${selector_ratio_name}`)
+        .transition(_trans)
+        .attr('transform', `translate(0, ${height_to_use})`);
+      g.select('#up_arrow')
+        // .transition(_trans)
+        .style('display', i === 0 ? 'none' : '');
+      g.select('#down_arrow')
+        // .transition(_trans)
+        .style('display', i === nb_variables - 1 ? 'none' : '');
       let _min;
       let _max;
       this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);

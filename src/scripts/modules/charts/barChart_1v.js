@@ -1,5 +1,5 @@
 import debug from 'debug';
-import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber } from './../helpers';
+import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
@@ -21,7 +21,7 @@ let current_range = [0, 0];
 let displayed;
 
 function updateDimensions() {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', noContextMenu);
   margin = {
     top: 10,
     right: 20,
@@ -29,7 +29,7 @@ function updateDimensions() {
     left: 60,
   };
   margin2 = {
-    top: math_round(fixed_dimension.chart.height - margin.top - margin.bottom + 25),
+    top: math_round(fixed_dimension.chart.height - margin.top - margin.bottom + 45),
     right: 20,
     bottom: 12.5,
     left: 60,

@@ -1,11 +1,11 @@
 import centroid from '@turf/centroid';
 import { app } from './../main';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './options';
-import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, prepareTooltip2, getElementsFromPoint } from './helpers';
+import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, prepareTooltip2, getElementsFromPoint, noContextMenu } from './helpers';
 import { filterLevelGeom } from './prepare_data';
 
 
-const svg_map = d3.select('svg#svg_map').on('contextmenu', null);
+const svg_map = d3.select('svg#svg_map').on('contextmenu', noContextMenu);
 const width_map = fixed_dimension.map.width;
 const height_map = fixed_dimension.map.height;
 let styles;

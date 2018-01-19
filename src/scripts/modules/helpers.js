@@ -617,6 +617,15 @@ function formatNumber(value, precision) {
   return values_list.join(formatnb_decimal_sep);
 }
 
+/**
+*
+*
+*
+*
+*/
+function noContextMenu() {
+  d3.event.preventDefault();
+}
 
 export {
   comp,
@@ -653,4 +662,5 @@ export {
   formatNumber,
   getStyle,
   getStyleProperty,
+  noContextMenu,
 };

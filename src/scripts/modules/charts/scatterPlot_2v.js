@@ -1,4 +1,4 @@
-import { Rect, comp2, prepareTooltip2, svgPathToCoords, computePercentileRank, getMean, formatNumber } from './../helpers';
+import { Rect, comp2, prepareTooltip2, svgPathToCoords, computePercentileRank, getMean, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors } from './../../main';
@@ -14,7 +14,7 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', noContextMenu);
   margin = { top: 20, right: 20, bottom: 40, left: 60 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -1017,16 +1017,18 @@ export default class ScatterPlot2 {
     this.pretty_name1 = var_info.name;
     this.unit1 = var_info.unit;
     // Update the name of the axis and the tooltip value:
-    svg_container.select('#title-axis-x')
+    const title_axis = svg_container.select('#title-axis-x')
       .attr('title-tooltip', this.pretty_name1)
       .html(`${code_variable} &#x25BE;`);
     // Update the position of the reverse button:
     svg_container.select('#img_reverse_x')
       .attrs({
-        x: margin.left + width / 2 - 20 - svg_container.select('#title-axis-x').node().getBoundingClientRect().width / 2,
+        x: title_axis.attr('x') - title_axis.node().getBoundingClientRect().width / 2 - 20,
         y: margin.top + height + margin.bottom / 2 + 5,
       });
+    // Update the items displayed in the context menu under this axis label:
     this.updateItemsCtxMenu();
+    // Filter the data to only keep data in which we are interested:
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {
         const res = { id: d.id, name: d.name };
@@ -1034,6 +1036,7 @@ export default class ScatterPlot2 {
         res[this.variable2] = d[this.variable2];
         return res;
       });
+    // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
       this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
     this.data.push(tmp_my_region);
@@ -1066,8 +1069,9 @@ export default class ScatterPlot2 {
         x: margin.left / 3 - 20,
         y: margin.top + (height / 2) + svg_container.select('#title-axis-y').node().getBoundingClientRect().height / 2 + 5,
       });
-
+    // Update the items displayed in the context menu under this axis label:
     this.updateItemsCtxMenu();
+    // Filter the data to only keep data in which we are interested:
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {
         const res = { id: d.id, name: d.name };
@@ -1075,7 +1079,7 @@ export default class ScatterPlot2 {
         res[this.variable2] = d[this.variable2];
         return res;
       });
-
+    // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
       this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
     this.data.push(tmp_my_region);
@@ -1093,6 +1097,7 @@ export default class ScatterPlot2 {
   }
 
   updateItemsCtxMenu() {
+    // Use all the variables selected in the left menu to fill the two context menu:
     this.itemsX = app.current_config.ratio.filter(elem => elem !== this.variable2)
       .map(elem => ({
         name: elem,
@@ -1106,6 +1111,8 @@ export default class ScatterPlot2 {
   }
 
   addVariable(code_variable) {
+    // When the user select a new variable on the left menu, the variable name is added
+    // in the context menu of X and Y axis but the plot stay the same:
     this.itemsX.push({
       name: code_variable,
       action: () => this.changeVariableX(code_variable),
@@ -1188,15 +1195,18 @@ export default class ScatterPlot2 {
   }
 
   selectBelowMean() {
-    const mean1 = getMean(this.data.map(ft => ft[this.variable1]));
-    const mean2 = getMean(this.data.map(ft => ft[this.variable2]));
+    const mean1 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable1]));
+    const mean2 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable2]));
+    const v1 = this.type === 'rank' ? this.rank_variable1 : this.variable1;
+    const v2 = this.type === 'rank' ? this.rank_variable2 : this.variable2;
+
     svg_container.select('.brush').call(this.brush.move, null);
     app.colors = {};
     for (let i = 0, len_i = this.data.length; i < len_i; i++) {
       const ft = this.data[i];
-      if (ft[this.variable1] < mean1 && ft[this.variable2] < mean2) {
+      if (ft[v1] < mean1 && ft[v2] < mean2) {
         app.colors[ft.id] = comp2(
-          ft[this.variable1], ft[this.variable2],
+          ft[v1], ft[v2],
           this.ref_value1, this.ref_value2,
           this.xInversed, this.yInversed);
       }
@@ -1226,15 +1236,18 @@ export default class ScatterPlot2 {
   }
 
   selectAboveMean() {
-    const mean1 = getMean(this.data.map(ft => ft[this.variable1]));
-    const mean2 = getMean(this.data.map(ft => ft[this.variable2]));
+    const mean1 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable1]));
+    const mean2 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable2]));
+    const v1 = this.type === 'rank' ? this.rank_variable1 : this.variable1;
+    const v2 = this.type === 'rank' ? this.rank_variable2 : this.variable2;
+
     svg_container.select('.brush').call(this.brush.move, null);
     app.colors = {};
     for (let i = 0, len_i = this.data.length; i < len_i; i++) {
       const ft = this.data[i];
-      if (ft[this.variable1] > mean1 && ft[this.variable2] > mean2) {
+      if (ft[v1] > mean1 && ft[v2] > mean2) {
         app.colors[ft.id] = comp2(
-          ft[this.variable1], ft[this.variable2],
+          ft[v1], ft[v2],
           this.ref_value1, this.ref_value2,
           this.xInversed, this.yInversed);
       }

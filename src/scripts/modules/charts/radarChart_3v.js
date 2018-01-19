@@ -1,7 +1,7 @@
 import alertify from 'alertifyjs';
 import {
   math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
-  getMean, Tooltipsify, prepareTooltip2, formatNumber } from './../helpers';
+  getMean, Tooltipsify, prepareTooltip2, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info } from './../../main';
@@ -17,7 +17,7 @@ let t;
 let tm;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', null);
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', noContextMenu);
   margin = { top: 60, right: 70, bottom: 60, left: 70 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -247,7 +247,7 @@ export default class RadarChart3 {
     const self = this;
 
     const swapAxis = function swapAxis() {
-      const ix = +this.parentElement.id;
+      const ix = +this.parentElement.id.slice(2);
       if (ix + 1 === self.allAxis.length) {
         for (let i = 0; i < self.data.length; i++) {
           swap(self.data[i].axes, ix, 0);
@@ -262,14 +262,14 @@ export default class RadarChart3 {
     };
 
     const reverseAxis = function reverseAxis(label) {
-      const id_axis = this.id;
+      const id_axis = this.parentElement.id;
       if (self.inversedAxis.has(label)) {
         self.inversedAxis.delete(label);
-        self.g.select(`g#${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_plus.png');
+        self.g.select(`g#gp${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_plus.png');
         this.style.fill = 'black';
       } else {
         self.inversedAxis.add(label);
-        self.g.select(`g#${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_moins.png');
+        self.g.select(`g#gp${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_moins.png');
         this.style.fill = 'red';
       }
 
@@ -597,7 +597,8 @@ export default class RadarChart3 {
 
     // Append the labels at each axis
     const gp_axis_label = axis.append('g')
-      .attr('id', (d, i) => i)
+      .attr('id', (d, i) => `gp${i}`)
+      .attr('class', 'gp_axis_label')
       .style('pointer-events', 'all');
 
     gp_axis_label.append('rect')
@@ -663,6 +664,12 @@ export default class RadarChart3 {
             .selectAll('image')
             .style('display', 'none');
         }, 250);
+      });
+
+    this.g.selectAll('.gridCircle')
+      .on('mousemove mouseover', () => {
+        clearTimeout(tm);
+        d3.selectAll('.gp_axis_label').selectAll('image').style('display', 'none');
       });
 
     // Filter for the outside glow
@@ -892,7 +899,6 @@ export default class RadarChart3 {
       }))
       .styles(d => ({
         fill: this.inversedAxis.has(d) ? 'red' : 'black',
-        cursor: 'pointer',
       }))
       .text(d => d)
       .call(d => this.wrap(d, cfg.wrapWidth));
