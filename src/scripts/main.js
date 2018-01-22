@@ -13,7 +13,7 @@ import BarChart1 from './modules/charts/barChart_1v';
 import ScatterPlot2 from './modules/charts/scatterPlot_2v';
 import RadarChart3 from './modules/charts/radarChart_3v';
 import Similarity1plus from './modules/charts/similarity1v';
-import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, Tooltipsify, getRatioToWide } from './modules/helpers';
+import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, Tooltipsify, getRatioToWide, clickDlPdf } from './modules/helpers';
 import {
   prepare_dataset,
   filterLevelVar,
@@ -521,12 +521,13 @@ function bindHelpMenu() {
       });
       let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
 <p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
-      const id_doc_pdf = o.id.split('N1')[0];
-      if (['TypoGDP', 'TypoPop', 'TypoEcoSpe', 'TypoUrb'].indexOf(id_doc_pdf) > -1) {
-        content += `<p><a class="buttonDownload" href="data/Doc_${id_doc_pdf}.pdf">Méthodologie détaillée (.pdf)</a></p>`;
+
+      if (['SPAT', 'UNIT_SUP'].indexOf(filter_id) < 0) {
+        content += `<p><a class="buttonDownload" href="data/${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
       }
       modal.setContent(content);
       modal.open();
+      document.querySelector('a.buttonDownload').onclick = clickDlPdf;
     };
   });
 

@@ -1058,4 +1058,28 @@ Sur ce graphique, il est possible d’inverser l’ordre de classement de l’in
 
 La carte et le graphique sont interactifs dans la mesure où l’utilisateur peut choisir de sélectionner des unités territoriales (clic gauche appuyé de la souris) et visualiser leur positionnement simultanément sur la carte (localisation géographique) ou sur le diagramme de distribution (positionnement statistique). Il peut aussi en un clic choisir de visualiser les unités territoriales ayant des valeurs inférieures/supérieures à la moyenne de l’espace d’étude ou inférieures/supérieures à la valeur de l’unité territoriale de référence (« ma région »).`;
   }
+
+  getTemplateHelp() {
+    const [my_region, my_rank] = this.data.map((d, i) => [d.id, i])
+      .find(d => d[0] === app.current_config.my_region);
+    const values = this.data.map(d => d[this.ratio_to_use]).sort((a, b) => a - b);
+    let inf = 0;
+    let sup = 0;
+    const my_value = this.ref_value;
+    values.forEach((v) => {
+      if (v < my_value) {
+        inf += 1;
+      } else {
+        sup += 1;
+      }
+    });
+    const name_study_zone = !app.current_config.filter_key
+      ? 'UE28' : app.current_config.filter_key instanceof Array
+      ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
+      : study_zones.find(d => d.id === app.current_config.filter_key).name;
+    return `
+L’unité territoriale ${my_region.name} a une valeur de ${formatNumber(this.ref_value, 1)} pour l’indicateur <i>${this.ratio_to_use}</i>. Elle se situe  au rang ${my_rank} de la distribution pour l’espace d’étude ${name_study_zone}.
+Pour cet indicateur, ${sup} unités territoriales ont une valeur supérieures et ${inf} unités territoriales ont une valeur inférieure.
+Par ailleurs mon unité territoriale se situe ${Math.abs(getMeanRank(this.mean_value, this.ratio_to_use) - my_rank)} ${this.ref_value > this.mean_value ? 'au dessus' : 'en-dessous'} de la moyenne de l’espace d’étude (${formatNumber(this.mean_value, 1)}).`;
+  }
 }

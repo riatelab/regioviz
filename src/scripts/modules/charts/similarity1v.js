@@ -69,7 +69,7 @@ export default class Similarity1plus {
     selection_close.append('input')
       .attrs({ class: 'nb_select', type: 'number' })
       .styles({ color: '#4f81bd', 'margin-left': '1px' })
-      .property('value', 5);
+      .property('value', 1);
     selection_close.append('span')
       .html('régions les plus proches');
     const section = menu_selection.append('section')
@@ -190,10 +190,10 @@ export default class Similarity1plus {
           })
           .style('cursor', 'pointer')
           .on('mousedown', function () {
-            this.style.filter = 'drop-shadow(1px 1px 0.2px #000)';
+            this.classList.add('arrow-shadow');
           })
           .on('mouseup mouseout', function () {
-            this.style.filter = '';
+            this.classList.remove('arrow-shadow');
           })
           .on('click', function () {
             const that_ratio = this.parentElement.id.slice(2);
@@ -218,10 +218,10 @@ export default class Similarity1plus {
           })
           .style('cursor', 'pointer')
           .on('mousedown', function () {
-            this.style.filter = 'drop-shadow(1px 1px 0.2px #000)';
+            this.classList.add('arrow-shadow');
           })
           .on('mouseup mouseout', function () {
-            this.style.filter = '';
+            this.classList.remove('arrow-shadow');
           })
           .on('click', function () {
             const that_ratio = this.parentElement.id.slice(2);
@@ -723,7 +723,7 @@ export default class Similarity1plus {
     this.map_elem = map_elem;
     this.map_elem.resetColors(this.current_ids);
     this.map_elem.displayLegend(2);
-    this.applySelection(5);
+    this.applySelection(1);
   }
 
   prepareTableStat() {
@@ -773,5 +773,9 @@ Par défaut, l’application renvoie les 5 unités territoriales pour l’espace
 Sur le graphique apparaissent les n unités territoriales les plus proches pour chaque indicateur dans leurs unités de mesure respectives. L’unité territoriale de référence apparaît systématiquement au centre de chacun des graphiques. Un clic gauche sur une des unités territoriales sur le graphique ou sur la carte génère une ligne entre chaque indicateur permettant d’évaluer le degré de ressemblance avec l’unité territoriale de référence et visualiser ainsi si celle-ci se positionne au-dessus ou en dessous, et pour quel indicateur.
 
 Par défaut, la taille des cercles sur le graphique est constante. Mais l’utilisateur peut activer l’option « cercles proportionnels au numérateur » pour visualiser graphiquement la masse des unités territoriales. Par exemple, si l’indicateur PIB par habitant est sélectionné, la taille des cercles sera proportionnelle à la masse de PIB des unités territoriales. Si c’est la part des 0-24 ans dans la population totale, la taille des figurés sera proportionnelle à la masse de la population âgée de 0 à 24 ans. Cette option a été créée afin de pouvoir restituer les ordres de grandeur potentiellement hétérogènes des unités territoriales proposées dans l’application.`;
+  }
+
+  getTemplateHelp() {
+    return ``;
   }
 }

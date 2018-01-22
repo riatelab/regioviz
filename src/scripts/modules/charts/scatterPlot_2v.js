@@ -1322,4 +1322,10 @@ Sur le graphique et la carte, les unités territoriales qui disposent de valeurs
 
 Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur (pourcentage par exemple). En sélectionnant l’option «valeurs de rang », l’indicateur est normalisé de 0 (valeur minimale) à 100 (valeur maximale). L’utilisation possible de ce type de transformation est la suivante : une unité territoriale disposant d’un indice de 67 sur un indicateur signifie que 33 % des unités territoriales de l’espace d’étude sont caractérisées par des valeurs supérieures à l’unité territoriale de référence pour les indicateurs sélectionnés. Et réciproquement. Les valeurs de rang permettent notamment de rendre comparables des unités de mesure et des paramètres de dispersion de deux indicateurs. Il ne faut néanmoins pas omettre que cette transformation nuit à la restitution de la dispersion statistique effective des indicateurs.`;
   }
+
+  getTemplateHelp() {
+    return `
+L’ unité territoriale <nom de l’unité territoriale de référence> a une valeur de <x> pour l’indicateur <nom de l’indicateur> représenté sur l’axe des abscisses et une valeur de <y> pour l’indicateur <nom de l’indicateur> représenté sur l’axe des ordonnées. Cela place cette unité territoriale de référence au rang <n> de la distribution pour l’espace d’étude <nom de l’espace d’étude> et l’indicateur <nom de l’indicateur> ; et au <n> rang pour l’indicateur <nom de l’indicateur>.
+Pour cet espace d’étude, <x> % des unités territoriales sont définies par une situation plus favorable sur les deux indicateurs pour la unité territoriale sélectionnée, représentées en vert sur le graphique et sur la carte. <x> % des unités territoriales sont caractérisées par une situation plus défavorables pour les deux indicateurs, représentées en rouge sur la carte. Enfin, l’unité territoriale <nom de l’unité territoriale de référence> se situe dans une situation contradictoire avec <x> % des unité territoriales, représentées en violet et orange sur la carte (situation favorable/défavorable pour un des deux indicateurs).`;
+  }
 }

@@ -1132,4 +1132,8 @@ Il est possible de cliquer sur la carte pour visualiser le positionnement d’au
 
 Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la forme dépend largement de la position des indicateurs sur le graphique, aléatoire par définition) que la position au regard de l’espace de référence ou d’autres unités territoriales sélectionnées sur le graphique. L’utilisateur peut dès lors inverser le sens du classement (clic droit sur le label de l’indicateur, adapté pour des indicateurs comme le taux de chômage ou un taux élevé ne signifie pas forcément une situation favorable) ou peut inverser l’ordre d’apparition des variables sur le graphique (clic gauche) si l’on souhaite par exemple rapprocher des indicateurs de même thématique côte à côte.`;
   }
+
+  getTemplateHelp() {
+    return ``;
+  }
 }

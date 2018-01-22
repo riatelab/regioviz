@@ -1,6 +1,6 @@
 import tingle from 'tingle.js';
 import { app } from './../main';
-import { exportHtmlRapport } from './helpers';
+import { exportHtmlRapport, clickDlPdf } from './helpers';
 
 /**
 * Function to prepare the menu, located on the top of the window, allowing to choose
@@ -133,17 +133,6 @@ export function makeHeaderMapSection() {
     .text('-');
 }
 
-function clickDlMetadata(event) {
-  console.log(event);
-  this.href = '#';
-  window.open('data/Metadonnees_Regioviz.pdf');
-  event.preventDefault();
-  // eslint-disable-next-line no-param-reassign
-  event.returnValue = false;
-  this.href = 'data/Metadonnees_Regioviz.pdf';
-  return false;
-}
-
 /**
 * Function to prepare the icons displayed on the top of the chart.
 * The function creates the elements on the DOM and bind click events on
@@ -191,13 +180,29 @@ export function makeHeaderChart() {
 <p><a class="buttonDownload large" id="dl_data" href="#">Table de données (.csv)</a></p>
 <p><a class="buttonDownload large" id="dl_metadata" href="data/Metadonnees_Regioviz.pdf">Fiche de métadonnées (.pdf)</a></p>
 <p><a class="buttonDownload large" id="dl_geolayer" href="#" download>Fond de carte (.geojson)</a></p></div>`);
-        document.getElementById('dl_metadata').onclick = clickDlMetadata;
+        document.getElementById('dl_metadata').onclick = clickDlPdf;
         document.getElementById('dl_data').onclick = () => {
-          const columns = Object.keys(app.current_data[0]);
-          const table_content = [
-            columns.join(','), '\r\n',
-            app.current_data.map(d => columns.map(c => d[c]).join(',')).join('\r\n'),
-          ].join('');
+          const ratios = app.current_config.ratio;
+          const nums = app.current_config.num;
+          const denums = app.current_config.denum;
+          const columns = ['id', 'name'];
+          ratios.forEach((v, i) => {
+            columns.push(v);
+            columns.push(nums[i]);
+            columns.push(denums[i]);
+            columns.push(`pr_${v}`);
+          });
+          let table_content = [
+            columns.join(','), '\r\n'];
+          app.chart.current_ids.forEach((idx) => {
+            const l1 = app.current_data.find(d => d.id === idx);
+            const l2 = app.chart.data.find(d => d.id === idx);
+            console.log(l1, l2);
+            table_content.push(columns.map(c => l1[c] || l2[c]).join(','));
+            table_content.push('\r\n');
+          });
+          // app.current_data.map(d => columns.map(c => d[c]).join(',')).join('\r\n'),
+          table_content = table_content.join('');
           const elem = document.createElement('a');
           elem.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(table_content)}`);
           elem.setAttribute('download', 'Regioviz_export.csv');
@@ -234,10 +239,7 @@ export function makeHeaderChart() {
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
     .on('click', () => {
-      const html_doc = exportHtmlRapport();
-      // d3.select('body')
-      //   .append('div')
-      //   .text(html_doc);
+
       const content = `<div id="prep_rapport"><h3>Rapport en cours de préparation...</h3>
 <div class="spinner"><div class="cube1"></div><div class="cube2"></div></div></div>`;
       // eslint-disable-next-line new-cap
@@ -254,10 +256,21 @@ export function makeHeaderChart() {
       });
       modal.setContent(content);
       modal.open();
+      const message = app.chart.getTemplateHelp();
+      const html_doc = exportHtmlRapport(message);
+      // const elem = document.createElement('a');
+      const href = `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`;
+      // elem.setAttribute('href', `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`);
+      // elem.setAttribute('download', 'rapport.html');
+      // elem.style.display = 'none';
       setTimeout(() => {
-        modal.setContent(`<div id="prep_rapport">
-<p><a class="buttonDownload" href="#">Télécharger</a> <a class="buttonDownload" href="#">Ouvrir</a></p></div>`);
-      }, 2000);
+        modal.setContent(`<div id="prep_rapport"><p><a class="buttonDownload" id="dl_rapport" download="Regioviz_rapport.html" href="${href}">Télécharger</a></p></div>`);
+        // document.querySelector('#dl_rapport').onclick = function () {
+        //   document.body.appendChild(elem);
+        //   elem.click();
+        //   document.body.removeChild(elem);
+        // };
+      }, 250);
     });
 
   header_bar_section.insert('img')

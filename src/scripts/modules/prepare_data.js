@@ -118,7 +118,11 @@ export function prepareVariablesInfo(metadata_indicateurs) {
     .filter(ft => ft.Regioviz_item === 'Study Area')
     .forEach((ft) => {
       study_zones.push({
-        name: ft.Name, id: ft.id, display_level: ft.Theme, methodology: ft.Methodology,
+        name: ft.Name,
+        id: ft.id,
+        display_level: ft.Theme,
+        methodology: ft.Methodology,
+        url: ft.URL,
       });
     });
   metadata_indicateurs

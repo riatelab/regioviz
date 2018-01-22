@@ -6,7 +6,7 @@ html, body {
 
 @media only screen and (max-width: 959px) {
   body {
-    font-size: 10px;
+    font-size: 11px;
   }
   #menutop {
     width: 540px;
@@ -25,7 +25,7 @@ html, body {
 
 @media only screen and (min-width: 960px) and (max-width: 1160px) {
   body {
-    font-size: 14px;
+    font-size: 15px;
   }
   #menutop {
     width: 960px;
@@ -44,7 +44,7 @@ html, body {
 
 @media only screen and (min-width: 1161px) and (max-width: 1360px) {
   body {
-    font-size: 14px;
+    font-size: 16px;
   }
   #menutop {
     width: 1160px;
@@ -63,7 +63,7 @@ html, body {
 
 @media only screen and (min-width: 1361px) and (max-width: 1560px) {
   body {
-    font-size: 16px;
+    font-size: 17px;
   }
   #menutop {
     width: 1350px;
@@ -95,13 +95,13 @@ html, body {
 
 @media only screen and (min-width: 2001px) {
   body {
-    font-size: 19px;
+    font-size: 18px;
   }
   #menutop {
-    width: 1850px;
+    width: 1750px;
   }
   #mainframe {
-    width: 1850px;
+    width: 1750px;
     height: 100%;
   }
   .img_scale_logo {
@@ -246,13 +246,13 @@ div.tingle-modal-box__content {
 }
 
 #menu > div.box > p, #menu > div.box > div > p {
-  font-size: 0.75em;
+  font-size: 0.8em;
   padding: 1px 1px 1px 8px;
   margin: 0;
 }
 
 #menu > div.box > p.small, #menu > div.box > div > p.small {
-  font-size: 0.7em;
+  font-size: 0.75em;
   margin-left: 0.7em;
   color: rgba(0, 0, 0, 0.8);
 }
@@ -367,7 +367,7 @@ span.link:hover {
 /* Styles for the completness section */
 .completude_section, .filter_info {
   font-family: "Signika", sans-serif;
-  font-size: 0.7em;
+  font-size: 0.8em;
   text-align: center;
   width: 100%;
   margin: auto;
@@ -400,7 +400,7 @@ span.link:hover {
     background: -webkit-gradient(linear, left top, left bottom, from(#67a8f6), to(#3f6797));
     background: -moz-linear-gradient(top, #67a8f6, #3f6797);
     background: linear-gradient(to bottom, #67a8f6, #3f6797);
-    font: normal normal normal 0.7em 'Signika', sans-serif;
+    font: normal normal normal 0.8em 'Signika', sans-serif;
     color: #ffffff;
     text-decoration: none;
 }
@@ -427,7 +427,7 @@ span.link:hover {
 /* End of styles for buttons */
 
 #menu_selection {
-  font-size: 0.75em;
+  font-size: 0.8em;
   font-family: "Signika",sans-serif;
   padding: 0em 1em 0.5em;
 }
@@ -493,7 +493,7 @@ span.link:hover {
 }
 /* End of styles for context-menu */
 
-/* Styles for BubbleChart1 : */
+/* Styles for Similarity chart / BubbleChart */
 input.nb_select {
   width: 30px;
   -moz-appearance: textfield;
@@ -511,7 +511,11 @@ input.nb_select::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0; /* Removes leftover margin */
 }
-/* End of style for BubbleChart1 */
+
+.arrow-shadow {
+    filter: drop-shadow(1px 1px 0.2px #000);
+}
+/* End of styles for Similarity chart / BubbleChart */
 
 /* Styles for minitable (displaying statistical summary) */
 .minitable_container {
@@ -525,7 +529,7 @@ input.nb_select::-webkit-outer-spin-button {
 
 .minitable > tbody > tr > td, .minitable > thead > tr > th  {
   padding: 0.4em 1em;
-  font-size: 0.7em;
+  font-size: 0.8em;
   font-weight: 400;
 }
 

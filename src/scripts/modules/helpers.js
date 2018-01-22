@@ -627,7 +627,25 @@ function noContextMenu() {
   d3.event.preventDefault();
 }
 
-function exportHtmlRapport() {
+/**
+*
+*
+*
+*
+*/
+function clickDlPdf(event) {
+  const path = this.href;
+  // console.log(event);
+  this.href = '#';
+  window.open(path);
+  event.preventDefault();
+  // eslint-disable-next-line no-param-reassign
+  event.returnValue = false;
+  this.href = path;
+  return false;
+}
+
+function exportHtmlRapport(message) {
   const targetSvgMap = document.getElementById('svg_map');
   const targetSvgChart = document.getElementById('svg_bar');
   const serializer = new XMLSerializer();
@@ -653,15 +671,12 @@ function exportHtmlRapport() {
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Regioviz</title>
 <body>
-  <div style="display: flex;">
-    <div style="width: 35%;">${sources[0]}</div>
-    <div style="width: 35%;>${sources[1]}</div>
+  <div style="display: flex; width: 75%; margin: auto;">
+    <div style="width: 35%; margin: auto;">${sources[0]}</div>
+    <div style="width: 35%; margin: auto;">${sources[1]}</div>
   </div>
-  <div style="text-align: justify;">
-  Bla blablsdkflsdklfsdlflsdkfl blalblalfdldslgf Bla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgfBla blablsdkflsdklfsdlflsdkfl blalblalfdldslgf
-  </div>
-</body>
-`;
+  <div style="text-align: justify; width: 70%; margin: auto;">${message}</div>
+</body>`;
   return new_html_doc;
 }
 
@@ -702,4 +717,5 @@ export {
   getStyleProperty,
   noContextMenu,
   exportHtmlRapport,
+  clickDlPdf,
 };
