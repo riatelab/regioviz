@@ -615,7 +615,7 @@ export default class Similarity1plus {
       document.querySelectorAll('.grp_var'),
       (el) => {
         const ty = +el.getAttribute('transform').split('translate(0')[1].replace(',', '').replace(')', '').trim();
-        const bubble = el.querySelector(`#${id_region}.bubble`);
+        const bubble = el.querySelector(`#${id_region}`);
         coords.push([bubble.cx.baseVal.value, bubble.cy.baseVal.value + ty]);
       });
     coords.sort((a, b) => a[1] - b[1]);

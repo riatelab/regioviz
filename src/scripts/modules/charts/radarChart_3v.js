@@ -265,14 +265,17 @@ export default class RadarChart3 {
       const id_axis = this.parentElement.id;
       if (self.inversedAxis.has(label)) {
         self.inversedAxis.delete(label);
-        self.g.select(`g#gp${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_plus.png');
+        self.g.select(`g#${id_axis}`)
+          .select('.img_reverse')
+          .attr('xlink:href', 'img/reverse_plus.png');
         this.style.fill = 'black';
       } else {
         self.inversedAxis.add(label);
-        self.g.select(`g#gp${id_axis}`).select('.img_reverse').attr('xlink:href', 'img/reverse_moins.png');
+        self.g.select(`g#${id_axis}`)
+          .select('.img_reverse')
+          .attr('xlink:href', 'img/reverse_moins.png');
         this.style.fill = 'red';
       }
-
       d3.event.stopPropagation();
       d3.event.preventDefault();
       self.inverse_data(label);
@@ -888,7 +891,9 @@ export default class RadarChart3 {
 
     const _g = update_axis.select('g');
     _g.select('.rectlabel').attr('class', 'rectlabel');
-    _g.select('.img_reverse').style('display', 'none');
+    _g.select('.img_reverse')
+      .attr('xlink:href', d => (this.inversedAxis.has(d) ? 'img/reverse_moins.png' : 'img/reverse_plus.png'))
+      .style('display', 'none');
     _g.select('.img_reverse2').style('display', 'none');
     _g.select('text.legend')
       .attrs((d, i) => ({
