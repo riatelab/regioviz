@@ -1,7 +1,7 @@
 import { Rect, comp2, prepareTooltip2, svgPathToCoords, computePercentileRank, getMean, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, variables_info, resetColors } from './../../main';
+import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
 import ContextMenu from './../contextMenu';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
@@ -1307,6 +1307,7 @@ export default class ScatterPlot2 {
     this.table_stats = new TableResumeStat(features);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
 <h3>Position  - 2 indicateurs</h3>
@@ -1320,8 +1321,58 @@ Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur
   }
 
   getTemplateHelp() {
-    return `
-L’ unité territoriale <nom de l’unité territoriale de référence> a une valeur de <x> pour l’indicateur <nom de l’indicateur> représenté sur l’axe des abscisses et une valeur de <y> pour l’indicateur <nom de l’indicateur> représenté sur l’axe des ordonnées. Cela place cette unité territoriale de référence au rang <n> de la distribution pour l’espace d’étude <nom de l’espace d’étude> et l’indicateur <nom de l’indicateur> ; et au <n> rang pour l’indicateur <nom de l’indicateur>.
-Pour cet espace d’étude, <x> % des unités territoriales sont définies par une situation plus favorable sur les deux indicateurs pour la unité territoriale sélectionnée, représentées en vert sur le graphique et sur la carte. <x> % des unités territoriales sont caractérisées par une situation plus défavorables pour les deux indicateurs, représentées en rouge sur la carte. Enfin, l’unité territoriale <nom de l’unité territoriale de référence> se situe dans une situation contradictoire avec <x> % des unité territoriales, représentées en violet et orange sur la carte (situation favorable/défavorable pour un des deux indicateurs).`;
+    // const [my_region, my_rank] = this.data.map((d, i) => [d.id, i])
+    //   .find(d => d[0] === app.current_config.my_region);
+    const nb_ft = this.data.length;
+    const v1 = this.variable1;
+    const v2 = this.variable2;
+    const info_var1 = variables_info.find(ft => ft.id === v1);
+    const info_var2 = variables_info.find(ft => ft.id === v2);
+    // const values1 = this.data.map(d => d[v1]).sort((a, b) => a - b);
+    // const values2 = this.data.map(d => d[v2]).sort((a, b) => a - b);
+    const my_rank1 = this.data.map(d => d[v1]).sort((a, b) => a - b).indexOf(this.ref_value1);
+    const my_rank2 = this.data.map(d => d[v2]).sort((a, b) => a - b).indexOf(this.ref_value2);
+    let sup_both = 0;
+    let inf_both = 0;
+    let contrad = 0;
+    this.data.forEach((o) => {
+      if (o[v1] > this.ref_value1 && o[v2] > this.ref_value2) {
+        sup_both += 1;
+      } else if (o[v1] <= this.ref_value1 && o[v2] <= this.ref_value2) {
+        inf_both += 1;
+      } else {
+        contrad += 1;
+      }
+    });
+    // eslint-disable-next-line no-nested-ternary
+    const name_study_zone = !app.current_config.filter_key
+      ? 'UE28' : app.current_config.filter_key instanceof Array
+        ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
+        : study_zones.find(d => d.id === app.current_config.filter_key).name;
+    const help1 = [`
+  <b>Indicateur 1</b> : ${info_var1.name} (${info_var1.id})<br>
+  <b>Indicateur 2</b> : ${info_var2.name} (${info_var2.id})<br>
+  <b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
+    if (app.current_config.my_category) {
+      help1.push(
+        `<b>Espace d'étude</b> : ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+    } else if (app.current_config.filter_key) {
+      help1.push(
+        `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+    } else {
+      help1.push( // eslint-disable-next-line quotes
+        `<b>Espace d'étude</b> : UE28`);
+    }
+
+    const help2 = `L'unité territoriale ${app.current_config.my_region_pretty_name} a une valeur de ${formatNumber(this.ref_value1, 1)} ${info_var1.unit} pour l’indicateur <b>${this.variable1}</b> représenté sur l’axe des abscisses
+et une valeur de ${formatNumber(this.ref_value2, 1)} ${info_var2.unit} pour l’indicateur <b>${this.variable2}</b> représenté sur l’axe des ordonnées.
+Cela place cette unité territoriale de référence au rang ${my_rank1} de la distribution pour l’espace d’étude <b>${name_study_zone}</b> pour l’indicateur <b>${this.pretty_name1}</b> ; et au ${my_rank2} rang pour l’indicateur <b>${this.pretty_name2}</b>.
+Pour cet espace d’étude, ${sup_both * 100 / nb_ft}% des unités territoriales sont définies par une situation plus favorable sur les deux indicateurs pour la unité territoriale sélectionnée, représentées en vert sur le graphique et sur la carte.
+${inf_both * 100 / nb_ft}% des unités territoriales sont caractérisées par une situation plus défavorables pour les deux indicateurs, représentées en rouge sur la carte.
+Enfin, l’unité territoriale ${app.current_config.my_region_pretty_name} se situe dans une situation contradictoire avec ${contrad * 100 / nb_ft}% des unité territoriales, représentées en violet et orange sur la carte (situation favorable/défavorable pour un des deux indicateurs).`;
+
+    const source = `<b>Indicateur 1</b> : ${info_var1.source} (Date de téléchargement de la donnée : ${info_var1.last_update})<br>
+<b>Indicateur 2</b> : ${info_var2.source} (Date de téléchargement de la donnée : ${info_var2.last_update})`;
+    return { section_selection: help1.join(''), section_help: help2, section_source: source };
   }
 }

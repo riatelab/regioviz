@@ -2,7 +2,7 @@ import debug from 'debug';
 import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, resetColors, variables_info } from './../../main';
+import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
@@ -1080,6 +1080,7 @@ La carte et le graphique sont interactifs dans la mesure où l’utilisateur peu
     const [my_region, my_rank] = this.data.map((d, i) => [d.id, i])
       .find(d => d[0] === app.current_config.my_region);
     const values = this.data.map(d => d[this.ratio_to_use]).sort((a, b) => a - b);
+    const info_var = variables_info.find(ft => ft.id === this.ratio_to_use);
     let inf = 0;
     let sup = 0;
     const my_value = this.ref_value;
@@ -1090,13 +1091,29 @@ La carte et le graphique sont interactifs dans la mesure où l’utilisateur peu
         sup += 1;
       }
     });
+    // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_key instanceof Array
-      ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
-      : study_zones.find(d => d.id === app.current_config.filter_key).name;
-    return `
-L’unité territoriale ${my_region.name} a une valeur de ${formatNumber(this.ref_value, 1)} pour l’indicateur <i>${this.ratio_to_use}</i>. Elle se situe  au rang ${my_rank} de la distribution pour l’espace d’étude ${name_study_zone}.
-Pour cet indicateur, ${sup} unités territoriales ont une valeur supérieures et ${inf} unités territoriales ont une valeur inférieure.
-Par ailleurs mon unité territoriale se situe ${Math.abs(getMeanRank(this.mean_value, this.ratio_to_use) - my_rank)} ${this.ref_value > this.mean_value ? 'au dessus' : 'en-dessous'} de la moyenne de l’espace d’étude (${formatNumber(this.mean_value, 1)}).`;
+        ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
+        : study_zones.find(d => d.id === app.current_config.filter_key).name;
+    const help1 = [`<b>Indicateur 1</b> : ${info_var.name} (${info_var.id})<br>
+<b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
+    if (app.current_config.my_category) {
+      help1.push(
+        `<b>Espace d'étude</b> : ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+    } else if (app.current_config.filter_key) {
+      help1.push(
+        `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+    } else {
+      help1.push( // eslint-disable-next-line quotes
+        `<b>Espace d'étude</b> : UE28`);
+    }
+    const help2 = `
+L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> a une valeur de <b>${formatNumber(this.ref_value, 1)} ${info_var.unit}</b> pour l’indicateur <i>${this.ratio_to_use}</i>.
+Elle se situe  au rang <b>${my_rank}</b> de la distribution pour l’espace d’étude <b>${name_study_zone}</b>.
+Pour cet indicateur, <b>${sup}</b> unités territoriales ont une valeur supérieures et <b>${inf}</b> unités territoriales ont une valeur inférieure.
+Par ailleurs mon unité territoriale se situe <b>${formatNumber(Math.abs(this.ref_value > this.mean_value ? this.ref_value / this.mean_value : this.mean_value / this.ref_value), 1)}%</b> ${this.ref_value > this.mean_value ? 'au dessus' : 'en-dessous'} de la moyenne de l’espace d’étude (${formatNumber(this.mean_value, 1)} ${info_var.unit}).`;
+    const source = `<b>Indicateur 1</b> : ${info_var.source} (Date de téléchargement de la donnée : ${info_var.last_update})`;
+    return { section_selection: help1.join(''), section_help: help2, section_source: source };
   }
 }

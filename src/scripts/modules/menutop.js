@@ -239,7 +239,7 @@ export function makeHeaderChart() {
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
     .on('click', () => {
-
+      let href;
       const content = `<div id="prep_rapport"><h3>Rapport en cours de préparation...</h3>
 <div class="spinner"><div class="cube1"></div><div class="cube2"></div></div></div>`;
       // eslint-disable-next-line new-cap
@@ -252,14 +252,15 @@ export function makeHeaderChart() {
         },
         onClose() {
           modal.destroy();
+          URL.revokeObjectURL(href);
         },
       });
       modal.setContent(content);
       modal.open();
-      const message = app.chart.getTemplateHelp();
-      const html_doc = exportHtmlRapport(message);
-      // const elem = document.createElement('a');
-      const href = `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`;
+      const sections = app.chart.getTemplateHelp();
+      const html_doc = exportHtmlRapport(sections, app.current_config.my_region_pretty_name);
+      // const href = `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`;
+      href = URL.createObjectURL(new Blob([html_doc], { type: 'text/html' }));
       // elem.setAttribute('href', `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`);
       // elem.setAttribute('download', 'rapport.html');
       // elem.style.display = 'none';

@@ -4,7 +4,7 @@ import {
   getMean, Tooltipsify, prepareTooltip2, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, variables_info } from './../../main';
+import { app, variables_info, study_zones, territorial_mesh } from './../../main';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
 
@@ -1142,6 +1142,49 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
   }
 
   getTemplateHelp() {
-    return ``;
+    const info_var = {};
+    this.variables.forEach((v, i) => {
+      info_var[i + 1] = variables_info.find(ft => ft.id === v);
+    });
+
+    // eslint-disable-next-line no-nested-ternary
+    const name_study_zone = !app.current_config.filter_key
+      ? 'UE28' : app.current_config.filter_key instanceof Array
+        ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
+        : study_zones.find(d => d.id === app.current_config.filter_key).name;
+    const help1 = [];
+    this.variables.forEach((v, i) => {
+      help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (${info_var[i + 1].id})<br>`);
+    });
+    help1.push(`<b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`);
+    if (app.current_config.my_category) {
+      help1.push(
+        `<b>Espace d'étude</b> : ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+    } else if (app.current_config.filter_key) {
+      help1.push(
+        `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+    } else {
+      help1.push( // eslint-disable-next-line quotes
+        `<b>Espace d'étude</b> : UE28`);
+    }
+
+    const help2 = [`${this.variables.length} indicateurs sont simultanément représentés sur ce graphique.`];
+// `Pour l’espace d’étude ${name_study_zone}, l’unité territoriale ${app.current_config.my_region_pretty_name} se positionne au-dessus de la valeur médiane (50) pour les indicateurs suivants (position plus favorable) :
+// <Nom de l’indicateur 1>, indice <valeur normalisée 1>, valeur <valeur brute 1> <unité de mesure 1>;
+// < Nom de l’indicateur n> , indice <valeur normalisée n>, valeur <valeur brute n><unité de mesure n> ;
+// Cette unité territoriale se positionne sous la valeur médiane pour les indicateurs suivants :
+// <Nom de l’indicateur y>, indice <valeur normalisée y>, valeur <valeur brute y><unité de mesure y>
+// Si sélection d’unités territoriales supplémentaires, répéter l’opération en fonction du nombre de unité territoriales sélectionnées.
+// En comparaison à l’unité territoriale <nom de l’unité territoriale sélectionnée> (<pays d’appartenance>), l’unité territoriale <nom de unité territoriale de référence> est caractérisée par des indices normalisés plus importants pour les indicateurs suivants :
+// <Nom de l’indicateur 1>, (<écart de points normalisés du plus grand au plus petit>).
+// Etc.
+// Inversement, l’unité territoriale <nom de l’unité territoriale de référence> est caractérisée par des scores moins importants pour ces indicateurs 
+// `;
+
+    let source = [];
+    this.variables.map((v, i) =>
+      `<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].source} (Date de téléchargement de la donnée : ${info_var[i + 1].update})`);
+    source = source.join('<br>');
+    return { section_selection: help1.join(''), section_help: help2.join(''), section_source: source };
   }
 }

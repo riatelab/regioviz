@@ -645,15 +645,20 @@ function clickDlPdf(event) {
   return false;
 }
 
-function exportHtmlRapport(message) {
+function exportHtmlRapport(sections, name_my_region) {
+  const {
+    section_selection,
+    section_help,
+    section_source,
+  } = sections;
   const targetSvgMap = document.getElementById('svg_map');
   const targetSvgChart = document.getElementById('svg_bar');
   const serializer = new XMLSerializer();
-  const sources = [
+  const svg_sources = [
     serializer.serializeToString(targetSvgMap),
     serializer.serializeToString(targetSvgChart),
   ];
-  sources.forEach((source) => {
+  svg_sources.forEach((source) => {
     if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
       // eslint-disable-next-line no-param-reassign
       source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
@@ -669,13 +674,56 @@ function exportHtmlRapport(message) {
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<style>
+@media only screen and (max-width: 959px) {
+  body {
+    font-size: 11px;
+  }
+}
+@media only screen and (min-width: 960px) and (max-width: 1460px) {
+  body {
+    font-size: 12px;
+  }
+}
+@media only screen and (min-width: 1461px) {
+  body {
+    font-size: 14px;
+  }
+}
+h1 { color: white; background: #4f81bd; }
+h3 { color: #4f81bd; }
+div { margin: auto; }
+div.f1 { width: 75%; }
+div.f2 { display: flex; width: 98%; }
+div.footer {
+  text-align: center;
+  width: 80%;
+  font-size: 0.8em;
+}
+</style>
 <title>Regioviz</title>
 <body>
-  <div style="display: flex; width: 75%; margin: auto;">
-    <div style="width: 35%; margin: auto;">${sources[0]}</div>
-    <div style="width: 35%; margin: auto;">${sources[1]}</div>
+  <div class="f1">
+    <h1>Regioviz - Rapport ${name_my_region}</h1>
+    <h3>Rappel de la sélection</h3>
+    <div>
+    ${section_selection}
+    </div>
+    <h3>Représentations graphiques</h3>
+    <div class="f2">
+      <div style="width: 40%; margin: auto;">${svg_sources[0]}</div>
+      <div style="width: 40%; margin: auto;">${svg_sources[1]}</div>
+    </div>
+    <h3>Aide de lecture</h3>
+    <div style="text-align: justify;">${section_help}</div>
+    <h3>Sources</h3>
+    <div>${section_source}</div>
+    <div class="footer">
+      <p>
+        <i>Ce rapport a été généré par l'application Regioviz, conceptualisée et developpée par l'UMS RIATE en 2018 dans le cadre d'un projet CGET associant les Secrétaires Généraux pour les Affaires Régionales (SGAR).</i>
+      </p>
+    </div>
   </div>
-  <div style="text-align: justify; width: 70%; margin: auto;">${message}</div>
 </body>`;
   return new_html_doc;
 }
