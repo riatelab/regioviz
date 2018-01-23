@@ -121,6 +121,7 @@ export default class Similarity1plus {
       let axis = this.draw_group.select(`g.axis--x.${selector_ratio_name}`);
       let layer_other;
       let layer_highlighted;
+      let layer_top;
       if (!g.node()) {
         g = this.draw_group
           .append('g')
@@ -235,9 +236,11 @@ export default class Similarity1plus {
 
         layer_other = g.append('g').attr('class', 'otherfeature');
         layer_highlighted = g.append('g').attr('class', 'highlighted');
+        layer_top = g.append('g').attr('class', 'top');
       } else {
         layer_other = g.select('g.otherfeature');
         layer_highlighted = g.select('g.highlighted');
+        layer_top = g.select('g.top');
       }
       // g.attr('transform', `translate(0, ${height_to_use})`);
       const _trans = this.draw_group.select(`#${selector_ratio_name}`)
@@ -258,10 +261,8 @@ export default class Similarity1plus {
       this.data.forEach((ft, _ix) => {
         ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
       });
-      const a = this.data.indexOf(this.my_region);
-      const b = this.data.splice(a, 1);
+      this.data.splice(this.data.indexOf(this.my_region), 1);
       this.data.push(this.my_region);
-      console.log(a, b);
       if (highlight_selection.length > 0) {
         const dist_axis = math_max(
           math_abs(my_region_value - +d3.min(highlight_selection, d => d[ratio_name])),
@@ -269,6 +270,13 @@ export default class Similarity1plus {
         const margin_min_max = math_round(dist_axis) / 8;
         _min = my_region_value - dist_axis - margin_min_max;
         _max = my_region_value + dist_axis + margin_min_max;
+        if (_min === _max) {
+          const _dist_axis = ((
+            my_region_value + this.data[this.data.length - 2][ratio_name])
+            - (my_region_value - this.data[this.data.length - 2][ratio_name])) / 2;
+          _min = my_region_value - _dist_axis - _dist_axis / 8;
+          _max = my_region_value + _dist_axis + _dist_axis / 8;
+        }
       } else {
         const ratio_values = this.data.map(d => d[ratio_name]);
         const dist_axis = math_max(
@@ -298,7 +306,7 @@ export default class Similarity1plus {
         .call(d3.axisBottom(xScale).tickFormat(formatNumber));
 
       const bubbles1 = layer_other.selectAll('.bubble')
-        .data(data.filter(d => app.colors[d.id] === undefined).slice(), d => d.id);
+        .data(data.filter(d => app.colors[d.id] === undefined), d => d.id);
 
       bubbles1
         .transition()
@@ -348,10 +356,12 @@ export default class Similarity1plus {
           };
         });
 
-      bubbles1.exit().transition().duration(125).remove();
+      bubbles1.exit().remove();
 
       const bubbles2 = layer_highlighted.selectAll('.bubble')
-        .data(data.filter(d => app.colors[d.id] !== undefined).slice(), d => d.id);
+        .data(
+          data.filter(d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined),
+          d => d.id);
 
       bubbles2
         .transition()
@@ -401,7 +411,61 @@ export default class Similarity1plus {
           };
         });
 
-      bubbles2.exit().transition().duration(125).remove();
+      bubbles2.exit().remove();
+
+      const bubbles3 = layer_top.selectAll('.bubbleMyRegion')
+        .data(data.filter(d => d.id === app.current_config.my_region), d => d.id);
+
+      bubbles3
+        .transition()
+        .duration(125)
+        .attrs((d) => {
+          let x_value = xScale(d[ratio_name]);
+          if (x_value > width) x_value = width + 200;
+          else if (x_value < 0) x_value = -200;
+          return {
+            globalrank: d.globalrank,
+            cx: x_value,
+            cy: 10,
+            r: size_func(d[num_name]),
+          };
+        })
+        .styles(d => ({
+          fill: app.colors[d.id],
+          'fill-opacity': 1,
+          stroke: 'darkgray',
+          'stroke-width': 0.75,
+          'stroke-opacity': 0.75,
+        }));
+
+      bubbles3
+        .enter()
+        .insert('circle')
+        .styles(d => ({
+          fill: app.colors[d.id],
+          'fill-opacity': 1,
+          stroke: 'darkgray',
+          'stroke-width': 0.75,
+          'stroke-opacity': 0.75,
+        }))
+        .transition()
+        .duration(125)
+        .attrs((d) => {
+          let x_value = xScale(d[ratio_name]);
+          if (x_value > width) x_value = width + 200;
+          else if (x_value < 0) x_value = -200;
+          return {
+            globalrank: d.globalrank,
+            id: d.id,
+            class: 'bubbleMyRegion',
+            cx: x_value,
+            cy: 10,
+            r: size_func(d[num_name]),
+          };
+        });
+
+      bubbles3.exit().remove();
+
       height_to_use += offset;
       setTimeout(() => {
         bubbles1.order();
@@ -586,9 +650,8 @@ export default class Similarity1plus {
           });
         });
       this.updateTableStat();
-      this.update();
       this.updateMapRegio();
-      // this.applySelection(this.highlight_selection.length);
+      this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
     }
   }
 
@@ -622,7 +685,6 @@ export default class Similarity1plus {
     this.data = app.current_data.filter(
       ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
     this.current_ids = this.data.map(d => d.id);
-    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
     this.data.forEach((ft) => {
       this.ratios.forEach((v) => {
         // eslint-disable-next-line no-param-reassign
@@ -635,7 +697,7 @@ export default class Similarity1plus {
     this.data.sort((a, b) => a.dist - b.dist);
     // eslint-disable-next-line no-param-reassign
     this.data.forEach((el, i) => { el.globalrank = i; });
-
+    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
     // To keep the same selection :
     // this.highlight_selection = this.highlight_selection.map((d) => {
     //   return this.data.find(el => el.id === d.id);
@@ -668,17 +730,18 @@ export default class Similarity1plus {
     this.data.sort((a, b) => a.dist - b.dist);
     // eslint-disable-next-line no-param-reassign
     this.data.forEach((el, i) => { el.globalrank = i; });
-    this.highlight_selection = this.highlight_selection
-      .map(d => this.data.find(el => el.id === d.id))
-      .filter(d => !!d);
-
+    // this.highlight_selection = this.highlight_selection
+    //   .map(d => this.data.find(el => el.id === d.id))
+    //   .filter(d => !!d);
     this.my_region = this.data.find(d => d.id === app.current_config.my_region);
 
     this.draw_group.select(`g#l_${code_variable}`).remove();
+
     // And use it immediatly:
     this.updateTableStat();
-    this.update();
     this.updateMapRegio();
+    // To use a new selection according to 'nb_select' value:
+    this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
   }
 
   bindMenu() {

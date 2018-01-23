@@ -121,9 +121,10 @@ export default class ScatterPlot2 {
     this.y = d3.scaleLinear()
       .range([height, 0])
       .nice();
-    this.xAxis = d3.axisBottom(this.x).ticks(10).tickFormat(formatNumber);
+
+    this.xAxis = d3.axisBottom(this.x).ticks(this.mean_variable1 >= 10000 ? 5 : 10).tickFormat(formatNumber);
     this.yAxis = d3.axisLeft(this.y).ticks(10 * height / width).tickFormat(formatNumber);
-    this.xAxis2 = d3.axisBottom(this.x).ticks(10).tickFormat(formatNumber);
+    this.xAxis2 = d3.axisBottom(this.x).ticks(this.mean_variable1 >= 10000 ? 5 : 10).tickFormat(formatNumber);
     this.yAxis2 = d3.axisLeft(this.y).ticks(10 * height / width).tickFormat(formatNumber);
 
     this.brush = d3.brush()
@@ -362,7 +363,7 @@ export default class ScatterPlot2 {
       .attrs({
         class: 'x axis', id: 'axis--x', transform: `translate(0, ${height})`,
       })
-      .call(this.xAxis);
+      .call(this.xAxis.ticks(this.mean_variable1 >= 10000 ? 5 : 10));
 
     this.plot.append('g')
       .attrs({ class: 'y axis', id: 'axis--y', opacity: 0.9 })
@@ -546,6 +547,7 @@ export default class ScatterPlot2 {
         class: 'grid grid-x', transform: `translate(0, ${height})`,
       })
       .call(this.xAxis2
+        .ticks(this.mean_variable1 >= 10000 ? 5 : 10)
         .tickSize(-height)
         .tickFormat(''));
     this.plot.insert('g', '#scatterplot')
@@ -563,15 +565,21 @@ export default class ScatterPlot2 {
     this.plot.select('.grid-x')
       .transition()
       .duration(125)
-      .call(this.xAxis2.tickSize(-height).tickFormat(''));
+      .call(this.xAxis2
+        .ticks(this.mean_variable1 >= 10000 ? 5 : 10)
+        .tickSize(-height)
+        .tickFormat(''));
     this.plot.select('.grid-y')
       .transition()
       .duration(125)
-      .call(this.yAxis2.tickSize(-width).tickFormat(''));
+      .call(this.yAxis2
+        .tickSize(-width)
+        .tickFormat(''));
     this.plot.select('#axis--x')
       .transition()
       .duration(125)
-      .call(this.xAxis);
+      .call(this.xAxis
+        .ticks(this.mean_variable1 >= 10000 ? 5 : 10));
     this.plot.select('#axis--y')
       .transition()
       .duration(125)
