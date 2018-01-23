@@ -258,6 +258,10 @@ export default class Similarity1plus {
       this.data.forEach((ft, _ix) => {
         ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
       });
+      const a = this.data.indexOf(this.my_region);
+      const b = this.data.splice(a, 1);
+      this.data.push(this.my_region);
+      console.log(a, b);
       if (highlight_selection.length > 0) {
         const dist_axis = math_max(
           math_abs(my_region_value - +d3.min(highlight_selection, d => d[ratio_name])),
@@ -294,7 +298,7 @@ export default class Similarity1plus {
         .call(d3.axisBottom(xScale).tickFormat(formatNumber));
 
       const bubbles1 = layer_other.selectAll('.bubble')
-        .data(data.filter(d => app.colors[d.id] === undefined), d => d.id);
+        .data(data.filter(d => app.colors[d.id] === undefined).slice(), d => d.id);
 
       bubbles1
         .transition()
@@ -347,7 +351,7 @@ export default class Similarity1plus {
       bubbles1.exit().transition().duration(125).remove();
 
       const bubbles2 = layer_highlighted.selectAll('.bubble')
-        .data(data.filter(d => app.colors[d.id] !== undefined), d => d.id);
+        .data(data.filter(d => app.colors[d.id] !== undefined).slice(), d => d.id);
 
       bubbles2
         .transition()
@@ -398,11 +402,13 @@ export default class Similarity1plus {
         });
 
       bubbles2.exit().transition().duration(125).remove();
-      bubbles1.order();
-      bubbles2.order();
       height_to_use += offset;
+      setTimeout(() => {
+        bubbles1.order();
+        bubbles2.order();
+      }, 145);
     }
-    setTimeout(() => { this.makeTooltips(); }, 125);
+    setTimeout(() => { this.makeTooltips(); }, 145);
   }
   /* eslint-enable no-loop-func */
 

@@ -986,6 +986,7 @@ export default class RadarChart3 {
 
     this.id_my_region = app.current_config.my_region;
     this.prepareData(app.current_data);
+    Array.from(this.inversedAxis).forEach((v) => { this.inverse_data(v); });
     this.drawAxisGrid();
     this.drawArea();
     other_features.forEach((id) => {
@@ -1008,6 +1009,7 @@ export default class RadarChart3 {
       .attr('transform', `translate(${this.cfg.w / 2 + this.cfg.margin.left},${this.cfg.h / 2 + this.cfg.margin.top})`);
 
     this.prepareData(app.current_data);
+    Array.from(this.inversedAxis).forEach((v) => { this.inverse_data(v); });
     this.drawAxisGrid();
     this.drawArea();
     other_features.forEach((id) => {
@@ -1031,6 +1033,7 @@ export default class RadarChart3 {
       .attr('transform', `translate(${this.cfg.w / 2 + this.cfg.margin.left},${this.cfg.h / 2 + this.cfg.margin.top})`);
 
     this.prepareData(app.current_data);
+    Array.from(this.inversedAxis).forEach((v) => { this.inverse_data(v); });
     this.drawAxisGrid();
     this.drawArea();
     other_features.forEach((id) => {

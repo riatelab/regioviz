@@ -659,20 +659,13 @@ export default class ScatterPlot2 {
     const data = self.data;
     const dots = this.scatter.selectAll('.dot')
       .data(data, d => d.id);
-
+    const _trans = dots.transition().duration(100);
     if (this.type === 'rank') {
       const rank_variable1 = this.rank_variable1;
       const rank_variable2 = this.rank_variable2;
       const range_x = this.xInversed ? [101, -1] : [-1, 101];
       const range_y = this.yInversed ? [101, -1] : [-1, 101];
-      // const range_x = this.xInversed
-      //   ? d3.extent(data, d => d[rank_variable1]).reverse()
-      //   : d3.extent(data, d => d[rank_variable1]);
-      // const range_y = this.yInversed
-      //   ? d3.extent(data, d => d[rank_variable2]).reverse()
-      //   : d3.extent(data, d => d[rank_variable2]);
-      // const serie_x = data.map(d => d[this.variable1]);
-      // const serie_y = data.map(d => d[this.variable2]);
+
       this.x.domain(range_x);
       this.y.domain(range_y);
       this.mean_variable1 = 50;
@@ -683,8 +676,7 @@ export default class ScatterPlot2 {
       const default_color = 'gray';
 
       dots
-        .transition()
-        .duration(125)
+        .transition(_trans)
         .attrs(d => ({
           r: 5,
           cx: x(d[rank_variable1]),
@@ -696,12 +688,12 @@ export default class ScatterPlot2 {
         }))
         .on('end', () => {
           self.bindTooltips(true);
+          dots.exit().remove();
+          dots.order();
         });
 
       dots.enter()
         .append('circle')
-        .transition()
-        .duration(125)
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
@@ -711,22 +703,20 @@ export default class ScatterPlot2 {
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
           class: 'dot',
-        }))
-        .on('end', () => {
-          self.bindTooltips(true);
-        });
-      dots.exit().transition().duration(125).remove();
+        }));
     } else if (this.type === 'value') {
       const variable1 = this.variable1;
       const variable2 = this.variable2;
       const serie_x = data.map(d => d[variable1]);
       const serie_y = data.map(d => d[variable2]);
+
       const range_x = this.xInversed
         ? d3.extent(serie_x).reverse()
         : d3.extent(serie_x);
       const range_y = this.yInversed
         ? d3.extent(serie_y).reverse()
         : d3.extent(serie_y);
+
       this.x.domain(range_x).nice();
       this.y.domain(range_y).nice();
       this.mean_variable1 = getMean(serie_x);
@@ -737,8 +727,7 @@ export default class ScatterPlot2 {
       const default_color = 'gray';
 
       dots
-        .transition()
-        .duration(125)
+        .transition(_trans)
         .attrs(d => ({
           r: 5,
           cx: x(d[variable1]),
@@ -750,12 +739,12 @@ export default class ScatterPlot2 {
         }))
         .on('end', () => {
           self.bindTooltips(false);
+          dots.exit().remove();
+          dots.order();
         });
 
       dots.enter()
         .append('circle')
-        .transition()
-        .duration(125)
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
@@ -765,12 +754,10 @@ export default class ScatterPlot2 {
           cx: x(d[variable1]),
           cy: y(d[variable2]),
           class: 'dot',
-        }))
-        .on('end', () => {
-          self.bindTooltips(false);
-        });
-      dots.exit().transition().duration(125).remove();
+        }));
     }
+    self.bindTooltips(false);
+    dots.exit().remove();
     dots.order();
     this.updateMeanMedianValue();
     this.updateAxisGrid();
@@ -982,6 +969,7 @@ export default class ScatterPlot2 {
         res[this.variable2] = d[this.variable2];
         return res;
       });
+    console.log(this.data);
     // Put "my region" at the end of the serie so it will be displayed on
     // the top of the chart:
     const tmp_my_region = this.data.splice(

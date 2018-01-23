@@ -103,7 +103,7 @@ function zoomClick() {
 
 
 function makeMapLegend(legend_elems, size, translateY) {
-  const rect_size = 14;
+  const rect_size = 15;
   const spacing = 4;
   const lgd_height = rect_size + spacing;
   const offset = lgd_height * legend_elems.length / 2;
@@ -115,7 +115,7 @@ function makeMapLegend(legend_elems, size, translateY) {
   const grp_lgd = d3.select('#svg_legend')
     .attr('viewBox', `0 0 ${fixed_dimension.legend.width} ${size}`)
     .append('g')
-    .styles({ 'font-size': '11px', 'font-family': '\'Signika\', sans-serif' });
+    .styles({ 'font-size': '12px', 'font-family': '\'Signika\', sans-serif' });
 
   const legends = grp_lgd.selectAll('.legend')
     .data(legend_elems)
@@ -153,7 +153,7 @@ function getLegendElems(type) {
         { color: color_sup, text: 'Rang plus élevé que ma région' },
         { color: color_inf, text: 'Rang moins élevé que ma région' },
       ],
-      '75', '41',
+      '80', '41',
     ];
   } else if (type === 1) {
     return [
@@ -164,7 +164,7 @@ function getLegendElems(type) {
         { color: color_inf, text: 'Rang moins élevé que ma région (2 indicateurs)' },
         { color: ['orange', 'rgb(160, 30, 160)'], text: 'Rang plus élevé que ma région (1 indicateur sur 2)' },
       ],
-      '95', '50',
+      '100', '50',
     ];
   }
   return [
@@ -173,7 +173,7 @@ function getLegendElems(type) {
       { color: color_countries, text: 'Autres régions de l\'espace d\'étude (sélectionnables)' },
       // { color: color_countries, text: 'Autres régions de l\'espace d\'étude, sélectionnables pour la comparaison' },
     ],
-    '60', '22.5',
+    '50', '22.5',
   ];
 }
 
