@@ -245,6 +245,7 @@ export default class RadarChart3 {
 
   wrap(_text, _width) {
     const self = this;
+    const nb_var = app.current_config.ratio.length;
 
     const swapAxis = function swapAxis() {
       const ix = +this.parentElement.id.slice(2);
@@ -287,7 +288,6 @@ export default class RadarChart3 {
       const lineHeight = 1.4;
       const x = +text.attr('x');
       const dy = parseFloat(text.attr('dy'));
-      const nb_var = app.current_config.ratio.length;
       const id = +text.attr('id');
       let y = +text.attr('y');
       let line = [];
@@ -328,11 +328,12 @@ export default class RadarChart3 {
       .on('click', self.cfg.allowInverseData ? reverseAxis : null);
 
     svg_bar.selectAll('.img_reverse2')
-      .attrs(function () {
+      .attrs(function (_, i) {
         const el = this.parentElement.querySelector('tspan');
         const x = +el.getAttribute('x');
         const y = +el.getAttribute('y') + 15;
-        return { x, y };
+        const transform = `rotate(${(360 / nb_var) * i}, ${x + 25 / 2}, ${y + 10 / 2})`;
+        return { x, y, transform };
       })
       .on('click', swapAxis);
 
@@ -618,7 +619,7 @@ export default class RadarChart3 {
         y: rScale(maxValue * cfg.labelFactor) * math_sin(angleSlice * i - HALF_PI),
       }))
       .styles(d => ({
-        'font-size': '11px',
+        'font-size': '12px',
         fill: (self.inversedAxis.has(d) ? 'red' : 'black'),
       }))
       .text(d => d);
@@ -635,11 +636,12 @@ export default class RadarChart3 {
 
     gp_axis_label.append('image')
       .attrs({
-        width: 15,
-        height: 15,
-        'xlink:href': 'img/reverse_blue.png',
+        width: 25,
+        height: 10,
+        'xlink:href': 'img/rotation_arrow.png',
         class: 'img_reverse2',
-        title: 'Inverser l\'ordre de classement de l\'indicateur',
+        title: 'Inverser l\'ordre des axes sur le graphique',
+        transform: 'rotate(0, 0, 0)',
       })
       .styles({ cursor: 'pointer', display: 'none' });
 

@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, prepareTooltip2, getMean, Tooltipsify, formatNumber, noContextMenu } from './../helpers';
+import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, prepareTooltip2, getMean, getStdDev, Tooltipsify, formatNumber, noContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
@@ -30,14 +30,7 @@ export default class Similarity1plus {
     this.ratios = app.current_config.ratio;
     this.nums = app.current_config.num;
     this.data = ref_data.filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
-    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
-    this.data.forEach((ft) => {
-      this.ratios.forEach((v) => {
-        // eslint-disable-next-line no-param-reassign
-        ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
-      });
-    });
-    this.current_ids = this.data.map(d => d.id);
+    this.prepareData();
     resetColors();
     this.highlight_selection = [];
     this.serie_inversed = false;
@@ -641,14 +634,7 @@ export default class Similarity1plus {
       this.changeStudyZone();
     } else {
       this.map_elem.updateLegend();
-      this.my_region = this.data.find(d => d.id === app.current_config.my_region);
-      this.data
-        .forEach((ft) => {
-          this.ratios.forEach((v) => {
-            // eslint-disable-next-line no-param-reassign
-            ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
-          });
-        });
+      this.prepareData();
       this.updateTableStat();
       this.updateMapRegio();
       this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
@@ -662,14 +648,7 @@ export default class Similarity1plus {
     this.nums = app.current_config.num;
     this.data = app.current_data.filter(
       ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
-    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
-    this.data.forEach((ft) => {
-      this.ratios.forEach((v) => {
-        // eslint-disable-next-line no-param-reassign
-        ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
-      });
-    });
-    this.current_ids = this.data.map(d => d.id);
+    this.prepareData();
     const temp = this.highlight_selection.length;
     this.highlight_selection = [];
     this.updateTableStat();
@@ -678,26 +657,50 @@ export default class Similarity1plus {
     this.updateMapRegio();
   }
 
+  prepareData() {
+    this.means = {};
+    this.stddevs = {};
+    this.ratios.forEach((v) => {
+      const values = this.data.map(ft => +ft[v]);
+      const mean = getMean(values);
+      this.means[v] = mean;
+      this.stddevs[v] = getStdDev(values, mean);
+    });
+    this.data
+      .forEach((ft) => {
+        this.ratios.forEach((v) => {
+          // eslint-disable-next-line no-param-reassign
+          ft[`cr_${v}`] = (+ft[v] - this.means[v]) / this.stddevs[v];
+          // // eslint-disable-next-line no-param-reassign
+          // ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
+        });
+      });
+    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
+    this.data
+      .forEach((ft) => {
+        this.ratios.forEach((v) => {
+          // eslint-disable-next-line no-param-reassign
+          ft[`dist_${v}`] = math_abs(+ft[`cr_${v}`] - +this.my_region[`cr_${v}`]);
+        });
+      });
+    this.current_ids = this.data.map(d => d.id);
+    this.data.forEach((ft) => {
+      // eslint-disable-next-line no-param-reassign, no-restricted-properties
+      ft.dist = math_sqrt(this.ratios.map(_v => `dist_${_v}`)
+        .map(_v => math_pow(ft[_v], 2)).reduce((a, b) => a + b));
+    });
+    this.data.sort((a, b) => a.dist - b.dist);
+    // eslint-disable-next-line no-param-reassign
+    this.data.forEach((el, i) => { el.globalrank = i; });
+  }
+
   addVariable(code_variable) {
     this.removeLines();
     this.ratios = app.current_config.ratio.slice();
     this.nums = app.current_config.num.slice();
     this.data = app.current_data.filter(
       ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
-    this.current_ids = this.data.map(d => d.id);
-    this.data.forEach((ft) => {
-      this.ratios.forEach((v) => {
-        // eslint-disable-next-line no-param-reassign
-        ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
-      });
-      // eslint-disable-next-line no-param-reassign, no-restricted-properties
-      ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`)
-        .map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
-    });
-    this.data.sort((a, b) => a.dist - b.dist);
-    // eslint-disable-next-line no-param-reassign
-    this.data.forEach((el, i) => { el.globalrank = i; });
-    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
+    this.prepareData();
     // To keep the same selection :
     // this.highlight_selection = this.highlight_selection.map((d) => {
     //   return this.data.find(el => el.id === d.id);
@@ -718,22 +721,7 @@ export default class Similarity1plus {
     this.nums = app.current_config.num.slice();
     this.data = app.current_data.filter(
       ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
-    this.data.forEach((ft) => {
-      this.ratios.forEach((v) => {
-        // eslint-disable-next-line no-param-reassign
-        ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
-      });
-      // eslint-disable-next-line no-param-reassign, no-restricted-properties
-      ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`)
-        .map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
-    });
-    this.data.sort((a, b) => a.dist - b.dist);
-    // eslint-disable-next-line no-param-reassign
-    this.data.forEach((el, i) => { el.globalrank = i; });
-    // this.highlight_selection = this.highlight_selection
-    //   .map(d => this.data.find(el => el.id === d.id))
-    //   .filter(d => !!d);
-    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
+    this.prepareData();
 
     this.draw_group.select(`g#l_${code_variable}`).remove();
 

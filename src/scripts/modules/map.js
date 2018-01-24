@@ -419,11 +419,10 @@ class MapSelect {
 
   unbindBrushClick() {
     this.brush_map = null;
-    svg_map.select('.brush_map')
-      .remove();
+    svg_map.select('.brush_map').remove();
   }
 
-  displayLegend(type = 0) {
+  displayLegend(type = 0) { // eslint-disable-line class-methods-use-this
     d3.selectAll('#svg_legend > g').remove();
     const [elems, size, ty] = getLegendElems(type);
     makeMapLegend(elems, size, ty);
@@ -431,26 +430,15 @@ class MapSelect {
 }
 
 function makeSourceSection() {
-  const parent = svg_map.node().parentElement;
-  // const bbox = svg_map.node().getBoundingClientRect();
-  const elem = document.createElement('p');
-  elem.style.fontSize = '0.45em';
-  elem.style.position = 'absolute';
-  elem.style.right = '0';
-  elem.style.textAlign = 'center';
-  elem.style.bottom = '0';
-  elem.style.left = '0';
-
-  // elem.style.fontSize = '0.45em';
-  // elem.style.position = 'relative';
-  // elem.style.right = '-50%';
-  // elem.style.top = `${bbox.top + bbox.height / 2}px`;
-  // elem.style.margin = 'auto';
-  // elem.style.width = '100%';
-  // elem.style.textAlign = 'center';
-  // elem.className = 'rotate';
-  elem.innerHTML = 'Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA';
-  parent.insertBefore(elem, parent.querySelector('#header_map'));
+  const src_group = svg_map.append('g').attr('id', 'source');
+  src_group.append('text')
+    .attrs({
+      x: width_map / 2,
+      y: height_map - 8,
+      'text-anchor': 'middle',
+    })
+    .style('font-size', '8px')
+    .text('Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA');
 }
 
 export {
