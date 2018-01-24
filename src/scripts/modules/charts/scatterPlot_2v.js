@@ -1,4 +1,4 @@
-import { Rect, comp2, prepareTooltip2, svgPathToCoords, computePercentileRank, getMean, formatNumber, noContextMenu } from './../helpers';
+import { Rect, comp2, prepareTooltip2, svgPathToCoords, computePercentileRank, getMean, formatNumber, noContextMenu, svgContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
@@ -14,7 +14,7 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', noContextMenu);
+  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart); });
   margin = { top: 20, right: 20, bottom: 40, left: 60 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -1350,8 +1350,8 @@ Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur
         ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
         : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [`
-  <b>Indicateur 1</b> : ${info_var1.name} (${info_var1.id})<br>
-  <b>Indicateur 2</b> : ${info_var2.name} (${info_var2.id})<br>
+  <b>Indicateur 1</b> : ${info_var1.name} (<i>${info_var1.id}</i>)<br>
+  <b>Indicateur 2</b> : ${info_var2.name} (<i>${info_var2.id}</i>)<br>
   <b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
     if (app.current_config.my_category) {
       help1.push(

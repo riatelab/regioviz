@@ -1,7 +1,7 @@
 import alertify from 'alertifyjs';
 import {
   math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
-  getMean, Tooltipsify, prepareTooltip2, formatNumber, noContextMenu } from './../helpers';
+  getMean, Tooltipsify, prepareTooltip2, formatNumber, noContextMenu, svgContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -17,8 +17,8 @@ let t;
 let tm;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', noContextMenu);
-  margin = { top: 60, right: 70, bottom: 60, left: 70 };
+  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `-5 -5 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart); });
+  margin = { top: 60, right: 80, bottom: 60, left: 80 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
@@ -169,7 +169,7 @@ export default class RadarChart3 {
       maxValue: 100, // What is the value that the biggest circle will represent
       // How much farther than the radius of the outer circle should the labels be placed:
       labelFactor: 1.2,
-      wrapWidth: 75, // The number of pixels after which a label needs to be given a new line
+      wrapWidth: 100, // The number of pixels after which a label needs to be given a new line
       opacityArea: 0.10, // The opacity of the area of the blob
       dotRadius: 4, // The size of the colored circles of each blog
       opacityCircles: 0.1, // The opacity of the circles of each blob
@@ -246,6 +246,35 @@ export default class RadarChart3 {
   wrap(_text, _width) {
     const self = this;
     const nb_var = app.current_config.ratio.length;
+
+    const colorLabel = function colorLabel(label) {
+      const el = this.parentElement.querySelector('text');
+      el.style.fill = 'darkblue';
+      el.style.fontWeight = '800';
+      const ix = +this.parentElement.id.slice(2);
+      let ix1 = ix + 1;
+      if (ix1 > nb_var - 1) {
+        ix1 = 0;
+      }
+      self.g.select(`g#gp${ix1}`).select('text').style('fill', 'darkblue').style('font-weight', '800');
+    };
+
+    const unColorLabel = function unColorLabel(label) {
+      const el = this.parentElement.querySelector('text');
+      if (self.inversedAxis.has(label)) {
+        el.style.fill = 'red';
+      } else {
+        el.style.fill = 'black';
+      }
+      el.style.fontWeight = null;
+      const ix = +this.parentElement.id.slice(2);
+      let ix1 = ix + 1;
+      if (ix1 > nb_var - 1) {
+        ix1 = 0;
+      }
+      const label1 = self.g.select(`g#gp${ix1}`).data()[0];
+      self.g.select(`g#gp${ix1}`).select('text').style('fill', self.inversedAxis.has(label1) ? 'red' : 'black').style('font-weight', null);
+    };
 
     const swapAxis = function swapAxis() {
       const ix = +this.parentElement.id.slice(2);
@@ -335,6 +364,8 @@ export default class RadarChart3 {
         const transform = `rotate(${(360 / nb_var) * i}, ${x + 25 / 2}, ${y + 10 / 2})`;
         return { x, y, transform };
       })
+      .on('mouseover', colorLabel)
+      .on('mouseout', unColorLabel)
       .on('click', swapAxis);
 
     svg_bar.selectAll('.rectlabel')
@@ -648,7 +679,7 @@ export default class RadarChart3 {
     texts.call(d => this.wrap(d, cfg.wrapWidth));
 
     gp_axis_label
-      .on('mouseover mousemove', function () {
+      .on('mouseover', function () {
         clearTimeout(tm);
         d3.select(this)
           .selectAll('image')
@@ -1152,16 +1183,16 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_key instanceof Array
-        ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
+        ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [];
     this.variables.forEach((v, i) => {
-      help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (${info_var[i + 1].id})<br>`);
+      help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (<i>${info_var[i + 1].id}</i>)<br>`);
     });
     help1.push(`<b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`);
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_key) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
@@ -1169,24 +1200,55 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);
     }
+    const my_region = this.data[0];
+    // const o_my_region = app.full_dataset.find(d => d.id === my_region.id);
+    const sup_median = my_region.axes.filter(d => d.value > 50);
+    const inf_median = my_region.axes.filter(d => d.value <= 50);
 
-    const help2 = [`${this.variables.length} indicateurs sont simultanément représentés sur ce graphique.`];
-// `Pour l’espace d’étude ${name_study_zone}, l’unité territoriale ${app.current_config.my_region_pretty_name} se positionne au-dessus de la valeur médiane (50) pour les indicateurs suivants (position plus favorable) :
-// <Nom de l’indicateur 1>, indice <valeur normalisée 1>, valeur <valeur brute 1> <unité de mesure 1>;
-// < Nom de l’indicateur n> , indice <valeur normalisée n>, valeur <valeur brute n><unité de mesure n> ;
-// Cette unité territoriale se positionne sous la valeur médiane pour les indicateurs suivants :
-// <Nom de l’indicateur y>, indice <valeur normalisée y>, valeur <valeur brute y><unité de mesure y>
-// Si sélection d’unités territoriales supplémentaires, répéter l’opération en fonction du nombre de unité territoriales sélectionnées.
-// En comparaison à l’unité territoriale <nom de l’unité territoriale sélectionnée> (<pays d’appartenance>), l’unité territoriale <nom de unité territoriale de référence> est caractérisée par des indices normalisés plus importants pour les indicateurs suivants :
-// <Nom de l’indicateur 1>, (<écart de points normalisés du plus grand au plus petit>).
-// Etc.
-// Inversement, l’unité territoriale <nom de l’unité territoriale de référence> est caractérisée par des scores moins importants pour ces indicateurs 
-// `;
+    const help2 = [`<b>${this.variables.length} indicateurs</b> sont simultanément représentés sur ce graphique.<br><br>`];
+    if (sup_median.length > 0) {
+      help2.push(
+        `Pour l’espace d’étude <b>${name_study_zone}</b>, l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> (<b>${app.current_config.my_region}</b>) se positionne <b>au-dessus de la valeur médiane (50)</b> pour les indicateurs suivants (position plus favorable) :<br>`);
+      sup_median.forEach((v) => {
+        help2.push(` - ${v.axis}, indice ${formatNumber(v.value, 1)}, valeur ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit};<br>`);
+      });
+    }
+    if (inf_median.length > 0) {
+      help2.push('Cette unité territoriale se positionne <b>sous la valeur médiane</b> pour les indicateurs suivants :<br>');
+      inf_median.forEach((v) => {
+        help2.push(` - ${v.axis}, indice ${formatNumber(v.value, 1)}, valeur ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit};<br>`);
+      });
+    }
 
-    let source = [];
-    this.variables.map((v, i) =>
-      `<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].source} (Date de téléchargement de la donnée : ${info_var[i + 1].update})`);
-    source = source.join('<br>');
+    if (this.data.length > 1) {
+      this.data.forEach((region, i) => {
+        if (i > 0) {
+          const id_region = region.name;
+          const o_region = app.full_dataset.find(d => d.id === id_region);
+          help2.push('<br>');
+          const _inf_my_reg = region.axes.filter((d, j) => d.value <= my_region.axes[j].value);
+          const _sup_my_reg = region.axes.filter((d, j) => d.value > my_region.axes[j].value);
+          if (_inf_my_reg.length > 0) {
+            // _inf_my_reg.sort((a, b) => b.value - a.value);
+            help2.push(
+              `En comparaison à l’unité territoriale <b>${o_region.name}</b> (${o_region.id} - ${o_region.UNIT_SUP}), l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des indices normalisés plus importants pour les indicateurs suivants :<br>`);
+            _inf_my_reg.forEach((v) => {
+              help2.push(` - ${v.axis} (${formatNumber(v.value, 1)});<br>`);
+            });
+          }
+          if (_sup_my_reg.length > 0) {
+            // _sup_my_reg.sort((a, b) => b.dist - a.dist);
+            help2.push(`Inversement, l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des scores moins importants pour ces indicateurs :<br>`);
+            _sup_my_reg.forEach((v) => {
+              help2.push(` - ${v.axis} (${formatNumber(v.value, 1)});<br>`);
+            });
+          }
+        }
+      });
+    }
+    const source = this.variables
+      .map((v, i) => `<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].source} (Date de téléchargement de la donnée : ${info_var[i + 1].last_update})`)
+      .join('<br>');
     return { section_selection: help1.join(''), section_help: help2.join(''), section_source: source };
   }
 }

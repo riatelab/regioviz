@@ -1,5 +1,5 @@
 import debug from 'debug';
-import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, noContextMenu } from './../helpers';
+import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, noContextMenu, svgContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -7,7 +7,7 @@ import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
 
-let svg_bar = d3.select('svg#svg_bar');
+let svg_bar = d3.select('svg#svg_bar').attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`);
 let margin = { top: 10, right: 20, bottom: 100, left: 60 };
 let margin2 = { top: 430, right: 20, bottom: 15, left: 60 };
 let width = fixed_dimension.chart.width - margin.left - margin.right;
@@ -21,7 +21,7 @@ let current_range = [0, 0];
 let displayed;
 
 function updateDimensions() {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', noContextMenu);
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', () => { svgContextMenu(app.chart); });
   margin = {
     top: 10,
     right: 20,
@@ -1096,7 +1096,7 @@ La carte et le graphique sont interactifs dans la mesure où l’utilisateur peu
       ? 'UE28' : app.current_config.filter_key instanceof Array
         ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
         : study_zones.find(d => d.id === app.current_config.filter_key).name;
-    const help1 = [`<b>Indicateur 1</b> : ${info_var.name} (${info_var.id})<br>
+    const help1 = [`<b>Indicateur 1</b> : ${info_var.name} (<i>${info_var.id}</i>)<br>
 <b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
     if (app.current_config.my_category) {
       help1.push(

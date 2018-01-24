@@ -1,4 +1,5 @@
 import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
+import ContextMenu from './contextMenu';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise,
 no-extend-native, prefer-rest-params, no-prototype-builtins,
@@ -627,6 +628,25 @@ function noContextMenu() {
   d3.event.preventDefault();
 }
 
+function svgContextMenu(current_chart) {
+  const items_menu = [
+    {
+      name: 'Export au format PNG',
+      action: () => { null; },
+    },
+    {
+      name: 'Export au format SVG',
+      action: () => { null; },
+    },
+    {
+      name: 'Export d\'un rapport complet',
+      action: () => { null; },
+    },
+  ];
+  current_chart.tooltip.style('display', 'none');
+  new ContextMenu().showMenu(d3.event, document.body, items_menu);
+}
+
 /**
 *
 *
@@ -690,18 +710,21 @@ function exportHtmlRapport(sections, name_my_region) {
     font-size: 14px;
   }
 }
-h1 { color: white; background: #4f81bd; }
-h3 { color: #4f81bd; }
+body { font-family: sans-serif; }
+h1 { color: white; background: #4f81bd; padding: 0.5em; font-family: Monospace,sans-serif; }
+h3 { color: #4f81bd; font-family: Monospace,sans-serif; }
 div { margin: auto; }
 div.f1 { width: 75%; }
 div.f2 { display: flex; width: 98%; }
 div.footer {
+  margin: auto;
   text-align: center;
-  width: 80%;
+  width: 70%;
   font-size: 0.8em;
+  padding: 10px 5px;
 }
 </style>
-<title>Regioviz</title>
+<title>Regioviz - Rapport ${name_my_region}</title>
 <body>
   <div class="f1">
     <h1>Regioviz - Rapport ${name_my_region}</h1>
@@ -764,6 +787,7 @@ export {
   getStyle,
   getStyleProperty,
   noContextMenu,
+  svgContextMenu,
   exportHtmlRapport,
   clickDlPdf,
 };

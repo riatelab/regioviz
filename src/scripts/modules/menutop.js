@@ -197,7 +197,6 @@ export function makeHeaderChart() {
           app.chart.current_ids.forEach((idx) => {
             const l1 = app.current_data.find(d => d.id === idx);
             const l2 = app.chart.data.find(d => d.id === idx);
-            console.log(l1, l2);
             table_content.push(columns.map(c => l1[c] || l2[c]).join(','));
             table_content.push('\r\n');
           });
@@ -249,6 +248,7 @@ export function makeHeaderChart() {
         closeLabel: 'Close',
         onOpen() {
           document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
+          document.querySelector('div.tingle-modal-box').style.width = '40%';
         },
         onClose() {
           modal.destroy();
@@ -265,7 +265,7 @@ export function makeHeaderChart() {
       // elem.setAttribute('download', 'rapport.html');
       // elem.style.display = 'none';
       setTimeout(() => {
-        modal.setContent(`<div id="prep_rapport"><p><a class="buttonDownload" id="dl_rapport" download="Regioviz_rapport.html" href="${href}">Télécharger</a></p></div>`);
+        modal.setContent(`<div style="text-align: center;margin: auto;padding: 15px;"><h3>Export d'un rapport</h3><br><img src="img/thumbnail_report.png" /></div><div style="text-align: center;margin: auto;"><p><a class="buttonDownload" id="dl_rapport" download="Regioviz_rapport.html" href="${href}">Télécharger</a></p></div>`);
         // document.querySelector('#dl_rapport').onclick = function () {
         //   document.body.appendChild(elem);
         //   elem.click();
