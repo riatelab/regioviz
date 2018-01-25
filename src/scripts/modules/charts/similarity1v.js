@@ -1,9 +1,10 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, prepareTooltip2, getMean, getStdDev, Tooltipsify, formatNumber, noContextMenu, svgContextMenu } from './../helpers';
+import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
+import { prepareTooltip, Tooltipsify } from './../tooltip';
 
 let svg_bar;
 let margin;
@@ -40,7 +41,7 @@ export default class Similarity1plus {
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip2(d3.select(svg_bar.node().parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
 
     this.completude = new CompletudeSection();
     this.completude.update(

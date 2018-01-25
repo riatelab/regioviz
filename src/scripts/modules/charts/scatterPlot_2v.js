@@ -1,10 +1,11 @@
-import { Rect, comp2, prepareTooltip2, svgPathToCoords, computePercentileRank, getMean, formatNumber, noContextMenu, svgContextMenu } from './../helpers';
+import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
 import ContextMenu from './../contextMenu';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
+import { prepareTooltip } from './../tooltip';
 
 let svg_bar;
 let margin;
@@ -14,7 +15,7 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart); });
+  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `-5 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart); });
   margin = { top: 20, right: 20, bottom: 40, left: 60 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -370,13 +371,13 @@ export default class ScatterPlot2 {
       .call(this.yAxis);
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip2(d3.select(svg_bar.node().parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
 
     this.prepareTitleAxis();
 
     svg_container.append('image')
       .attrs({
-        x: margin.left + width / 2 - 20 - svg_container.select('#title-axis-x').node().getBoundingClientRect().width / 2,
+        x: margin.left + width / 2 - 30 - svg_container.select('#title-axis-x').node().getBoundingClientRect().width / 2,
         y: margin.top + height + margin.bottom / 2 + 5,
         width: 15,
         height: 15,
@@ -409,7 +410,7 @@ export default class ScatterPlot2 {
     svg_container.append('image')
       .attrs({
         x: margin.left / 3 - 20,
-        y: margin.top + (height / 2) + svg_container.select('#title-axis-y').node().getBoundingClientRect().height / 2 + 5,
+        y: margin.top + (height / 2) + svg_container.select('#title-axis-y').node().getBoundingClientRect().height / 2 + 15,
         width: 15,
         height: 15,
         'xlink:href': 'img/reverse_plus.png',
@@ -1019,7 +1020,7 @@ export default class ScatterPlot2 {
     // Update the position of the reverse button:
     svg_container.select('#img_reverse_x')
       .attrs({
-        x: title_axis.attr('x') - title_axis.node().getBoundingClientRect().width / 2 - 20,
+        x: title_axis.attr('x') - title_axis.node().getBoundingClientRect().width / 2 - 30,
         y: margin.top + height + margin.bottom / 2 + 5,
       });
     // Update the items displayed in the context menu under this axis label:
@@ -1063,7 +1064,7 @@ export default class ScatterPlot2 {
     svg_container.select('#img_reverse_y')
       .attrs({
         x: margin.left / 3 - 20,
-        y: margin.top + (height / 2) + svg_container.select('#title-axis-y').node().getBoundingClientRect().height / 2 + 5,
+        y: margin.top + (height / 2) + svg_container.select('#title-axis-y').node().getBoundingClientRect().height / 2 + 15,
       });
     // Update the items displayed in the context menu under this axis label:
     this.updateItemsCtxMenu();

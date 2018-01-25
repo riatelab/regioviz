@@ -1,11 +1,11 @@
-import debug from 'debug';
-import { comp, math_round, math_abs, Rect, prepareTooltip2, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, noContextMenu, svgContextMenu } from './../helpers';
+import { comp, math_round, math_abs, Rect, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
+import { prepareTooltip } from './../tooltip';
 
 let svg_bar = d3.select('svg#svg_bar').attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`);
 let margin = { top: 10, right: 20, bottom: 100, left: 60 };
@@ -360,7 +360,7 @@ export default class BarChart1 {
 
     svg_container.append('image')
       .attrs({
-        x: width + margin.left + 5,
+        x: width + margin.left + 2.5,
         y: 385,
         width: 15,
         height: 15,
@@ -401,7 +401,7 @@ export default class BarChart1 {
       });
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip2(d3.select(svg_bar.node().parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
 
     // // Deactivate the brush rect selection on the map + on the chart
     // // when he user press the Ctrl key:

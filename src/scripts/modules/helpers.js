@@ -190,107 +190,23 @@ const getElementsFromPoint = (x, y, context = document.body) => {
 };
 
 /**
-* Function to prepare a tooltip zone to be used/bound later.
-*
-* @param {Object} parent - The d3 node selection for the parent.
-* @param {String} before - The selector describing the before element.
-* @param {String} classname - The className value to be used for
-*                             this tooltip (default 'tooltip').
-* @return {Object} - The d3 node element for this tooltip zone.
-*
-*/
-function prepareTooltip2(parent, before, classname = 'tooltip') {
-  const t = parent.select('.tooltip');
-  if (t.node()) {
-    return t;
-  }
-  const tooltip = parent.insert('div', before)
-    .attr('class', classname)
-    .style('display', 'none');
-
-  tooltip.append('p').attr('class', 'title');
-  tooltip.append('p').attr('class', 'content');
-
-  return tooltip;
-}
-
-/**
 * Function to get the computed style value of an element.
 *
-*
-*
+* @param {Node} el - The targeted element.
+* @return {Object}
 *
 */
 const getStyle = el => (window.getComputedStyle ? getComputedStyle(el, null) : el.currentStyle);
 
 /**
-* Function to get the computed style value of an element.
+* Function to get the computed style value of an element's property.
 *
-*
-*
+* @param {Node} elem - The targeted node.
+* @param {String} prop - The targeted property.
+* @return {String} - The computed/current value for this style property.
 *
 */
 const getStyleProperty = (elem, prop) => getStyle(elem)[prop];
-
-/**
-* Function to bind a tooltip (on mousedown/mousemove)
-* on each element described by the given 'selector'.
-* Options can contains the name of attribute containing
-* the tooltip value, the name of the class to be used for
-* the tooltip and the parent DOM element on which appending
-* these tooltips (these tooltips are created and destroyed
-* each time they are displayed).
-*
-* @param {String} selector
-* @param {Object} options
-* @return {Void}
-*
-*/
-const Tooltipsify = (selector, options = {}) => {
-  const opts = {
-    parent: options.parent || document.body,
-    className: options.className || 'tooltip-black',
-    dataAttr: options.dataAttr || 'title-tooltip',
-    timeout: options.timeout || 5,
-  };
-  const elems = d3.selectAll(selector);
-  if (elems._groups[0].length === 0) return;
-
-  let tooltip_parent = d3.select(opts.parent).select(`.${opts.className}`);
-  let tooltip;
-  let t;
-
-  if (!tooltip_parent.node()) {
-    tooltip_parent = d3.select(opts.parent).insert('div')
-      .attr('class', opts.className)
-      .style('display', 'none');
-    tooltip = tooltip_parent.append('p').attr('class', 'content');
-  } else {
-    tooltip = tooltip_parent.select('.content');
-  }
-
-  elems
-    .on('mouseover', () => {
-      clearTimeout(t);
-      tooltip_parent.style('display', null);
-    })
-    .on('mouseout', () => {
-      clearTimeout(t);
-      t = setTimeout(() => { tooltip_parent.style('display', 'none'); }, opts.timeout);
-    })
-    .on('mousemove mousedown', function () {
-      clearTimeout(t);
-      tooltip
-        .html(this.getAttribute(opts.dataAttr));
-      const b = tooltip.node().getBoundingClientRect();
-      tooltip_parent
-        .styles({
-          display: null,
-          left: `${d3.event.pageX - 5}px`,
-          top: `${d3.event.pageY - b.height - 15}px`,
-        });
-    });
-};
 
 function unbindUI() {
   // Removes the current behavior corresponding to clicking on the left menu:
@@ -470,6 +386,14 @@ const getMean = (serie) => {
   return sum / nb_values;
 };
 
+/**
+* Compute the standard deviation of a serie of values.
+*
+* @param {Array} serie - An array of Number.
+* @param {Number} mean_value - (Optional) The mean value of the serie.
+* @return {Number} - The standard deviation of the input serie of values.
+*
+*/
 const getStdDev = (serie, mean_value) => {
   const nb_values = serie.length;
   if (!mean_value) {
@@ -483,6 +407,14 @@ const getStdDev = (serie, mean_value) => {
   return math_sqrt((1 / nb_values) * sum);
 };
 
+/**
+* ...
+*
+* @param {Array} serie - The Array of Number to be standardized.
+* @return {Array} - The resulting standardized Array of Number, in the same order
+*  as the input Array.
+*
+*/
 const getStandardizedMeanStdDev = (serie) => {
   const mean = getMean(serie);
   const stddev = getStdDev(serie, mean);
@@ -570,20 +502,20 @@ function getRandom(arr, false_length) {
   return arr[Math.round(Math.random() * (false_length || arr.length))];
 }
 
-const getRatioToWide = () => {
-  if (window.matchMedia('(min-width: 1561px)').matches) {
-    return 1550 / 1350;
-  } else if (window.matchMedia('(min-width: 1361px) and (max-width: 1560px)').matches) {
-    return 1350 / 1350;
-  } else if (window.matchMedia('(min-width: 1161px) and (max-width: 1360px)').matches) {
-    return 1150 / 1350;
-  } else if (window.matchMedia('(min-width: 960px) and (max-width: 1160px)').matches) {
-    return 960 / 1350;
-  } else if (window.matchMedia('(max-width: 959px)').matches) {
-    return 540 / 1350;
-  }
-  return 1350 / 1350;
-};
+// const getRatioToWide = () => {
+//   if (window.matchMedia('(min-width: 1561px)').matches) {
+//     return 1550 / 1350;
+//   } else if (window.matchMedia('(min-width: 1361px) and (max-width: 1560px)').matches) {
+//     return 1350 / 1350;
+//   } else if (window.matchMedia('(min-width: 1161px) and (max-width: 1360px)').matches) {
+//     return 1150 / 1350;
+//   } else if (window.matchMedia('(min-width: 960px) and (max-width: 1160px)').matches) {
+//     return 960 / 1350;
+//   } else if (window.matchMedia('(max-width: 959px)').matches) {
+//     return 540 / 1350;
+//   }
+//   return 1350 / 1350;
+// };
 
 
 function addThousandsSeparator(value) {
@@ -618,16 +550,28 @@ function formatNumber(value, precision) {
   return values_list.join(formatnb_decimal_sep);
 }
 
+const array_slice = Array.slice;
+
 /**
+* Removes all Node of the given NodeList.
 *
-*
-*
+* @param {NodeList} elems - A NodeList (or an Array) containing the elements
+*  to be removed.
+* @return {Void}
 *
 */
-function noContextMenu() {
-  d3.event.preventDefault();
-}
+const removeAll = (elems) => {
+  array_slice(elems).forEach((el) => { el.remove(); });
+};
 
+/**
+* Display a custom context menu when the user triggers a right click on the map
+* or on a chart.
+*
+* @param {Object} current_chart - The Object corresponding to the
+*  current chart in use in the application.
+* @return {Void}
+*/
 function svgContextMenu(current_chart) {
   const items_menu = [
     {
@@ -648,9 +592,13 @@ function svgContextMenu(current_chart) {
 }
 
 /**
+* Catch the event when the user click on the download anchor of a pdf document and
+* use the 'href' attribute of the anchor to open the document on a new window/tab
+* (and avoid the default action of trying to download the document).
 *
-*
-*
+* @param {Event} event - The current event.
+* @return {Boolean} - Always returns false the indicate the default action for this
+*  event has been prevented.
 *
 */
 function clickDlPdf(event) {
@@ -663,92 +611,6 @@ function clickDlPdf(event) {
   event.returnValue = false;
   this.href = path;
   return false;
-}
-
-function exportHtmlRapport(sections, name_my_region) {
-  const {
-    section_selection,
-    section_help,
-    section_source,
-  } = sections;
-  const targetSvgMap = document.getElementById('svg_map');
-  const targetSvgChart = document.getElementById('svg_bar');
-  const serializer = new XMLSerializer();
-  const svg_sources = [
-    serializer.serializeToString(targetSvgMap),
-    serializer.serializeToString(targetSvgChart),
-  ];
-  svg_sources.forEach((source) => {
-    if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
-      // eslint-disable-next-line no-param-reassign
-      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-    }
-    if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
-      // eslint-disable-next-line no-param-reassign
-      source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-    }
-    // // eslint-disable-next-line no-param-reassign
-    // source = ['<?xml version="1.0" standalone="no"?>\r\n', source].join('');
-  });
-  const new_html_doc = `
-<!DOCTYPE html>
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<style>
-@media only screen and (max-width: 959px) {
-  body {
-    font-size: 11px;
-  }
-}
-@media only screen and (min-width: 960px) and (max-width: 1460px) {
-  body {
-    font-size: 12px;
-  }
-}
-@media only screen and (min-width: 1461px) {
-  body {
-    font-size: 14px;
-  }
-}
-body { font-family: sans-serif; }
-h1 { color: white; background: #4f81bd; padding: 0.5em; font-family: Monospace,sans-serif; }
-h3 { color: #4f81bd; font-family: Monospace,sans-serif; }
-div { margin: auto; }
-div.f1 { width: 75%; }
-div.f2 { display: flex; width: 98%; }
-div.footer {
-  margin: auto;
-  text-align: center;
-  width: 70%;
-  font-size: 0.8em;
-  padding: 10px 5px;
-}
-</style>
-<title>Regioviz - Rapport ${name_my_region}</title>
-<body>
-  <div class="f1">
-    <h1>Regioviz - Rapport ${name_my_region}</h1>
-    <h3>Rappel de la sélection</h3>
-    <div>
-    ${section_selection}
-    </div>
-    <h3>Représentations graphiques</h3>
-    <div class="f2">
-      <div style="width: 40%; margin: auto;">${svg_sources[0]}</div>
-      <div style="width: 40%; margin: auto;">${svg_sources[1]}</div>
-    </div>
-    <h3>Aide de lecture</h3>
-    <div style="text-align: justify;">${section_help}</div>
-    <h3>Sources</h3>
-    <div>${section_source}</div>
-    <div class="footer">
-      <p>
-        <i>Ce rapport a été généré par l'application Regioviz, conceptualisée et developpée par l'UMS RIATE en 2018 dans le cadre d'un projet CGET associant les Secrétaires Généraux pour les Affaires Régionales (SGAR).</i>
-      </p>
-    </div>
-  </div>
-</body>`;
-  return new_html_doc;
 }
 
 export {
@@ -766,7 +628,6 @@ export {
   Rect,
   PropSizer,
   unbindUI,
-  prepareTooltip2,
   removeDuplicates,
   getSvgPathType,
   svgPathToCoords,
@@ -780,14 +641,12 @@ export {
   selectFirstAvailableVar,
   prepareGeomLayerId,
   getRandom,
-  Tooltipsify,
   getElementsFromPoint,
-  getRatioToWide,
+  // getRatioToWide,
   formatNumber,
   getStyle,
   getStyleProperty,
-  noContextMenu,
+  removeAll,
   svgContextMenu,
-  exportHtmlRapport,
   clickDlPdf,
 };

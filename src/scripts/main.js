@@ -13,7 +13,8 @@ import BarChart1 from './modules/charts/barChart_1v';
 import ScatterPlot2 from './modules/charts/scatterPlot_2v';
 import RadarChart3 from './modules/charts/radarChart_3v';
 import Similarity1plus from './modules/charts/similarity1v';
-import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, Tooltipsify, getRatioToWide, clickDlPdf } from './modules/helpers';
+import { Tooltipsify } from './modules/tooltip';
+import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, clickDlPdf } from './modules/helpers';
 import {
   prepare_dataset,
   filterLevelVar,
@@ -65,11 +66,16 @@ function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NU
     // (these values should match with the values of the "id_field" in the
     // tabular dataset)
     id_field_geom: 'id',
-    num: [var_info.id1],
-    denum: [var_info.id2],
+    // An Array containing the id of one or more variables (currently selected in the UI)
     ratio: [variable],
+    // Array containing the corresponding 'pretty names' (same order).
     ratio_pretty_name: [var_info.name],
+    // Array containing the corresponding units (same order).
     ratio_unit: [var_info.unit],
+    // Array containing the corresponding numerator id.
+    num: [var_info.id1],
+    // Array containing the corresponding denominator id.
+    denum: [var_info.id2],
     // The level currently in use:
     current_level: 'N1',
     // The ID of the region currently in use:
@@ -607,7 +613,7 @@ function loadData() {
       if (error) throw error;
       document.body.classList.remove('loading');
       document.querySelector('.spinner').remove();
-      app.ratioToWide = getRatioToWide();
+      // app.ratioToWide = getRatioToWide();
       const [
         full_dataset, nuts, borders, countries, countries_remote,
         coasts, coasts_remote, cyprus_non_espon_space,

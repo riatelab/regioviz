@@ -1,8 +1,16 @@
 {
   "name": "regioviz",
   "version": "0.1.0",
-  "description": "",
-  "license": "GPLv3",
+  "description": "Statistical exploration tool to compare new French regions in a European context.",
+  "license": "CECILL-2.1",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/riatelab/regioviz.git"
+  },
+  "author": {
+    "name" : "Matthieu Viry",
+    "email" : "matthieu.viry@cnrs.fr"
+  },
   "devDependencies": {
     "autoprefixer": "^7.2.2",
     "babel-core": "latest",
@@ -33,7 +41,7 @@
     "tippy.js": "^2.0.4"
   },
   "scripts": {
-    "prepublish": "rm -rf build/img && rm -rf build/data && rm -rf build/vendor && cp -r src/img/ build/img/ && cp -r src/data/ build/data/ && cp -r src/vendor/ build/vendor/",
+    "prepublish": "rm -rf build/* && cp src/index.html build/ && cp -r src/img/ build/img/ && cp -r src/data/ build/data/ && cp -r src/vendor/ build/vendor/",
     "build": "npm run prepublish && rollup -c",
     "watch": "npm run prepublish && rollup -c -w",
     "dev": "npm run prepublish && rollup -c -w --environment SERVE"

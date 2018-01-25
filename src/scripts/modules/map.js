@@ -1,11 +1,12 @@
 import centroid from '@turf/centroid';
 import { app } from './../main';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './options';
-import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, prepareTooltip2, getElementsFromPoint, noContextMenu } from './helpers';
+import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, getElementsFromPoint, svgContextMenu } from './helpers';
 import { filterLevelGeom } from './prepare_data';
+import { prepareTooltip } from './tooltip';
 
 
-const svg_map = d3.select('svg#svg_map').on('contextmenu', noContextMenu);
+const svg_map = d3.select('svg#svg_map').on('contextmenu', svgContextMenu);
 const width_map = fixed_dimension.map.width;
 const height_map = fixed_dimension.map.height;
 let styles;
@@ -244,7 +245,7 @@ class MapSelect {
       .each(function () {
         this._pts = svgPathToCoords(this.getAttribute('d'), app.type_path);
       });
-    this.tooltip = prepareTooltip2(d3.select(svg_map.node().parentElement), null, 'tooltip_map');
+    this.tooltip = prepareTooltip(d3.select(svg_map.node().parentElement), null, 'tooltip_map');
     this.bindTooltips();
   }
 

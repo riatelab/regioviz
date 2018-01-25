@@ -1,7 +1,7 @@
 import tingle from 'tingle.js';
+import generateHtmlRapport from './report';
 import { app } from './../main';
-import { exportHtmlRapport, clickDlPdf } from './helpers';
-
+import { clickDlPdf } from './helpers';
 /**
 * Function to prepare the menu, located on the top of the window, allowing to choose
 * between the various kind of charts offered by the application.
@@ -258,7 +258,7 @@ export function makeHeaderChart() {
       modal.setContent(content);
       modal.open();
       const sections = app.chart.getTemplateHelp();
-      const html_doc = exportHtmlRapport(sections, app.current_config.my_region_pretty_name);
+      const html_doc = generateHtmlRapport(sections, app.current_config.my_region_pretty_name);
       // const href = `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`;
       href = URL.createObjectURL(new Blob([html_doc], { type: 'text/html' }));
       // elem.setAttribute('href', `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`);

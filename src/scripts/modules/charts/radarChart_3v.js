@@ -1,12 +1,13 @@
 import alertify from 'alertifyjs';
 import {
   math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
-  getMean, Tooltipsify, prepareTooltip2, formatNumber, noContextMenu, svgContextMenu } from './../helpers';
+  getMean, formatNumber, svgContextMenu } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, study_zones, territorial_mesh } from './../../main';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
+import { prepareTooltip, Tooltipsify } from './../tooltip';
 
 
 let svg_bar;
@@ -199,7 +200,7 @@ export default class RadarChart3 {
       .attr('transform', `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`);
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip2(d3.select(svg_bar.node().parentElement.parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement.parentElement), null);
 
     this.prepareData(data);
     this.drawAxisGrid();
@@ -767,7 +768,10 @@ export default class RadarChart3 {
     menu_selection.append('div')
       .attr('class', 'mini-legend-line noselect redline')
       .style('margin', 'auto')
-      .html(`<div class="mini-legend-item"><p class="color_square" style="background-image:url('img/legend_red_line2.png')"></p><span>Médiane de l'espace d'étude</span></div>`);
+      .html(`<div class="mini-legend-item">
+<p class="color_square" style="background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAXCAYAAAD+4+QTAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAVYAAAFWABqGegqwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACaSURBVEiJ7ZO7CYVAEADnHq8DC7ABEwMrEGOxDiMDCxCsQTC3ksPA3E8PdqCIrMEGV4G84N0mOwwLE60REeHl+bwd8JE/jhgpSyHPIcvU9D3Ms3LTQBDAdUFVqQtDqGvlaYJhUC4KSFPlroNtU25bvlgLceyy6wrWKh+H7vt2Lorc7b47nyTOLwuMo/J5Yvwz+oiP+IiP/DDyAKfDL75QM0o+AAAAAElFTkSuQmCC')"></p>
+<span>Médiane de l'espace d'étude</span></div>`);
+
     menu_selection.selectAll('div')
       .data(this.data.map(a => a.name), d => d)
       .enter()
@@ -1221,6 +1225,7 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
     }
 
     if (this.data.length > 1) {
+      help2.push('<div style="font-size:0.9em;">');
       this.data.forEach((region, i) => {
         if (i > 0) {
           const id_region = region.name;
@@ -1245,10 +1250,22 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
           }
         }
       });
+      help2.push('</div>');
     }
     const source = this.variables
       .map((v, i) => `<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].source} (Date de téléchargement de la donnée : ${info_var[i + 1].last_update})`)
       .join('<br>');
-    return { section_selection: help1.join(''), section_help: help2.join(''), section_source: source };
+
+    const lgd = document.getElementById('menu_selection').outerHTML.replace(/✘/g, '');
+    const extra_css = `.mini-legend-item { display: inline-block; }
+.mini-legend-item > p.color_square {width: 1.1em;height: 1.1em;margin: auto;display: inline-block;vertical-align: text-top;border-radius: 10%;}
+.mini-legend-item > span {padding: 0 5px;}`;
+    return {
+      section_selection: help1.join(''),
+      section_help: help2.join(''),
+      section_source: source,
+      section_optional: lgd,
+      extra_css,
+    };
   }
 }
