@@ -8,8 +8,13 @@ import { prepareTooltip, Tooltipsify } from './../tooltip';
 
 let svg_bar;
 let margin;
+let margin_global_dist;
+let margin2_global_dist;
 let width;
 let height;
+let width_global_dist;
+let height_global_dist;
+let height2_global_dist;
 let svg_container;
 let t;
 
@@ -18,6 +23,12 @@ const updateDimensions = () => {
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
+
+  margin_global_dist = { top: 20, right: 20, bottom: 200, left: 50 };
+  margin2_global_dist = { top: math_round(fixed_dimension.chart.height - margin_global_dist.top - margin_global_dist.bottom + 45), right: 20, bottom: 20, left: 50 };
+  width_global_dist = fixed_dimension.chart.width - margin_global_dist.left - margin_global_dist.right;
+  height_global_dist = fixed_dimension.chart.height - margin_global_dist.top - margin_global_dist.bottom;
+  height2_global_dist = fixed_dimension.chart.height - margin2_global_dist.top - margin2_global_dist.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
   d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
   svg_container = svg_bar.append('g').attr('class', 'container');
@@ -32,6 +43,7 @@ export default class Similarity1plus {
     this.nums = app.current_config.num;
     this.data = ref_data.filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
     this.prepareData();
+    this.type = 'detailled';
     resetColors();
     this.highlight_selection = [];
     this.serie_inversed = false;
@@ -57,6 +69,23 @@ export default class Similarity1plus {
       .append('div')
       .attr('id', 'menu_selection')
       .styles({ position: 'relative', color: '#4f81bd', 'text-align': 'center' });
+
+    const chart_type = menu_selection.append('p');
+
+    chart_type.append('span')
+      .attrs({
+        id: 'ind_dist_detailled',
+        class: 'choice_ind active noselect',
+      })
+      .text('Distance détaillée');
+
+    chart_type.append('span')
+      .attrs({
+        id: 'ind_dist_global',
+        class: 'choice_ind noselect',
+      })
+      .text('Distance globale');
+
     const selection_close = menu_selection.append('p').attr('class', 'selection_display');
     selection_close.append('span')
       .html('Sélection des');
@@ -101,372 +130,492 @@ export default class Similarity1plus {
   update() {
     const self = this;
     const data = self.data;
-    const highlight_selection = self.highlight_selection;
-    const nb_variables = self.ratios.length;
-    const offset = height / nb_variables + 1;
-    let height_to_use = offset / 2;
-    for (let i = 0; i < nb_variables; i++) {
-      const ratio_name = self.ratios[i];
-      const selector_ratio_name = `l_${ratio_name}`;
-      const ratio_pretty_name = app.current_config.ratio_pretty_name[i];
-      const num_name = self.nums[i];
-      const my_region_value = self.my_region[ratio_name];
-      let g = this.draw_group.select(`#${selector_ratio_name}`);
-      let axis = this.draw_group.select(`g.axis--x.${selector_ratio_name}`);
-      let layer_other;
-      let layer_highlighted;
-      let layer_top;
+
+    if (self.type === 'detailled') {
+      const highlight_selection = self.highlight_selection;
+      const nb_variables = self.ratios.length;
+      const offset = height / nb_variables + 1;
+      let height_to_use = offset / 2;
+      for (let i = 0; i < nb_variables; i++) {
+        const ratio_name = self.ratios[i];
+        const selector_ratio_name = `l_${ratio_name}`;
+        const ratio_pretty_name = app.current_config.ratio_pretty_name[i];
+        const num_name = self.nums[i];
+        const my_region_value = self.my_region[ratio_name];
+        let g = this.draw_group.select(`#${selector_ratio_name}`);
+        let axis = this.draw_group.select(`g.axis--x.${selector_ratio_name}`);
+        let layer_other;
+        let layer_highlighted;
+        let layer_top;
+        if (!g.node()) {
+          g = this.draw_group
+            .append('g')
+            .attrs({
+              id: selector_ratio_name,
+              num: num_name,
+              class: 'grp_var',
+            });
+          axis = g.append('g')
+            .attrs({
+              class: `axis axis--x ${selector_ratio_name}`,
+              transform: 'translate(0, 10)',
+            });
+
+          g.append('text')
+            .attrs({
+              // x: 0,
+              x: 20,
+              y: -7.5,
+              class: `title_axis ${selector_ratio_name} noselect`,
+              fill: '#4f81bd',
+              'font-size': '11px',
+              'font-weight': 'bold',
+              'font-family': '"Signika",sans-serif',
+              'title-tooltip': ratio_pretty_name,
+            })
+            .text(ratio_name);
+
+          g.append('image')
+            .attrs({
+              x: 0,
+              // x: txt.node().getBoundingClientRect().width + 5,
+              y: -18,
+              width: 14,
+              height: 14,
+              'xlink:href': 'img/reverse_plus.png',
+              id: 'img_reverse',
+            })
+            .style('cursor', 'pointer')
+            .on('click', function () {
+              if (self.inversedAxis.has(ratio_name)) {
+                this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
+                const title_ax = this.previousSibling;
+                title_ax.setAttribute('title-tooltip', ratio_pretty_name);
+                title_ax.setAttribute('fill', '#4f81bd');
+                self.inversedAxis.delete(ratio_name);
+              } else {
+                this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_moins.png');
+                self.inversedAxis.add(ratio_name);
+                const title_ax = this.previousSibling;
+                title_ax.setAttribute('title-tooltip', `${ratio_pretty_name} (axe inversé)`);
+                title_ax.setAttribute('fill', 'red');
+              }
+              self.update();
+            });
+
+          g.append('image')
+            .attrs({
+              // x: txt.node().getBoundingClientRect().width + 22.5,
+              x: -19,
+              y: -6,
+              width: 12,
+              height: 15,
+              'xlink:href': 'img/Up-Arrow.svg',
+              id: 'up_arrow',
+              title: 'Changer l\'ordre des axes (vers le haut)',
+            })
+            .style('cursor', 'pointer')
+            .on('mousedown', function () {
+              this.classList.add('arrow-shadow');
+            })
+            .on('mouseup mouseout', function () {
+              this.classList.remove('arrow-shadow');
+            })
+            .on('click', function () {
+              const that_ratio = this.parentElement.id.slice(2);
+              const current_position = self.ratios.indexOf(that_ratio);
+              if (current_position === 0) { return; }
+              self.ratios.splice(current_position, 1);
+              self.ratios.splice(current_position - 1, 0, that_ratio);
+              self.removeLines();
+              self.update();
+            });
+
+          g.append('image')
+            .attrs({
+              // x: txt.node().getBoundingClientRect().width + 22.5,
+              x: -19,
+              y: 13,
+              width: 12,
+              height: 15,
+              'xlink:href': 'img/Down-Arrow.svg',
+              id: 'down_arrow',
+              title: 'Changer l\'ordre des axes (vers le bas)',
+            })
+            .style('cursor', 'pointer')
+            .on('mousedown', function () {
+              this.classList.add('arrow-shadow');
+            })
+            .on('mouseup mouseout', function () {
+              this.classList.remove('arrow-shadow');
+            })
+            .on('click', function () {
+              const that_ratio = this.parentElement.id.slice(2);
+              const current_position = self.ratios.indexOf(that_ratio);
+              if (current_position === self.ratios.length) { return; }
+              self.ratios.splice(current_position, 1);
+              self.ratios.splice(current_position + 1, 0, that_ratio);
+              self.removeLines();
+              self.update();
+            });
+
+          layer_other = g.append('g').attr('class', 'otherfeature');
+          layer_highlighted = g.append('g').attr('class', 'highlighted');
+          layer_top = g.append('g').attr('class', 'top');
+        } else {
+          layer_other = g.select('g.otherfeature');
+          layer_highlighted = g.select('g.highlighted');
+          layer_top = g.select('g.top');
+        }
+        // g.attr('transform', `translate(0, ${height_to_use})`);
+        const _trans = this.draw_group.select(`#${selector_ratio_name}`)
+          .transition()
+          .duration(225);
+        g = this.draw_group.select(`#${selector_ratio_name}`)
+          .transition(_trans)
+          .attr('transform', `translate(0, ${height_to_use})`);
+        g.select('#up_arrow')
+          // .transition(_trans)
+          .style('display', i === 0 ? 'none' : '');
+        g.select('#down_arrow')
+          // .transition(_trans)
+          .style('display', i === nb_variables - 1 ? 'none' : '');
+        let _min;
+        let _max;
+        this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
+        this.data.forEach((ft, _ix) => {
+          ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
+        });
+        this.data.splice(this.data.indexOf(this.my_region), 1);
+        this.data.push(this.my_region);
+        if (highlight_selection.length > 0) {
+          const dist_axis = math_max(
+            math_abs(my_region_value - +d3.min(highlight_selection, d => d[ratio_name])),
+            math_abs(+d3.max(highlight_selection, d => d[ratio_name]) - my_region_value));
+          const margin_min_max = math_round(dist_axis) / 8;
+          _min = my_region_value - dist_axis - margin_min_max;
+          _max = my_region_value + dist_axis + margin_min_max;
+          if (_min === _max) {
+            const _dist_axis = ((
+              my_region_value + this.data[this.data.length - 2][ratio_name])
+              - (my_region_value - this.data[this.data.length - 2][ratio_name])) / 2;
+            _min = my_region_value - _dist_axis - _dist_axis / 8;
+            _max = my_region_value + _dist_axis + _dist_axis / 8;
+          }
+        } else {
+          const ratio_values = this.data.map(d => d[ratio_name]);
+          const dist_axis = math_max(
+            math_abs(my_region_value - d3.min(ratio_values)),
+            math_abs(d3.max(ratio_values) - my_region_value));
+          const margin_min_max = math_round(dist_axis) / 8;
+          _min = my_region_value - dist_axis - margin_min_max;
+          _max = my_region_value + dist_axis + margin_min_max;
+        }
+        this.highlight_selection.forEach((elem) => {
+          app.colors[elem.id] = comp(
+            elem[ratio_name], my_region_value, !self.inversedAxis.has(ratio_name));
+        });
+
+        app.colors[app.current_config.my_region] = color_highlight;
+
+        const size_func = this.proportionnal_symbols
+          ? new PropSizer(d3.max(data, d => d[num_name]), 33).scale
+          : () => 7.5;
+        const xScale = d3.scaleLinear()
+          .domain([_min, _max])
+          .range([0, width]);
+
+        axis
+          .transition()
+          .duration(125)
+          .call(d3.axisBottom(xScale).tickFormat(formatNumber));
+
+        const bubbles1 = layer_other.selectAll('.bubble')
+          .data(data.filter(d => app.colors[d.id] === undefined), d => d.id);
+
+        bubbles1
+          .transition()
+          .duration(125)
+          .attrs((d) => {
+            let x_value = xScale(d[ratio_name]);
+            if (x_value > width) x_value = width + 200;
+            else if (x_value < 0) x_value = -200;
+            return {
+              globalrank: d.globalrank,
+              cx: x_value,
+              cy: 10,
+              r: size_func(d[num_name]),
+            };
+          })
+          .styles({
+            fill: color_countries,
+            'fill-opacity': 0.1,
+            stroke: 'darkgray',
+            'stroke-width': 0.75,
+            'stroke-opacity': 0.75,
+          });
+
+        bubbles1
+          .enter()
+          .insert('circle')
+          .styles({
+            fill: color_countries,
+            'fill-opacity': 0.1,
+            stroke: 'darkgray',
+            'stroke-width': 0.75,
+            'stroke-opacity': 0.75,
+          })
+          .transition()
+          .duration(125)
+          .attrs((d) => {
+            let x_value = xScale(d[ratio_name]);
+            if (x_value > width) x_value = width + 200;
+            else if (x_value < 0) x_value = -200;
+            return {
+              globalrank: d.globalrank,
+              id: d.id,
+              class: 'bubble',
+              cx: x_value,
+              cy: 10,
+              r: size_func(d[num_name]),
+            };
+          });
+
+        bubbles1.exit().remove();
+
+        const bubbles2 = layer_highlighted.selectAll('.bubble')
+          .data(
+            data.filter(d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined),
+            d => d.id);
+
+        bubbles2
+          .transition()
+          .duration(125)
+          .attrs((d) => {
+            let x_value = xScale(d[ratio_name]);
+            if (x_value > width) x_value = width + 200;
+            else if (x_value < 0) x_value = -200;
+            return {
+              globalrank: d.globalrank,
+              cx: x_value,
+              cy: 10,
+              r: size_func(d[num_name]),
+            };
+          })
+          .styles(d => ({
+            fill: app.colors[d.id],
+            'fill-opacity': d.id === app.current_config.my_region ? 1 : 0.7,
+            stroke: 'darkgray',
+            'stroke-width': 0.75,
+            'stroke-opacity': 0.75,
+          }));
+
+        bubbles2
+          .enter()
+          .insert('circle')
+          .styles(d => ({
+            fill: app.colors[d.id],
+            'fill-opacity': d.id === app.current_config.my_region ? 1 : 0.7,
+            stroke: 'darkgray',
+            'stroke-width': 0.75,
+            'stroke-opacity': 0.75,
+          }))
+          .transition()
+          .duration(125)
+          .attrs((d) => {
+            let x_value = xScale(d[ratio_name]);
+            if (x_value > width) x_value = width + 200;
+            else if (x_value < 0) x_value = -200;
+            return {
+              globalrank: d.globalrank,
+              id: d.id,
+              class: 'bubble',
+              cx: x_value,
+              cy: 10,
+              r: size_func(d[num_name]),
+            };
+          });
+
+        bubbles2.exit().remove();
+
+        const bubbles3 = layer_top.selectAll('.bubbleMyRegion')
+          .data(data.filter(d => d.id === app.current_config.my_region), d => d.id);
+
+        bubbles3
+          .transition()
+          .duration(125)
+          .attrs((d) => {
+            let x_value = xScale(d[ratio_name]);
+            if (x_value > width) x_value = width + 200;
+            else if (x_value < 0) x_value = -200;
+            return {
+              globalrank: d.globalrank,
+              cx: x_value,
+              cy: 10,
+              r: size_func(d[num_name]),
+            };
+          })
+          .styles(d => ({
+            fill: app.colors[d.id],
+            'fill-opacity': 1,
+            stroke: 'darkgray',
+            'stroke-width': 0.75,
+            'stroke-opacity': 0.75,
+          }));
+
+        bubbles3
+          .enter()
+          .insert('circle')
+          .styles(d => ({
+            fill: app.colors[d.id],
+            'fill-opacity': 1,
+            stroke: 'darkgray',
+            'stroke-width': 0.75,
+            'stroke-opacity': 0.75,
+          }))
+          .transition()
+          .duration(125)
+          .attrs((d) => {
+            let x_value = xScale(d[ratio_name]);
+            if (x_value > width) x_value = width + 200;
+            else if (x_value < 0) x_value = -200;
+            return {
+              globalrank: d.globalrank,
+              id: d.id,
+              class: 'bubbleMyRegion',
+              cx: x_value,
+              cy: 10,
+              r: size_func(d[num_name]),
+            };
+          });
+
+        bubbles3.exit().remove();
+
+        height_to_use += offset;
+        setTimeout(() => {
+          bubbles1.order();
+          bubbles2.order();
+        }, 145);
+      }
+      setTimeout(() => { this.makeTooltips(); }, 145);
+    } else if (self.type === 'global') {
+      data.sort((a, b) => a.dist - b.dist);
+      const values = data.map(ft => ft.dist);
+      const _values = values.slice().splice(2);
+      const q1 = d3.quantile(_values, 0.25);
+      const q2 = d3.quantile(_values, 0.5);
+      const q3 = d3.quantile(_values, 0.75);
+      app.colors = {};
+      data.forEach((ft, i) => {
+        if (ft.id === app.current_config.my_region) {
+          app.colors[app.current_config.my_region] = color_highlight;
+        } else if (i === 1) {
+          app.colors[ft.id] = color_default_dissim;
+        } else if (ft.dist < q1) {
+          app.colors[ft.id] = '#a73030';
+        } else if (ft.dist < q2) {
+          app.colors[ft.id] = '#bd5656';
+        } else if (ft.dist < q3) {
+          app.colors[ft.id] = '#d89090';
+        } else {
+          app.colors[ft.id] = '#efcccc';
+        }
+      });
+
+      const x = d3.scaleLinear()
+        .rangeRound([0, width_global_dist]);
+      const xAxis = d3.axisBottom(x).ticks(10, '');
+      x.domain(d3.extent(values));
+
+      const simulation = d3.forceSimulation(data)
+        .force('x', d3.forceX(d => x(d.dist)).strength(9))
+        .force('y', d3.forceY(height_global_dist / 2).strength(0.11))
+        .force('collide', d3.forceCollide(5.5))
+        .stop();
+
+      for (let i = 0; i < 125; ++i) {
+        simulation.tick();
+      }
+
+      const voro = d3.voronoi()
+        .extent([
+          [-margin_global_dist.left,
+            -margin_global_dist.top],
+          [width_global_dist + margin_global_dist.right,
+            height_global_dist + margin_global_dist.top]])
+        .x(d => d.x)
+        .y(d => d.y)
+        .polygons(data);
+
+      let g = this.draw_group.select('#global_dist');
       if (!g.node()) {
         g = this.draw_group
           .append('g')
           .attrs({
-            id: selector_ratio_name,
-            num: num_name,
-            class: 'grp_var',
-          });
-        axis = g.append('g')
-          .attrs({
-            class: `axis axis--x ${selector_ratio_name}`,
-            transform: 'translate(0, 10)',
+            id: 'global_dist',
+            class: 'global_dist',
           });
 
-        g.append('text')
-          .attrs({
-            // x: 0,
-            x: 20,
-            y: -7.5,
-            class: `title_axis ${selector_ratio_name} noselect`,
-            fill: '#4f81bd',
-            'font-size': '11px',
-            'font-weight': 'bold',
-            'font-family': '"Signika",sans-serif',
-            'title-tooltip': ratio_pretty_name,
-          })
-          .text(ratio_name);
+        g.append('g')
+          .attr('class', 'axis-top-v axis--x')
+          .attr('transform', `translate(0,${height_global_dist})`)
+          .call(xAxis);
 
-        g.append('image')
-          .attrs({
-            x: 0,
-            // x: txt.node().getBoundingClientRect().width + 5,
-            y: -18,
-            width: 14,
-            height: 14,
-            'xlink:href': 'img/reverse_plus.png',
-            id: 'img_reverse',
-          })
-          .style('cursor', 'pointer')
-          .on('click', function () {
-            if (self.inversedAxis.has(ratio_name)) {
-              this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
-              const title_ax = this.previousSibling;
-              title_ax.setAttribute('title-tooltip', ratio_pretty_name);
-              title_ax.setAttribute('fill', '#4f81bd');
-              self.inversedAxis.delete(ratio_name);
-            } else {
-              this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_moins.png');
-              self.inversedAxis.add(ratio_name);
-              const title_ax = this.previousSibling;
-              title_ax.setAttribute('title-tooltip', `${ratio_pretty_name} (axe inversé)`);
-              title_ax.setAttribute('fill', 'red');
-            }
-            self.update();
-          });
+        const cell = g.append('g')
+          .attr('class', 'cells')
+          .selectAll('g.cell')
+          .data(voro, d => d.data.id)
+          .enter()
+          .append('g')
+          .attr('class', 'cell');
+        cell.append('circle')
+          .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
+          .styles(d => ({
+            fill: app.colors[d.data.id] || 'black',
+            'stroke-width': 0.45,
+            stroke: 'darkgrey',
+          }));
 
-        g.append('image')
-          .attrs({
-            // x: txt.node().getBoundingClientRect().width + 22.5,
-            x: -19,
-            y: -6,
-            width: 12,
-            height: 15,
-            'xlink:href': 'img/Up-Arrow.svg',
-            id: 'up_arrow',
-            title: 'Changer l\'ordre des axes (vers le haut)',
-          })
-          .style('cursor', 'pointer')
-          .on('mousedown', function () {
-            this.classList.add('arrow-shadow');
-          })
-          .on('mouseup mouseout', function () {
-            this.classList.remove('arrow-shadow');
-          })
-          .on('click', function () {
-            const that_ratio = this.parentElement.id.slice(2);
-            const current_position = self.ratios.indexOf(that_ratio);
-            if (current_position === 0) { return; }
-            self.ratios.splice(current_position, 1);
-            self.ratios.splice(current_position - 1, 0, that_ratio);
-            self.removeLines();
-            self.update();
-          });
-
-        g.append('image')
-          .attrs({
-            // x: txt.node().getBoundingClientRect().width + 22.5,
-            x: -19,
-            y: 13,
-            width: 12,
-            height: 15,
-            'xlink:href': 'img/Down-Arrow.svg',
-            id: 'down_arrow',
-            title: 'Changer l\'ordre des axes (vers le bas)',
-          })
-          .style('cursor', 'pointer')
-          .on('mousedown', function () {
-            this.classList.add('arrow-shadow');
-          })
-          .on('mouseup mouseout', function () {
-            this.classList.remove('arrow-shadow');
-          })
-          .on('click', function () {
-            const that_ratio = this.parentElement.id.slice(2);
-            const current_position = self.ratios.indexOf(that_ratio);
-            if (current_position === self.ratios.length) { return; }
-            self.ratios.splice(current_position, 1);
-            self.ratios.splice(current_position + 1, 0, that_ratio);
-            self.removeLines();
-            self.update();
-          });
-
-        layer_other = g.append('g').attr('class', 'otherfeature');
-        layer_highlighted = g.append('g').attr('class', 'highlighted');
-        layer_top = g.append('g').attr('class', 'top');
+        cell.append('path')
+          .attr('class', 'polygon')
+          .attr('d', d => `M${d.join('L')}Z`);
       } else {
-        layer_other = g.select('g.otherfeature');
-        layer_highlighted = g.select('g.highlighted');
-        layer_top = g.select('g.top');
+        g.selectAll('.axis-top-v')
+          .transition()
+          .duration(125)
+          .call(xAxis);
+
+        const cells = g.select('.cells')
+          .selectAll('g.cell')
+          .data(voro, d => d.data.id);
+
+        cells.select('circle')
+          // .data(voro, d => d.data.id)
+          .transition()
+          .duration(125)
+          .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
+          .styles(d => ({ fill: app.colors[d.data.id] || 'black' }));
+
+        cells.select('.polygon')
+          .transition()
+          .duration(125)
+          // .data(voro, d => d.data.id)
+          .attr('d', d => `M${d.join('L')}Z`);
+
+        const a = cells.enter().insert('g').attr('class', 'cell');
+
+        a.append('circle')
+          .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
+          .styles(d => ({ fill: app.colors[d.data.id] || 'black' }));
+
+        a.append('path')
+          .attr('class', 'polygon')
+          .attr('d', d => `M${d.join('L')}Z`);
+
+        cells.exit().remove();
       }
-      // g.attr('transform', `translate(0, ${height_to_use})`);
-      const _trans = this.draw_group.select(`#${selector_ratio_name}`)
-        .transition()
-        .duration(225);
-      g = this.draw_group.select(`#${selector_ratio_name}`)
-        .transition(_trans)
-        .attr('transform', `translate(0, ${height_to_use})`);
-      g.select('#up_arrow')
-        // .transition(_trans)
-        .style('display', i === 0 ? 'none' : '');
-      g.select('#down_arrow')
-        // .transition(_trans)
-        .style('display', i === nb_variables - 1 ? 'none' : '');
-      let _min;
-      let _max;
-      this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
-      this.data.forEach((ft, _ix) => {
-        ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
-      });
-      this.data.splice(this.data.indexOf(this.my_region), 1);
-      this.data.push(this.my_region);
-      if (highlight_selection.length > 0) {
-        const dist_axis = math_max(
-          math_abs(my_region_value - +d3.min(highlight_selection, d => d[ratio_name])),
-          math_abs(+d3.max(highlight_selection, d => d[ratio_name]) - my_region_value));
-        const margin_min_max = math_round(dist_axis) / 8;
-        _min = my_region_value - dist_axis - margin_min_max;
-        _max = my_region_value + dist_axis + margin_min_max;
-        if (_min === _max) {
-          const _dist_axis = ((
-            my_region_value + this.data[this.data.length - 2][ratio_name])
-            - (my_region_value - this.data[this.data.length - 2][ratio_name])) / 2;
-          _min = my_region_value - _dist_axis - _dist_axis / 8;
-          _max = my_region_value + _dist_axis + _dist_axis / 8;
-        }
-      } else {
-        const ratio_values = this.data.map(d => d[ratio_name]);
-        const dist_axis = math_max(
-          math_abs(my_region_value - d3.min(ratio_values)),
-          math_abs(d3.max(ratio_values) - my_region_value));
-        const margin_min_max = math_round(dist_axis) / 8;
-        _min = my_region_value - dist_axis - margin_min_max;
-        _max = my_region_value + dist_axis + margin_min_max;
-      }
-      this.highlight_selection.forEach((elem) => {
-        app.colors[elem.id] = comp(
-          elem[ratio_name], my_region_value, !self.inversedAxis.has(ratio_name));
-      });
-
-      app.colors[app.current_config.my_region] = color_highlight;
-
-      const size_func = this.proportionnal_symbols
-        ? new PropSizer(d3.max(data, d => d[num_name]), 33).scale
-        : () => 7.5;
-      const xScale = d3.scaleLinear()
-        .domain([_min, _max])
-        .range([0, width]);
-
-      axis
-        .transition()
-        .duration(125)
-        .call(d3.axisBottom(xScale).tickFormat(formatNumber));
-
-      const bubbles1 = layer_other.selectAll('.bubble')
-        .data(data.filter(d => app.colors[d.id] === undefined), d => d.id);
-
-      bubbles1
-        .transition()
-        .duration(125)
-        .attrs((d) => {
-          let x_value = xScale(d[ratio_name]);
-          if (x_value > width) x_value = width + 200;
-          else if (x_value < 0) x_value = -200;
-          return {
-            globalrank: d.globalrank,
-            cx: x_value,
-            cy: 10,
-            r: size_func(d[num_name]),
-          };
-        })
-        .styles({
-          fill: color_countries,
-          'fill-opacity': 0.1,
-          stroke: 'darkgray',
-          'stroke-width': 0.75,
-          'stroke-opacity': 0.75,
-        });
-
-      bubbles1
-        .enter()
-        .insert('circle')
-        .styles({
-          fill: color_countries,
-          'fill-opacity': 0.1,
-          stroke: 'darkgray',
-          'stroke-width': 0.75,
-          'stroke-opacity': 0.75,
-        })
-        .transition()
-        .duration(125)
-        .attrs((d) => {
-          let x_value = xScale(d[ratio_name]);
-          if (x_value > width) x_value = width + 200;
-          else if (x_value < 0) x_value = -200;
-          return {
-            globalrank: d.globalrank,
-            id: d.id,
-            class: 'bubble',
-            cx: x_value,
-            cy: 10,
-            r: size_func(d[num_name]),
-          };
-        });
-
-      bubbles1.exit().remove();
-
-      const bubbles2 = layer_highlighted.selectAll('.bubble')
-        .data(
-          data.filter(d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined),
-          d => d.id);
-
-      bubbles2
-        .transition()
-        .duration(125)
-        .attrs((d) => {
-          let x_value = xScale(d[ratio_name]);
-          if (x_value > width) x_value = width + 200;
-          else if (x_value < 0) x_value = -200;
-          return {
-            globalrank: d.globalrank,
-            cx: x_value,
-            cy: 10,
-            r: size_func(d[num_name]),
-          };
-        })
-        .styles(d => ({
-          fill: app.colors[d.id],
-          'fill-opacity': d.id === app.current_config.my_region ? 1 : 0.7,
-          stroke: 'darkgray',
-          'stroke-width': 0.75,
-          'stroke-opacity': 0.75,
-        }));
-
-      bubbles2
-        .enter()
-        .insert('circle')
-        .styles(d => ({
-          fill: app.colors[d.id],
-          'fill-opacity': d.id === app.current_config.my_region ? 1 : 0.7,
-          stroke: 'darkgray',
-          'stroke-width': 0.75,
-          'stroke-opacity': 0.75,
-        }))
-        .transition()
-        .duration(125)
-        .attrs((d) => {
-          let x_value = xScale(d[ratio_name]);
-          if (x_value > width) x_value = width + 200;
-          else if (x_value < 0) x_value = -200;
-          return {
-            globalrank: d.globalrank,
-            id: d.id,
-            class: 'bubble',
-            cx: x_value,
-            cy: 10,
-            r: size_func(d[num_name]),
-          };
-        });
-
-      bubbles2.exit().remove();
-
-      const bubbles3 = layer_top.selectAll('.bubbleMyRegion')
-        .data(data.filter(d => d.id === app.current_config.my_region), d => d.id);
-
-      bubbles3
-        .transition()
-        .duration(125)
-        .attrs((d) => {
-          let x_value = xScale(d[ratio_name]);
-          if (x_value > width) x_value = width + 200;
-          else if (x_value < 0) x_value = -200;
-          return {
-            globalrank: d.globalrank,
-            cx: x_value,
-            cy: 10,
-            r: size_func(d[num_name]),
-          };
-        })
-        .styles(d => ({
-          fill: app.colors[d.id],
-          'fill-opacity': 1,
-          stroke: 'darkgray',
-          'stroke-width': 0.75,
-          'stroke-opacity': 0.75,
-        }));
-
-      bubbles3
-        .enter()
-        .insert('circle')
-        .styles(d => ({
-          fill: app.colors[d.id],
-          'fill-opacity': 1,
-          stroke: 'darkgray',
-          'stroke-width': 0.75,
-          'stroke-opacity': 0.75,
-        }))
-        .transition()
-        .duration(125)
-        .attrs((d) => {
-          let x_value = xScale(d[ratio_name]);
-          if (x_value > width) x_value = width + 200;
-          else if (x_value < 0) x_value = -200;
-          return {
-            globalrank: d.globalrank,
-            id: d.id,
-            class: 'bubbleMyRegion',
-            cx: x_value,
-            cy: 10,
-            r: size_func(d[num_name]),
-          };
-        });
-
-      bubbles3.exit().remove();
-
-      height_to_use += offset;
-      setTimeout(() => {
-        bubbles1.order();
-        bubbles2.order();
-      }, 145);
+      self.makeTooltips();
     }
-    setTimeout(() => { this.makeTooltips(); }, 145);
   }
   /* eslint-enable no-loop-func */
 
@@ -478,17 +627,31 @@ export default class Similarity1plus {
 
   updateMapRegio() {
     if (!this.map_elem) return;
-    this.map_elem.target_layer.selectAll('path')
-      .attr('fill', (d) => {
-        const _id = d.id;
-        if (_id === app.current_config.my_region) {
-          return color_highlight;
-        } else if (this.current_ids.indexOf(_id) > -1) {
-          if (app.colors[_id]) return color_default_dissim;
-          return color_countries;
-        }
-        return color_disabled;
-      });
+    if (this.type === 'detailled') {
+      this.map_elem.target_layer.selectAll('path')
+        .attr('fill', (d) => {
+          const _id = d.id;
+          if (_id === app.current_config.my_region) {
+            return color_highlight;
+          } else if (this.current_ids.indexOf(_id) > -1) {
+            if (app.colors[_id]) return color_default_dissim;
+            return color_countries;
+          }
+          return color_disabled;
+        });
+    } else if (this.type === 'global') {
+      this.map_elem.target_layer.selectAll('path')
+        .attr('fill', (d) => {
+          const _id = d.id;
+          if (_id === app.current_config.my_region) {
+            return color_highlight;
+          } else if (this.current_ids.indexOf(_id) > -1) {
+            if (app.colors[_id]) return app.colors[_id];
+            return color_countries;
+          }
+          return color_disabled;
+        });
+    }
   }
 
   handleClickMap(d, parent) {
@@ -521,6 +684,7 @@ export default class Similarity1plus {
 
   makeTooltips() {
     const self = this;
+    // Tooltips for bubble on detailled distance:
     this.draw_group.selectAll('g.grp_var')
       .selectAll('circle')
       .on('mouseover', () => {
@@ -600,6 +764,68 @@ export default class Similarity1plus {
             }
           });
       });
+
+    this.draw_group.selectAll('g.cell')
+      .selectAll('.polygon')
+      .on('mouseover', function () {
+        const circle = this.previousSibling;
+        circle.style.stroke = 'black';
+        circle.style.strokeWidth = '2';
+        clearTimeout(t);
+        self.tooltip.style('display', null);
+      })
+      .on('mouseout', function () {
+        const circle = this.previousSibling;
+        circle.style.stroke = 'darkgrey';
+        circle.style.strokeWidth = '0.45';
+        clearTimeout(t);
+        t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
+      })
+      .on('mousemove mousedown', function (d) {
+        const circle = this.previousSibling;
+        circle.style.stroke = 'black';
+        circle.style.strokeWidth = '2';
+        const content = [];
+        const globalrank = d.data.globalrank;
+        if (!Number.isNaN(globalrank)) {
+          if (+globalrank === 0) {
+            content.push('<b>Ma région</b>');
+          } else if (+globalrank === 1) {
+            content.push(`Indice de similarité : ${d.data.dist}`);
+            content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
+          } else {
+            content.push(`Indice de similarité : ${d.data.dist}`);
+            content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
+          }
+        }
+        clearTimeout(t);
+        self.tooltip.select('.title')
+          .attr('class', d.data.id === app.current_config.my_region ? 'title myRegion' : 'title')
+          .html([d.name, ' (', d.data.id, ')'].join(''));
+        self.tooltip.select('.content')
+          .html(content.join('<br>'));
+        self.tooltip
+          .styles({
+            display: null,
+            left: `${d3.event.pageX - window.scrollX - 5}px`,
+            top: `${d3.event.pageY - window.scrollY - 75}px`,
+          });
+      })
+      .on('click', (d) => {
+        self.map_elem.target_layer
+          .selectAll('path')
+          .each(function (ft) {
+            if (ft.id === d.data.id) {
+              const cloned = this.cloneNode();
+              cloned.style.fill = 'red';
+              cloned.style.stroke = 'orange';
+              cloned.style.strokeWidth = '2.25px';
+              cloned.classList.add('cloned');
+              self.map_elem.layers.select('#temp').node().appendChild(cloned);
+              setTimeout(() => { cloned.remove(); }, 5000);
+            }
+          });
+      });
   }
 
   displayLine(id_region) {
@@ -636,6 +862,7 @@ export default class Similarity1plus {
     } else {
       this.map_elem.updateLegend();
       this.prepareData();
+      this.updateCompletude();
       this.updateTableStat();
       this.updateMapRegio();
       this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
@@ -710,7 +937,7 @@ export default class Similarity1plus {
 
     // To use a new selection according to 'nb_select' value:
     this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
-
+    this.updateCompletude();
     this.updateTableStat();
     this.updateMapRegio();
     Tooltipsify('[title-tooltip]');
@@ -727,6 +954,7 @@ export default class Similarity1plus {
     this.draw_group.select(`g#l_${code_variable}`).remove();
 
     // And use it immediatly:
+    this.updateCompletude();
     this.updateTableStat();
     this.updateMapRegio();
     // To use a new selection according to 'nb_select' value:
@@ -761,6 +989,34 @@ export default class Similarity1plus {
           self.proportionnal_symbols = false;
         }
         self.update();
+      });
+
+    menu.select('#ind_dist_global')
+      .on('click', function () {
+        if (this.classList.contains('active')) {
+          return;
+        }
+        self.removeLines();
+        self.type = 'global';
+        this.classList.add('active');
+        menu.select('#ind_dist_detailled').attr('class', 'choice_ind noselect');
+        menu.select('.selection_display').style('display', 'none');
+        self.draw_group.selectAll('g').remove();
+        self.update();
+        self.updateMapRegio();
+      });
+
+    menu.select('#ind_dist_detailled')
+      .on('click', function () {
+        if (this.classList.contains('active')) {
+          return;
+        }
+        self.type = 'detailled';
+        this.classList.add('active');
+        menu.select('#ind_dist_global').attr('class', 'choice_ind noselect');
+        menu.select('.selection_display').style('display', null);
+        self.draw_group.selectAll('g').remove();
+        self.applySelection(1);
       });
   }
 

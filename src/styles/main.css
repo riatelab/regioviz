@@ -1017,3 +1017,22 @@ h3 {
   font-size: 0.8em;
   font-family: 'Poppins', sans-serif;
 }
+
+
+
+/* Styles for beeswarm chart / similarity with global distance */
+.axis-top-v path, .axis-top-v line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis-top-v text {
+  font: 10px sans-serif;
+}
+
+.cells path {
+  fill: none;
+  pointer-events: all;
+}
+/* End of styles for beeswarm chart / similarity with global distance */
