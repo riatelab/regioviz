@@ -833,7 +833,7 @@ export default class Similarity1plus {
           });
       })
       .on('click', function (d) {
-        const circle = this.querySelector('circle');
+        const circle = this.parentElement.querySelector('circle');
         self.map_elem.target_layer
           .selectAll('path')
           .each(function (ft) {
