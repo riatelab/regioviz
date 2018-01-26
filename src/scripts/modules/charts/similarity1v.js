@@ -693,11 +693,12 @@ export default class Similarity1plus {
     } else if (this.type === 'global') {
       const id = d.id;
       if (this.current_ids.indexOf(id) < 0 || id === app.current_config.my_region) return;
-      const c = this.draw_group.select(`#c_${id}.cell`)
-        .select('circle');
-      c.style('stroke', 'black').style('stroke-width', '2');
+      const c = this.draw_group.select(`#c_${id}.cell`).select('circle');
+      d3.select(parent).attr('fill', '#4f81bd');
+      c.style('fill', '#4f81bd').style('stroke', 'black').style('stroke-width', '2');
       setTimeout(() => {
-        c.style('stroke', 'darkgray').style('stroke-width', '0.45');
+        d3.select(parent).attr('fill', app.colors[id]);
+        c.style('fill', app.colors[id]).style('stroke', 'darkgray').style('stroke-width', '0.45');
       }, 5000);
     }
   }
@@ -831,18 +832,27 @@ export default class Similarity1plus {
             top: `${d3.event.pageY - window.scrollY - 75}px`,
           });
       })
-      .on('click', (d) => {
+      .on('click', function (d) {
+        const circle = this.querySelector('circle');
         self.map_elem.target_layer
           .selectAll('path')
           .each(function (ft) {
             if (ft.id === d.data.id) {
+              circle.style.fill = '#4f81bd';
+              circle.style.stroke = 'black';
+              circle.style.strokeWidth = '2';
               const cloned = this.cloneNode();
               cloned.style.fill = '#4f81bd';
               cloned.style.stroke = 'black';
               cloned.style.strokeWidth = '2.25px';
               cloned.classList.add('cloned');
               self.map_elem.layers.select('#temp').node().appendChild(cloned);
-              setTimeout(() => { cloned.remove(); }, 5000);
+              setTimeout(() => {
+                circle.style.fill = app.colors[d.data.id];
+                circle.style.stroke = 'darkgray';
+                circle.style.strokeWidth = '0.45';
+                cloned.remove();
+              }, 5000);
             }
           });
       });
