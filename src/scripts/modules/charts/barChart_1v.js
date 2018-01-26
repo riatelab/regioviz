@@ -1100,7 +1100,7 @@ La carte et le graphique sont interactifs dans la mesure où l’utilisateur peu
 <b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : Régions de même ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_key) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);

@@ -550,7 +550,7 @@ function formatNumber(value, precision) {
   return values_list.join(formatnb_decimal_sep);
 }
 
-const array_slice = Array.slice;
+const array_slice = Array.prototype.slice;
 
 /**
 * Removes all Node of the given NodeList.
@@ -561,7 +561,7 @@ const array_slice = Array.slice;
 *
 */
 const removeAll = (elems) => {
-  array_slice(elems).forEach((el) => { el.remove(); });
+  array_slice.call(elems).forEach((el) => { el.remove(); });
 };
 
 /**

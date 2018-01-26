@@ -9,13 +9,8 @@ import { prepareTooltip, Tooltipsify } from './../tooltip';
 
 let svg_bar;
 let margin;
-let margin_global_dist;
-let margin2_global_dist;
 let width;
 let height;
-let width_global_dist;
-let height_global_dist;
-let height2_global_dist;
 let svg_container;
 let t;
 
@@ -24,12 +19,6 @@ const updateDimensions = () => {
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
-
-  margin_global_dist = { top: 20, right: 20, bottom: 200, left: 50 };
-  margin2_global_dist = { top: math_round(fixed_dimension.chart.height - margin_global_dist.top - margin_global_dist.bottom + 45), right: 20, bottom: 20, left: 50 };
-  width_global_dist = fixed_dimension.chart.width - margin_global_dist.left - margin_global_dist.right;
-  height_global_dist = fixed_dimension.chart.height - margin_global_dist.top - margin_global_dist.bottom;
-  height2_global_dist = fixed_dimension.chart.height - margin2_global_dist.top - margin2_global_dist.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
   d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
   svg_container = svg_bar.append('g').attr('class', 'container');
@@ -78,35 +67,35 @@ export default class Similarity1plus {
         id: 'ind_dist_detailled',
         class: 'choice_ind noselect',
       })
-      .text('Distance détaillée');
+      .text('Par indicateur');
 
     chart_type.append('span')
       .attrs({
         id: 'ind_dist_global',
         class: 'choice_ind active noselect',
       })
-      .text('Distance globale');
+      .text('Ressemblance globale');
 
     const selection_close = menu_selection.append('p')
       .attr('class', 'selection_display')
       .style('display', 'none');
     selection_close.append('span')
-      .html('Sélection des');
+      .html('Sélection de la');
     selection_close.append('input')
       .attrs({ class: 'nb_select', type: 'number' })
       .styles({ color: '#4f81bd', 'margin-left': '1px' })
       .property('value', 1);
     selection_close.append('span')
-      .html('régions les plus proches');
+      .html('<sup>ème</sup> région la plus proche');
 
-    const section = menu_selection.append('section')
-      .attr('class', 'slider-checkbox')
-      .style('display', 'none');
+    const section = menu_selection.append('div')
+      .append('section')
+      .attr('class', 'slider-checkbox');
     section.append('input')
       .attrs({ type: 'checkbox', id: 'check_prop' });
     section.append('label')
       .attrs({ class: 'label not_selected noselect', for: 'check_prop' })
-      .text('Cercles proportionnels au numérateur');
+      .text('Cercles proportionnels à la population');
 
     this.bindMenu();
     this.makeTableStat();
@@ -126,7 +115,6 @@ export default class Similarity1plus {
     } else {
       this.highlight_selection = [];
     }
-    console.log(this.highlight_selection);
     this.removeLines();
     this.update();
     this.updateMapRegio();
@@ -146,7 +134,8 @@ export default class Similarity1plus {
         const ratio_name = self.ratios[i];
         const selector_ratio_name = `l_${ratio_name}`;
         const ratio_pretty_name = app.current_config.ratio_pretty_name[i];
-        const num_name = self.nums[i];
+        // const num_name = self.nums[i];
+        const num_name = app.current_config.pop_field;
         const my_region_value = self.my_region[ratio_name];
         let g = this.draw_group.select(`#${selector_ratio_name}`);
         let axis = this.draw_group.select(`g.axis--x.${selector_ratio_name}`);
@@ -184,7 +173,6 @@ export default class Similarity1plus {
           g.append('image')
             .attrs({
               x: 0,
-              // x: txt.node().getBoundingClientRect().width + 5,
               y: -18,
               width: 14,
               height: 14,
@@ -325,7 +313,7 @@ export default class Similarity1plus {
         app.colors[app.current_config.my_region] = color_highlight;
 
         const size_func = this.proportionnal_symbols
-          ? new PropSizer(d3.max(data, d => d[num_name]), 33).scale
+          ? new PropSizer(d3.max(data, d => d[num_name]), 30).scale
           : () => 7.5;
         const xScale = d3.scaleLinear()
           .domain([_min, _max])
@@ -410,10 +398,10 @@ export default class Similarity1plus {
           })
           .styles(d => ({
             fill: app.colors[d.id],
-            'fill-opacity': d.id === app.current_config.my_region ? 1 : 0.7,
-            stroke: 'darkgray',
-            'stroke-width': 0.75,
-            'stroke-opacity': 0.75,
+            'fill-opacity': d.globalrank === self.highlight_selection.length ? 0.85 : 0.5,
+            stroke: d.globalrank === self.highlight_selection.length ? 'black' : 'darkgray',
+            'stroke-width': d.globalrank === self.highlight_selection.length ? 0.9 : 0.75,
+            'stroke-opacity': d.globalrank === self.highlight_selection.length ? 0.95 : 0.75,
           }));
 
         bubbles2
@@ -421,10 +409,10 @@ export default class Similarity1plus {
           .insert('circle')
           .styles(d => ({
             fill: app.colors[d.id],
-            'fill-opacity': d.id === app.current_config.my_region ? 1 : 0.7,
-            stroke: 'darkgray',
-            'stroke-width': 0.75,
-            'stroke-opacity': 0.75,
+            'fill-opacity': d.globalrank === self.highlight_selection.length ? 0.85 : 0.5,
+            stroke: d.globalrank === self.highlight_selection.length ? 'black' : 'darkgray',
+            'stroke-width': d.globalrank === self.highlight_selection.length ? 0.9 : 0.75,
+            'stroke-opacity': d.globalrank === self.highlight_selection.length ? 0.95 : 0.75,
           }))
           .transition()
           .duration(125)
@@ -511,6 +499,7 @@ export default class Similarity1plus {
       const q1 = d3.quantile(_values, 0.25);
       const q2 = d3.quantile(_values, 0.5);
       const q3 = d3.quantile(_values, 0.75);
+      const num_name = app.current_config.pop_field;
       app.colors = {};
       data.forEach((ft, i) => {
         if (ft.id === app.current_config.my_region) {
@@ -528,15 +517,19 @@ export default class Similarity1plus {
         }
       });
 
+      const size_func = self.proportionnal_symbols
+        ? new PropSizer(d3.max(data, d => +d[num_name]), 30).scale
+        : () => 4.5;
+      const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
       const x = d3.scaleLinear()
-        .rangeRound([0, width_global_dist]);
+        .rangeRound([0, width]);
       const xAxis = d3.axisBottom(x).ticks(10, '');
       x.domain(d3.extent(values));
 
       const simulation = d3.forceSimulation(data)
         .force('x', d3.forceX(d => x(d.dist)).strength(9))
-        .force('y', d3.forceY(height_global_dist / 2).strength(0.11))
-        .force('collide', d3.forceCollide(5.5))
+        .force('y', d3.forceY(height / 2).strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)))
+        .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
         .stop();
 
       for (let i = 0; i < 125; ++i) {
@@ -545,10 +538,8 @@ export default class Similarity1plus {
 
       const voro = d3.voronoi()
         .extent([
-          [-margin_global_dist.left,
-            -margin_global_dist.top],
-          [width_global_dist + margin_global_dist.right,
-            height_global_dist + margin_global_dist.top]])
+          [-margin.left, -margin.top * 2],
+          [width + margin.right, height + margin.top * 2]])
         .x(d => d.x)
         .y(d => d.y)
         .polygons(data);
@@ -564,7 +555,7 @@ export default class Similarity1plus {
 
         g.append('g')
           .attr('class', 'axis-top-v axis--x')
-          .attr('transform', `translate(0,${height_global_dist})`)
+          .attr('transform', `translate(0,${height})`)
           .call(xAxis);
 
         const cell = g.append('g')
@@ -576,7 +567,7 @@ export default class Similarity1plus {
           .attr('class', 'cell')
           .attr('id', d => `c_${d.data.id}`);
         cell.append('circle')
-          .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
+          .attrs(d => ({ r: size_func(+d.data[num_name]), cx: d.data.x, cy: d.data.y }))
           .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
@@ -600,8 +591,12 @@ export default class Similarity1plus {
           // .data(voro, d => d.data.id)
           .transition()
           .duration(125)
-          .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
-          .styles(d => ({ fill: app.colors[d.data.id] || 'black' }));
+          .attrs(d => ({ r: size_func(+d.data[num_name]), cx: d.data.x, cy: d.data.y }))
+          .styles(d => ({
+            fill: app.colors[d.data.id] || 'black',
+            'stroke-width': 0.45,
+            stroke: 'darkgray',
+          }));
 
         cells.select('.polygon')
           .transition()
@@ -615,8 +610,12 @@ export default class Similarity1plus {
           .attr('id', d => `c_${d.data.id}`);
 
         a.append('circle')
-          .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
-          .styles(d => ({ fill: app.colors[d.data.id] || 'black' }));
+          .attrs(d => ({ r: size_func(+d.data[num_name]), cx: d.data.x, cy: d.data.y }))
+          .styles(d => ({
+            fill: app.colors[d.data.id] || 'black',
+            'stroke-width': 0.45,
+            stroke: 'darkgray',
+          }));
 
         a.append('path')
           .attr('class', 'polygon')
@@ -838,8 +837,8 @@ export default class Similarity1plus {
           .each(function (ft) {
             if (ft.id === d.data.id) {
               const cloned = this.cloneNode();
-              cloned.style.fill = 'red';
-              cloned.style.stroke = 'orange';
+              cloned.style.fill = '#4f81bd';
+              cloned.style.stroke = 'black';
               cloned.style.strokeWidth = '2.25px';
               cloned.classList.add('cloned');
               self.map_elem.layers.select('#temp').node().appendChild(cloned);
@@ -1021,7 +1020,7 @@ export default class Similarity1plus {
         self.type = 'global';
         this.classList.add('active');
         menu.select('#ind_dist_detailled').attr('class', 'choice_ind noselect');
-        menu.selectAll('.selection_display, section').style('display', 'none');
+        menu.select('.selection_display').style('display', 'none');
         self.draw_group.selectAll('g').remove();
         self.update();
         self.updateMapRegio();
@@ -1036,9 +1035,9 @@ export default class Similarity1plus {
         self.type = 'detailled';
         this.classList.add('active');
         menu.select('#ind_dist_global').attr('class', 'choice_ind noselect');
-        menu.selectAll('.selection_display, section').style('display', null);
+        menu.select('.selection_display').style('display', null);
         self.draw_group.selectAll('g').remove();
-        self.applySelection(1);
+        self.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
         self.map_elem.displayLegend(2);
       });
   }

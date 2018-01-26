@@ -39,10 +39,10 @@ export function filterLevelVar(app) {
   // Fetch the name(s) of the ratio (and associated num and denum variable),
   // the name of the targeted region and the current level :
   const {
-    num, denum, ratio, current_level, id_field, filter_key, name_field, my_region,
+    num, denum, ratio, current_level, id_field, filter_key, name_field, my_region, pop_field,
   } = app.current_config;
 
-  const all_variables = ratio.concat(num).concat(denum);
+  const all_variables = ratio.concat(num).concat(denum).concat([pop_field]);
   // Prepare the data:
   let temp;
   if (filter_key instanceof Array) {

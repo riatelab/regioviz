@@ -173,10 +173,10 @@ function getLegendElems(type) {
       [
         { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
         { color: color_default_dissim, text: 'Région la plus ressemblante' },
-        { color: color_q1, text: 'q1' },
-        { color: color_q2, text: 'q2' },
-        { color: color_q3, text: 'q3' },
-        { color: color_q4, text: 'q4' },
+        { color: color_q1, text: 'Régions très ressemblantes' },
+        { color: color_q2, text: 'Régions ressemblantes' },
+        { color: color_q3, text: 'Régions éloignées' },
+        { color: color_q4, text: 'Régions très éloignées' },
       ],
       '120', '60',
     ];

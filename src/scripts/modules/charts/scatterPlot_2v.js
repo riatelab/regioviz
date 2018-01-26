@@ -1,4 +1,4 @@
-import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu } from './../helpers';
+import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
@@ -91,7 +91,9 @@ export default class ScatterPlot2 {
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 2;
     const self = this;
+    const pop_field = app.current_config.pop_field;
     this.type = 'value';
+    this.proportionnal_symbols = false;
     this.variable1 = app.current_config.ratio[0];
     this.variable2 = app.current_config.ratio[1];
     this.rank_variable1 = `pr_${this.variable1}`;
@@ -105,8 +107,10 @@ export default class ScatterPlot2 {
         const res = { id: d.id, name: d.name };
         res[this.variable1] = d[this.variable1];
         res[this.variable2] = d[this.variable2];
+        res[pop_field] = d[pop_field];
         return res;
       });
+    this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     const tmp_my_region = this.data.splice(
       this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
     this.data.push(tmp_my_region);
@@ -533,6 +537,15 @@ export default class ScatterPlot2 {
         self.selectAboveMyRegion();
       });
 
+    const section = menu_selection.append('div')
+      .append('section')
+      .attr('class', 'slider-checkbox');
+    section.append('input')
+      .attrs({ type: 'checkbox', id: 'check_prop' });
+    section.append('label')
+      .attrs({ class: 'label not_selected noselect', for: 'check_prop' })
+      .text('Cercles proportionnels à la population');
+
 
     this.bindMenu();
     // this.update();
@@ -669,6 +682,11 @@ export default class ScatterPlot2 {
     const dots = this.scatter.selectAll('.dot')
       .data(data, d => d.id);
     const _trans = dots.transition().duration(100);
+    const num_name = app.current_config.pop_field;
+    const size_func = this.proportionnal_symbols
+      ? new PropSizer(d3.max(data, d => d[app.current_config.pop_field]), 30).scale
+      : () => 5;
+
     if (this.type === 'rank') {
       const rank_variable1 = this.rank_variable1;
       const rank_variable2 = this.rank_variable2;
@@ -687,7 +705,7 @@ export default class ScatterPlot2 {
       dots
         .transition(_trans)
         .attrs(d => ({
-          r: 5,
+          r: size_func(d[num_name]),
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
         }))
@@ -708,7 +726,7 @@ export default class ScatterPlot2 {
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
         }))
         .attrs(d => ({
-          r: 5,
+          r: size_func(d[num_name]),
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
           class: 'dot',
@@ -738,7 +756,7 @@ export default class ScatterPlot2 {
       dots
         .transition(_trans)
         .attrs(d => ({
-          r: 5,
+          r: size_func(d[num_name]),
           cx: x(d[variable1]),
           cy: y(d[variable2]),
         }))
@@ -759,7 +777,7 @@ export default class ScatterPlot2 {
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
         }))
         .attrs(d => ({
-          r: 5,
+          r: size_func(d[num_name]),
           cx: x(d[variable1]),
           cy: y(d[variable2]),
           class: 'dot',
@@ -971,14 +989,16 @@ export default class ScatterPlot2 {
 
   changeStudyZone() {
     // Fetch the new data subset for this study zone and theses variables:
+    const pop_field = app.current_config.pop_field;
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {
         const res = { id: d.id, name: d.name };
         res[this.variable1] = d[this.variable1];
         res[this.variable2] = d[this.variable2];
+        res[pop_field] = d[pop_field];
         return res;
       });
-    console.log(this.data);
+    this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Put "my region" at the end of the serie so it will be displayed on
     // the top of the chart:
     const tmp_my_region = this.data.splice(
@@ -1026,13 +1046,16 @@ export default class ScatterPlot2 {
     // Update the items displayed in the context menu under this axis label:
     this.updateItemsCtxMenu();
     // Filter the data to only keep data in which we are interested:
+    const pop_field = app.current_config.pop_field;
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {
         const res = { id: d.id, name: d.name };
         res[this.variable1] = d[this.variable1];
         res[this.variable2] = d[this.variable2];
+        res[pop_field] = d[pop_field];
         return res;
       });
+    this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
       this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
@@ -1069,13 +1092,16 @@ export default class ScatterPlot2 {
     // Update the items displayed in the context menu under this axis label:
     this.updateItemsCtxMenu();
     // Filter the data to only keep data in which we are interested:
+    const pop_field = app.current_config.pop_field;
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
       .map((d) => {
         const res = { id: d.id, name: d.name };
         res[this.variable1] = d[this.variable1];
         res[this.variable2] = d[this.variable2];
+        res[pop_field] = d[pop_field];
         return res;
       });
+    this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
       this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
@@ -1187,6 +1213,18 @@ export default class ScatterPlot2 {
         menu.select('#ind_raw_values').attr('class', 'choice_ind noselect');
         menu.select('#btn_above_mean').text('inférieures à la médiane');
         menu.select('#btn_below_mean').text('supérieures à la médiane');
+        self.update();
+      });
+
+    menu.select('#check_prop')
+      .on('change', function () {
+        if (this.checked) {
+          menu.select('.slider-checkbox > .label').attr('class', 'label noselect');
+          self.proportionnal_symbols = true;
+        } else {
+          menu.select('.slider-checkbox > .label').attr('class', 'label noselect not_selected');
+          self.proportionnal_symbols = false;
+        }
         self.update();
       });
   }
@@ -1356,7 +1394,7 @@ Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur
   <b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : Régions de même ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_key) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);

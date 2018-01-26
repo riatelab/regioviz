@@ -749,8 +749,9 @@ export default class RadarChart3 {
         self.tooltip.select('.content')
           .attr('class', 'content')
           .html([
-            `${formatNumber(100 - d.value, 1)} ${self.cfg.unit} des régions ont une valeur ${direction}`,
             `${code_variable} : ${formatNumber(d.raw_value, 1)} ${d.raw_value_unit}`,
+            `Rang : ${formatNumber(d.value, 1)}/100`,
+            `${formatNumber(100 - d.value, 1)} ${self.cfg.unit} des régions ont une valeur ${direction}`,
           ].join('<br>'));
         self.tooltip
           .styles({
@@ -1196,7 +1197,7 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
     help1.push(`<b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`);
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_key) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);

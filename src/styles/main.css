@@ -103,6 +103,9 @@ html, body {
   .img_scale_logo {
     width: 8em;
   }
+  .cont_btn {
+    margin: 0.4em 4.75em !important;
+  }
 }
 
 @media only screen and (min-width: 2001px) {
