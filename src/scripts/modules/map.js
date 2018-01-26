@@ -1,6 +1,7 @@
 import centroid from '@turf/centroid';
 import { app } from './../main';
-import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './options';
+import { color_disabled, color_countries, color_sup, color_inf, color_highlight,
+  fixed_dimension, color_default_dissim, color_q1, color_q2, color_q3, color_q4 } from './options';
 import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, getElementsFromPoint, svgContextMenu } from './helpers';
 import { filterLevelGeom } from './prepare_data';
 import { prepareTooltip } from './tooltip';
@@ -166,6 +167,18 @@ function getLegendElems(type) {
         { color: ['orange', 'rgb(160, 30, 160)'], text: 'Rang plus élevé que ma région (1 indicateur sur 2)' },
       ],
       '100', '50',
+    ];
+  } else if (type === 4) {
+    return [
+      [
+        { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
+        { color: color_default_dissim, text: 'Région la plus ressemblante' },
+        { color: color_q1, text: 'q1' },
+        { color: color_q2, text: 'q2' },
+        { color: color_q3, text: 'q3' },
+        { color: color_q4, text: 'q4' },
+      ],
+      '120', '60',
     ];
   }
   return [

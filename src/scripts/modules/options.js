@@ -6,8 +6,11 @@ export const color_disabled = '#bebecd'; // Color for features outside the study
 export const color_sup = 'green'; // Color for selected feature with "better" values than the reference feature
 export const color_inf = 'red'; // Color for selected feature with "worse" values than the reference feature
 export const color_highlight = 'yellow'; // Color for the reference feature ("Ma région")
-export const color_default_dissim = 'darkred'; // Neutral color for selected features when green/red can't be used
-
+export const color_default_dissim = '#980043'; // 'darkred'; // Neutral color for selected features when green/red can't be used
+export const color_q1 = '#dd1c77';
+export const color_q2 = '#df65b0';
+export const color_q3 = '#c994c7';
+export const color_q4 = '#d4b9da';
 /*
 * Options regarding the formatting of numbers as string
 *

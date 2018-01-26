@@ -41,7 +41,7 @@
     "tippy.js": "^2.0.4"
   },
   "scripts": {
-    "prepublish": "rm -rf build/* && cp src/index.html build/ && cp -r src/img/ build/img/ && cp -r src/data/ build/data/ && cp -r src/vendor/ build/vendor/",
+    "prepublish": "rm -rf build/* && cp src/index.html build/ && cp -r src/img/ build/img/ && cp -r src/data/ build/data/ && cp -r src/vendor/ build/vendor/ && cp src/img/favicon.ico build/favicon.ico",
     "build": "npm run prepublish && rollup -c",
     "watch": "npm run prepublish && rollup -c -w",
     "dev": "npm run prepublish && rollup -c -w --environment SERVE"

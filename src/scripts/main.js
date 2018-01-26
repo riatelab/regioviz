@@ -14,7 +14,7 @@ import ScatterPlot2 from './modules/charts/scatterPlot_2v';
 import RadarChart3 from './modules/charts/radarChart_3v';
 import Similarity1plus from './modules/charts/similarity1v';
 import { Tooltipsify } from './modules/tooltip';
-import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, clickDlPdf } from './modules/helpers';
+import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, clickDlPdf, removeAll } from './modules/helpers';
 import {
   prepare_dataset,
   filterLevelVar,
@@ -612,7 +612,7 @@ function loadData() {
     .awaitAll((error, results) => {
       if (error) throw error;
       document.body.classList.remove('loading');
-      document.querySelector('.spinner').remove();
+      removeAll(document.querySelectorAll('.spinner, .top-spinner'));
       // app.ratioToWide = getRatioToWide();
       const [
         full_dataset, nuts, borders, countries, countries_remote,

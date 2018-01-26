@@ -1,5 +1,6 @@
 import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu } from './../helpers';
-import { color_disabled, color_countries, color_default_dissim, color_highlight, fixed_dimension } from './../options';
+import { color_disabled, color_countries, color_default_dissim,
+  color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info } from './../../main';
 import TableResumeStat from './../tableResumeStat';
@@ -43,7 +44,7 @@ export default class Similarity1plus {
     this.nums = app.current_config.num;
     this.data = ref_data.filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
     this.prepareData();
-    this.type = 'detailled';
+    this.type = 'global';
     resetColors();
     this.highlight_selection = [];
     this.serie_inversed = false;
@@ -75,18 +76,20 @@ export default class Similarity1plus {
     chart_type.append('span')
       .attrs({
         id: 'ind_dist_detailled',
-        class: 'choice_ind active noselect',
+        class: 'choice_ind noselect',
       })
       .text('Distance détaillée');
 
     chart_type.append('span')
       .attrs({
         id: 'ind_dist_global',
-        class: 'choice_ind noselect',
+        class: 'choice_ind active noselect',
       })
       .text('Distance globale');
 
-    const selection_close = menu_selection.append('p').attr('class', 'selection_display');
+    const selection_close = menu_selection.append('p')
+      .attr('class', 'selection_display')
+      .style('display', 'none');
     selection_close.append('span')
       .html('Sélection des');
     selection_close.append('input')
@@ -95,8 +98,10 @@ export default class Similarity1plus {
       .property('value', 1);
     selection_close.append('span')
       .html('régions les plus proches');
+
     const section = menu_selection.append('section')
-      .attr('class', 'slider-checkbox');
+      .attr('class', 'slider-checkbox')
+      .style('display', 'none');
     section.append('input')
       .attrs({ type: 'checkbox', id: 'check_prop' });
     section.append('label')
@@ -121,6 +126,7 @@ export default class Similarity1plus {
     } else {
       this.highlight_selection = [];
     }
+    console.log(this.highlight_selection);
     this.removeLines();
     this.update();
     this.updateMapRegio();
@@ -512,13 +518,13 @@ export default class Similarity1plus {
         } else if (i === 1) {
           app.colors[ft.id] = color_default_dissim;
         } else if (ft.dist < q1) {
-          app.colors[ft.id] = '#a73030';
+          app.colors[ft.id] = color_q1;
         } else if (ft.dist < q2) {
-          app.colors[ft.id] = '#bd5656';
+          app.colors[ft.id] = color_q2;
         } else if (ft.dist < q3) {
-          app.colors[ft.id] = '#d89090';
+          app.colors[ft.id] = color_q3;
         } else {
-          app.colors[ft.id] = '#efcccc';
+          app.colors[ft.id] = color_q4;
         }
       });
 
@@ -567,13 +573,14 @@ export default class Similarity1plus {
           .data(voro, d => d.data.id)
           .enter()
           .append('g')
-          .attr('class', 'cell');
+          .attr('class', 'cell')
+          .attr('id', d => `c_${d.data.id}`);
         cell.append('circle')
           .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
           .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
-            stroke: 'darkgrey',
+            stroke: 'darkgray',
           }));
 
         cell.append('path')
@@ -602,7 +609,10 @@ export default class Similarity1plus {
           // .data(voro, d => d.data.id)
           .attr('d', d => `M${d.join('L')}Z`);
 
-        const a = cells.enter().insert('g').attr('class', 'cell');
+        const a = cells.enter()
+          .insert('g')
+          .attr('class', 'cell')
+          .attr('id', d => `c_${d.data.id}`);
 
         a.append('circle')
           .attrs(d => ({ r: 4.5, cx: d.data.x, cy: d.data.y }))
@@ -655,31 +665,42 @@ export default class Similarity1plus {
   }
 
   handleClickMap(d, parent) {
-    let to_display = false;
-    const id = d.id;
-    if (this.current_ids.indexOf(id) < 0 || id === app.current_config.my_region) return;
-    if (app.colors[id] !== undefined) {
-      // Remove the clicked feature from the colored selection on the chart:
-      const id_to_remove = this.highlight_selection
-        .map((ft, i) => (ft.id === id ? i : null)).filter(ft => ft)[0];
-      this.highlight_selection.splice(id_to_remove, 1);
-      // Change its color in the global colors object:
-      app.colors[id] = undefined;
-      // Change the color on the map:
-      d3.select(parent).attr('fill', color_countries);
-    } else {
-      app.colors[id] = color_default_dissim;
-      // Change the color on the map:
-      d3.select(parent).attr('fill', color_default_dissim);
-      // Add the clicked feature on the colored selection on the chart:
-      const obj = this.data.find(el => el.id === id);
-      this.highlight_selection.push(obj);
-      to_display = true;
+    if (this.type === 'detailled') {
+      let to_display = false;
+      const id = d.id;
+      if (this.current_ids.indexOf(id) < 0 || id === app.current_config.my_region) return;
+      if (app.colors[id] !== undefined) {
+        // Remove the clicked feature from the colored selection on the chart:
+        const id_to_remove = this.highlight_selection
+          .map((ft, i) => (ft.id === id ? i : null)).filter(ft => ft)[0];
+        this.highlight_selection.splice(id_to_remove, 1);
+        // Change its color in the global colors object:
+        app.colors[id] = undefined;
+        // Change the color on the map:
+        d3.select(parent).attr('fill', color_countries);
+      } else {
+        app.colors[id] = color_default_dissim;
+        // Change the color on the map:
+        d3.select(parent).attr('fill', color_default_dissim);
+        // Add the clicked feature on the colored selection on the chart:
+        const obj = this.data.find(el => el.id === id);
+        this.highlight_selection.push(obj);
+        to_display = true;
+      }
+      this.highlight_selection.sort((a, b) => a.dist - b.dist);
+      this.removeLines();
+      this.update();
+      if (to_display) setTimeout(() => { this.displayLine(id); }, 150);
+    } else if (this.type === 'global') {
+      const id = d.id;
+      if (this.current_ids.indexOf(id) < 0 || id === app.current_config.my_region) return;
+      const c = this.draw_group.select(`#c_${id}.cell`)
+        .select('circle');
+      c.style('stroke', 'black').style('stroke-width', '2');
+      setTimeout(() => {
+        c.style('stroke', 'darkgray').style('stroke-width', '0.45');
+      }, 5000);
     }
-    this.highlight_selection.sort((a, b) => a.dist - b.dist);
-    this.removeLines();
-    this.update();
-    if (to_display) setTimeout(() => { this.displayLine(id); }, 150);
   }
 
   makeTooltips() {
@@ -776,7 +797,7 @@ export default class Similarity1plus {
       })
       .on('mouseout', function () {
         const circle = this.previousSibling;
-        circle.style.stroke = 'darkgrey';
+        circle.style.stroke = 'darkgray';
         circle.style.strokeWidth = '0.45';
         clearTimeout(t);
         t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
@@ -791,17 +812,17 @@ export default class Similarity1plus {
           if (+globalrank === 0) {
             content.push('<b>Ma région</b>');
           } else if (+globalrank === 1) {
-            content.push(`Indice de similarité : ${d.data.dist}`);
+            content.push(`Indice de similarité : ${formatNumber(d.data.dist, 2)}`);
             content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
-            content.push(`Indice de similarité : ${d.data.dist}`);
+            content.push(`Indice de similarité : ${formatNumber(d.data.dist, 2)}`);
             content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
         clearTimeout(t);
         self.tooltip.select('.title')
           .attr('class', d.data.id === app.current_config.my_region ? 'title myRegion' : 'title')
-          .html([d.name, ' (', d.data.id, ')'].join(''));
+          .html(`${d.data.name} (${d.data.id})`);
         self.tooltip.select('.content')
           .html(content.join('<br>'));
         self.tooltip
@@ -1000,10 +1021,11 @@ export default class Similarity1plus {
         self.type = 'global';
         this.classList.add('active');
         menu.select('#ind_dist_detailled').attr('class', 'choice_ind noselect');
-        menu.select('.selection_display').style('display', 'none');
+        menu.selectAll('.selection_display, section').style('display', 'none');
         self.draw_group.selectAll('g').remove();
         self.update();
         self.updateMapRegio();
+        self.map_elem.displayLegend(4);
       });
 
     menu.select('#ind_dist_detailled')
@@ -1014,9 +1036,10 @@ export default class Similarity1plus {
         self.type = 'detailled';
         this.classList.add('active');
         menu.select('#ind_dist_global').attr('class', 'choice_ind noselect');
-        menu.select('.selection_display').style('display', null);
+        menu.selectAll('.selection_display, section').style('display', null);
         self.draw_group.selectAll('g').remove();
         self.applySelection(1);
+        self.map_elem.displayLegend(2);
       });
   }
 
@@ -1036,7 +1059,7 @@ export default class Similarity1plus {
   bindMap(map_elem) {
     this.map_elem = map_elem;
     this.map_elem.resetColors(this.current_ids);
-    this.map_elem.displayLegend(2);
+    this.map_elem.displayLegend(4);
     this.applySelection(1);
   }
 
