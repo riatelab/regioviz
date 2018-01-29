@@ -175,8 +175,8 @@ function getLegendElems(type) {
         { color: color_default_dissim, text: 'Région la plus ressemblante' },
         { color: color_q1, text: 'Régions très ressemblantes' },
         { color: color_q2, text: 'Régions ressemblantes' },
-        { color: color_q3, text: 'Régions éloignées' },
-        { color: color_q4, text: 'Régions très éloignées' },
+        { color: color_q3, text: 'Régions dissemblantes' },
+        { color: color_q4, text: 'Régions très dissemblantes' },
       ],
       '120', '60',
     ];
