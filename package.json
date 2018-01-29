@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "description": "Statistical exploration tool to compare new French regions in a European context.",
   "license": "CECILL-2.1",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/riatelab/regioviz.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/riatelab/regioviz.git"
   },
   "author": {
-    "name" : "Matthieu Viry",
-    "email" : "matthieu.viry@cnrs.fr"
+    "name": "Matthieu Viry",
+    "email": "matthieu.viry@cnrs.fr"
   },
   "devDependencies": {
     "autoprefixer": "^7.2.2",
@@ -22,7 +22,10 @@
     "eslint-plugin-import": "^2.8.0",
     "rollup": "^0.52.1",
     "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-clean": "^1.0.0",
+    "rollup-plugin-cleaner": "^0.2.0",
     "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-copy": "^0.2.3",
     "rollup-plugin-eslint": "^4.0.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-postcss": "^0.4.3",
@@ -41,9 +44,8 @@
     "tippy.js": "^2.0.4"
   },
   "scripts": {
-    "prepublish": "rm -rf build/* && cp src/index.html build/ && cp -r src/img/ build/img/ && cp -r src/data/ build/data/ && cp -r src/vendor/ build/vendor/ && cp src/img/favicon.ico build/favicon.ico",
-    "build": "npm run prepublish && rollup -c",
-    "watch": "npm run prepublish && rollup -c -w",
-    "dev": "npm run prepublish && rollup -c -w --environment SERVE"
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "dev": "rollup -c -w --environment SERVE"
   }
 }
