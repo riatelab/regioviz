@@ -15,7 +15,10 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart); });
+  svg_bar = d3.select('svg#svg_bar')
+    .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
+    .on('contextmenu', () => { svgContextMenu(app.chart); })
+    .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -140,6 +143,7 @@ export default class Similarity1plus {
       }
       this.last_selection = null;
     } else {
+      this.map_elem.layers.selectAll('.cloned').remove();
       const selection = [d3.event.selection[0] - 1, d3.event.selection[1] + 1.5];
       const highlighted = [];
       this.draw_group.selectAll('.circle')
