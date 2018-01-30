@@ -17,7 +17,7 @@ let t;
 const updateDimensions = () => {
   svg_bar = d3.select('svg#svg_bar')
     .attr('viewBox', `-5 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
-    .on('contextmenu', () => { svgContextMenu(app.chart); })
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); })
     .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 60 };
   width = fixed_dimension.chart.width - margin.left - margin.right;

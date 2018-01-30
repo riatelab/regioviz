@@ -564,6 +564,55 @@ const removeAll = (elems) => {
   array_slice.call(elems).forEach((el) => { el.remove(); });
 };
 
+export function exportSVG(elem) {
+  const targetSvg = elem.cloneNode(true);
+  const serializer = new XMLSerializer();
+  removeAll(targetSvg.querySelectorAll('.brush_map'));
+  let source = serializer.serializeToString(targetSvg);
+  source = ['<?xml version="1.0" encoding="utf-8" standalone="no"?>\r\n', source].join('');
+
+  const href = URL.createObjectURL(new Blob([source], { type: 'image/svg+xml' }));
+  const a = document.createElement('a');
+  a.setAttribute('download', 'chart.svg');
+  a.setAttribute('href', href);
+  a.style.display = 'none';
+  document.body.append(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(href);
+}
+
+export function exportPNG(elem) {
+  const b = elem.getBoundingClientRect();
+  const targetCanvas = d3.select('body')
+    .append('canvas')
+    .attrs({ id: 'canvas_export', height: b.height, width: b.width })
+    .node();
+  const targetSvg = elem.cloneNode(true);
+  targetSvg.removeAttribute('viewBox');
+  targetSvg.setAttribute('width', b.width);
+  targetSvg.setAttribute('height', b.height);
+  const svg_src = (new XMLSerializer()).serializeToString(elem);
+  const ctx = targetCanvas.getContext('2d');
+  const img = new Image();
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg_src)}`;
+  img.onload = function () {
+    ctx.drawImage(img, 0, 0);
+    targetCanvas.toBlob((blob) => {
+      const href = URL.createObjectURL(new Blob([blob], { type: 'image/png' }));
+      const a = document.createElement('a');
+      a.setAttribute('download', 'chart.png');
+      a.setAttribute('href', href);
+      a.style.display = 'none';
+      document.body.append(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(href);
+    }, 'image/png')
+  };
+}
+
+
 /**
 * Display a custom context menu when the user triggers a right click on the map
 * or on a chart.
@@ -572,15 +621,16 @@ const removeAll = (elems) => {
 *  current chart in use in the application.
 * @return {Void}
 */
-function svgContextMenu(current_chart) {
+function svgContextMenu(current_chart, svg_elem) {
+  console.log(current_chart, svg_elem);
   const items_menu = [
     {
       name: 'Export au format PNG',
-      action: () => { null; },
+      action: () => { exportPNG(svg_elem.node()); },
     },
     {
       name: 'Export au format SVG',
-      action: () => { null; },
+      action: () => { exportSVG(svg_elem.node()); },
     },
     {
       name: 'Export d\'un rapport complet',

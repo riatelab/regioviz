@@ -7,7 +7,7 @@ import { filterLevelGeom } from './prepare_data';
 import { prepareTooltip } from './tooltip';
 
 
-const svg_map = d3.select('svg#svg_map').on('contextmenu', svgContextMenu);
+const svg_map = d3.select('svg#svg_map').on('contextmenu', () => svgContextMenu(app.map, svg_map));
 const width_map = fixed_dimension.map.width;
 const height_map = fixed_dimension.map.height;
 let styles;
