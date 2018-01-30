@@ -21,7 +21,7 @@ let current_range = [0, 0];
 let displayed;
 
 function updateDimensions() {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', () => { svgContextMenu(app.chart); });
+  svg_bar = d3.select('svg#svg_bar').on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); });
   margin = {
     top: 10,
     right: 20,

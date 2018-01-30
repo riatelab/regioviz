@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu } from './../helpers';
+import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu, getElementsFromPoint } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
@@ -15,7 +15,10 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart); });
+  svg_bar = d3.select('svg#svg_bar')
+    .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); })
+    .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -36,6 +39,7 @@ export default class Similarity1plus {
     this.type = 'global';
     resetColors();
     this.highlight_selection = [];
+    this.highlighted = [];
     this.serie_inversed = false;
     this.proportionnal_symbols = false;
     this.draw_group = svg_container
@@ -49,6 +53,11 @@ export default class Similarity1plus {
     this.completude.update(
       calcCompletudeSubset(app, this.ratios, 'array'),
       calcPopCompletudeSubset(app, this.ratios));
+
+    // Brush behavior (only used for beeswarm):
+    this.brush = d3.brushX()
+      .extent([[0, 0], [width, height]])
+      .on('brush end', () => this.brushed());
 
     // To decide wether to inverse the positive/negative color for an axis
     this.inversedAxis = new Set();
@@ -64,17 +73,17 @@ export default class Similarity1plus {
 
     chart_type.append('span')
       .attrs({
-        id: 'ind_dist_detailled',
-        class: 'choice_ind noselect',
-      })
-      .text('Par indicateur');
-
-    chart_type.append('span')
-      .attrs({
         id: 'ind_dist_global',
         class: 'choice_ind active noselect',
       })
       .text('Ressemblance globale');
+
+    chart_type.append('span')
+      .attrs({
+        id: 'ind_dist_detailled',
+        class: 'choice_ind noselect',
+      })
+      .text('Par indicateur');
 
     const selection_close = menu_selection.append('p')
       .attr('class', 'selection_display')
@@ -101,6 +110,72 @@ export default class Similarity1plus {
     this.makeTableStat();
   }
 
+  brushed() {
+    const e = d3.event;
+    if (!e.selection && e.type === 'end') {
+      if (!this.last_selection) {
+        const elems = getElementsFromPoint(e.sourceEvent.clientX, e.sourceEvent.clientY);
+        const elem = elems.find(el => el.className.baseVal === 'polygon' || el.className.baseVal === 'circle');
+        if (elem) {
+          const new_click_event = new MouseEvent('click', {
+            pageX: e.sourceEvent.pageX,
+            pageY: e.sourceEvent.pageY,
+            clientX: e.sourceEvent.clientX,
+            clientY: e.sourceEvent.clientY,
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          });
+          elem.dispatchEvent(new_click_event);
+        }
+      } else {
+        this.draw_group.selectAll('.circle')
+          .style('fill', d => app.colors[d.data.id]);
+        this.map_elem.target_layer.selectAll('path')
+          .attr('fill', (d) => {
+            const _id = d.id;
+            if (_id === app.current_config.my_region) {
+              return color_highlight;
+            } else if (this.current_ids.indexOf(_id) > -1) {
+              if (app.colors[_id]) return app.colors[_id];
+              return color_countries;
+            }
+            return color_disabled;
+          });
+      }
+      this.last_selection = null;
+    } else {
+      this.map_elem.layers.selectAll('.cloned').remove();
+      const selection = [d3.event.selection[0] - 1, d3.event.selection[1] + 1.5];
+      this.highlighted = [];
+      this.draw_group.selectAll('.circle')
+        .style('fill', (d) => {
+          if (d.data.id === app.current_config.my_region) {
+            return color_highlight;
+          } else if (d.data.x >= selection[0] && d.data.x <= selection[1]) {
+            this.highlighted.push(d.data.id);
+            return 'purple';
+          }
+          return app.colors[d.data.id];
+        });
+
+      this.map_elem.target_layer.selectAll('path')
+        .attr('fill', (d) => {
+          const _id = d.id;
+          if (_id === app.current_config.my_region) {
+            return color_highlight;
+          } else if (this.highlighted.indexOf(_id) > -1) {
+            return 'purple';
+          } else if (this.current_ids.indexOf(_id) > -1) {
+            if (app.colors[_id]) return app.colors[_id];
+            return color_countries;
+          }
+          return color_disabled;
+        });
+      this.last_selection = selection;
+    }
+  }
+
   applySelection(nb) {
     app.colors = {};
     if (nb > 0) {
@@ -124,7 +199,7 @@ export default class Similarity1plus {
   update() {
     const self = this;
     const data = self.data;
-
+    this.draw_group.select('.brush').remove();
     if (self.type === 'detailled') {
       const highlight_selection = self.highlight_selection;
       const nb_variables = self.ratios.length;
@@ -521,13 +596,12 @@ export default class Similarity1plus {
         ? new PropSizer(d3.max(data, d => +d[num_name]), 30).scale
         : () => 4.5;
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
-      const x = d3.scaleLinear()
-        .rangeRound([0, width]);
-      const xAxis = d3.axisBottom(x).ticks(10, '');
-      x.domain(d3.extent(values));
+      this.x = d3.scaleLinear().rangeRound([0, width]);
+      const xAxis = d3.axisBottom(this.x).ticks(10, '');
+      this.x.domain(d3.extent(values));
 
       const simulation = d3.forceSimulation(data)
-        .force('x', d3.forceX(d => x(d.dist)).strength(9))
+        .force('x', d3.forceX(d => this.x(d.dist)).strength(9))
         .force('y', d3.forceY(height / 2).strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)))
         .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
         .stop();
@@ -567,7 +641,12 @@ export default class Similarity1plus {
           .attr('class', 'cell')
           .attr('id', d => `c_${d.data.id}`);
         cell.append('circle')
-          .attrs(d => ({ r: size_func(+d.data[num_name]), cx: d.data.x, cy: d.data.y }))
+          .attrs(d => ({
+            class: 'circle',
+            r: size_func(+d.data[num_name]),
+            cx: d.data.x,
+            cy: d.data.y,
+          }))
           .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
@@ -576,7 +655,9 @@ export default class Similarity1plus {
 
         cell.append('path')
           .attr('class', 'polygon')
-          .attr('d', d => `M${d.join('L')}Z`);
+          .attr('d', d => `M${d.join('L')}Z`)
+          .style('fill', 'none');
+
       } else {
         g.selectAll('.axis-top-v')
           .transition()
@@ -587,11 +668,16 @@ export default class Similarity1plus {
           .selectAll('g.cell')
           .data(voro, d => d.data.id);
 
-        cells.select('circle')
+        cells.select('.circle')
           // .data(voro, d => d.data.id)
           .transition()
           .duration(125)
-          .attrs(d => ({ r: size_func(+d.data[num_name]), cx: d.data.x, cy: d.data.y }))
+          .attrs(d => ({
+            class: 'circle',
+            r: size_func(+d.data[num_name]),
+            cx: d.data.x,
+            cy: d.data.y,
+          }))
           .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
@@ -602,7 +688,8 @@ export default class Similarity1plus {
           .transition()
           .duration(125)
           // .data(voro, d => d.data.id)
-          .attr('d', d => `M${d.join('L')}Z`);
+          .attr('d', d => `M${d.join('L')}Z`)
+          .style('fill', 'none');
 
         const a = cells.enter()
           .insert('g')
@@ -610,7 +697,12 @@ export default class Similarity1plus {
           .attr('id', d => `c_${d.data.id}`);
 
         a.append('circle')
-          .attrs(d => ({ r: size_func(+d.data[num_name]), cx: d.data.x, cy: d.data.y }))
+          .attrs(d => ({
+            class: 'circle',
+            r: size_func(+d.data[num_name]),
+            cx: d.data.x,
+            cy: d.data.y,
+          }))
           .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
@@ -619,7 +711,8 @@ export default class Similarity1plus {
 
         a.append('path')
           .attr('class', 'polygon')
-          .attr('d', d => `M${d.join('L')}Z`);
+          .attr('d', d => `M${d.join('L')}Z`)
+          .style('fill', 'none');
 
         cells.exit().remove();
       }
@@ -693,13 +786,21 @@ export default class Similarity1plus {
     } else if (this.type === 'global') {
       const id = d.id;
       if (this.current_ids.indexOf(id) < 0 || id === app.current_config.my_region) return;
-      const c = this.draw_group.select(`#c_${id}.cell`).select('circle');
-      d3.select(parent).attr('fill', '#4f81bd');
-      c.style('fill', '#4f81bd').style('stroke', 'black').style('stroke-width', '2');
-      setTimeout(() => {
-        d3.select(parent).attr('fill', app.colors[id]);
-        c.style('fill', app.colors[id]).style('stroke', 'darkgray').style('stroke-width', '0.45');
-      }, 5000);
+      if (this.highlighted.indexOf(id) > -1) {
+        this.highlighted.splice(this.highlighted.indexOf(id), 1);
+        d3.select(parent).attr('fill', _d => app.colors[_d.id]);
+        this.draw_group.select(`#c_${id}.cell > circle`)
+          .style('fill', _d => app.colors[_d.data.id]);
+      } else {
+        this.highlighted.push(id);
+        d3.select(parent).attr('fill', 'purple');
+        this.draw_group.select(`#c_${id}.cell > circle`)
+          .styles({
+            fill: 'purple',
+            stroke: 'black',
+            'stroke-width': 2,
+          });
+      }
     }
   }
 
@@ -778,7 +879,7 @@ export default class Similarity1plus {
               const cloned = this.cloneNode();
               cloned.style.fill = 'red';
               cloned.style.stroke = 'orange';
-              cloned.style.strokeWidth = '2.25px';
+              cloned.style.strokeWidth = '1.25px';
               cloned.classList.add('cloned');
               self.map_elem.layers.select('#temp').node().appendChild(cloned);
               setTimeout(() => { cloned.remove(); }, 5000);
@@ -786,23 +887,29 @@ export default class Similarity1plus {
           });
       });
 
+    if (this.type === 'detailled') return;
+
     this.draw_group.selectAll('g.cell')
       .selectAll('.polygon')
-      .on('mouseover', function () {
+      .on('mouseover.tooltip', function () {
+        self.draw_group.selectAll('circle')
+          .styles({ stroke: 'darkgray', 'stroke-width': '0.45' });
         const circle = this.previousSibling;
         circle.style.stroke = 'black';
         circle.style.strokeWidth = '2';
         clearTimeout(t);
         self.tooltip.style('display', null);
       })
-      .on('mouseout', function () {
+      .on('mouseout.tooltip', function () {
         const circle = this.previousSibling;
         circle.style.stroke = 'darkgray';
         circle.style.strokeWidth = '0.45';
         clearTimeout(t);
         t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
       })
-      .on('mousemove mousedown', function (d) {
+      .on('mousemove.tooltip', function (d) {
+        self.draw_group.selectAll('circle')
+          .styles({ stroke: 'darkgray', 'stroke-width': '0.45' });
         const circle = this.previousSibling;
         circle.style.stroke = 'black';
         circle.style.strokeWidth = '2';
@@ -833,28 +940,74 @@ export default class Similarity1plus {
           });
       })
       .on('click', function (d) {
+        const id = d.data.id;
         const circle = this.parentElement.querySelector('circle');
-        self.map_elem.target_layer
-          .selectAll('path')
-          .each(function (ft) {
-            if (ft.id === d.data.id) {
-              circle.style.fill = '#4f81bd';
-              circle.style.stroke = 'black';
-              circle.style.strokeWidth = '2';
-              const cloned = this.cloneNode();
-              cloned.style.fill = '#4f81bd';
-              cloned.style.stroke = 'black';
-              cloned.style.strokeWidth = '2.25px';
-              cloned.classList.add('cloned');
-              self.map_elem.layers.select('#temp').node().appendChild(cloned);
-              setTimeout(() => {
-                circle.style.fill = app.colors[d.data.id];
-                circle.style.stroke = 'darkgray';
-                circle.style.strokeWidth = '0.45';
-                cloned.remove();
-              }, 5000);
+        if (self.highlighted.indexOf(id) > -1) {
+          self.highlighted.splice(self.highlighted.indexOf(id), 1);
+          self.map_elem.target_layer
+            .selectAll('path')
+            .each(function (ft) {
+              if (ft.id === id) {
+                circle.style.fill = app.colors[id];
+                this.setAttribute('fill', app.colors[id]);
+              }
+            });
+        } else {
+          self.highlighted.push(id);
+          self.map_elem.target_layer
+            .selectAll('path')
+            .each(function (ft) {
+              if (ft.id === id) {
+                circle.style.fill = 'purple';
+                circle.style.stroke = 'black';
+                circle.style.strokeWidth = '2';
+                this.setAttribute('fill', 'purple');
+              }
+            });
+        }
+      });
+
+    this.draw_group.append('g')
+      .attr('class', 'brush')
+      .call(this.brush)
+      .on('dblclick', function () {
+        self.highlighted = [];
+        self.draw_group.selectAll('.circle')
+          .style('fill', d => app.colors[d.data.id]);
+        self.map_elem.target_layer.selectAll('path')
+          .attr('fill', (d) => {
+            const _id = d.id;
+            if (_id === app.current_config.my_region) {
+              return color_highlight;
+            } else if (self.current_ids.indexOf(_id) > -1) {
+              if (app.colors[_id]) return app.colors[_id];
+              return color_countries;
             }
+            return color_disabled;
           });
+      })
+      .on('mousemove mousedown mouseover', () => {
+        const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
+        const elem = elems.find(e => e.className.baseVal === 'polygon' || e.className.baseVal === 'circle');
+        if (elem) {
+          const new_click_event = new MouseEvent('mousemove', {
+            pageX: d3.event.pageX,
+            pageY: d3.event.pageY,
+            clientX: d3.event.clientX,
+            clientY: d3.event.clientY,
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          });
+          elem.dispatchEvent(new_click_event);
+        } else {
+          clearTimeout(t);
+          t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
+        }
+      })
+      .on('mouseout', () => {
+        clearTimeout(t);
+        t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
       });
   }
 

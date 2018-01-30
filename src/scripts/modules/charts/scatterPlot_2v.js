@@ -15,12 +15,16 @@ let svg_container;
 let t;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `-5 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart); });
+  svg_bar = d3.select('svg#svg_bar')
+    .attr('viewBox', `-5 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); })
+    .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 60 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
-  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
+  d3.select('.cont_svg.cchart')
+    .style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
   svg_container = svg_bar.append('g').attr('class', 'container');
 };
 
@@ -58,10 +62,10 @@ export default class ScatterPlot2 {
       ];
       if (this.xInversed) range_x.reverse();
       if (this.yInversed) range_y.reverse();
-      range_x[0] -= 0.5;
-      range_x[1] += 0.5;
-      range_y[0] -= 0.5;
-      range_y[1] += 0.5;
+      range_x[0] -= 0.5 / this.k;
+      range_x[1] += 0.5 / this.k;
+      range_y[0] -= 0.5 / this.k;
+      range_y[1] += 0.5 / this.k;
       let t1;
       let t2;
       if (this.type === 'value') {
@@ -126,15 +130,28 @@ export default class ScatterPlot2 {
     this.y = d3.scaleLinear()
       .range([height, 0])
       .nice();
-
-    this.xAxis = d3.axisBottom(this.x).ticks(this.mean_variable1 >= 10000 ? 5 : 10).tickFormat(formatNumber);
-    this.yAxis = d3.axisLeft(this.y).ticks(10 * height / width).tickFormat(formatNumber);
-    this.xAxis2 = d3.axisBottom(this.x).ticks(this.mean_variable1 >= 10000 ? 5 : 10).tickFormat(formatNumber);
-    this.yAxis2 = d3.axisLeft(this.y).ticks(10 * height / width).tickFormat(formatNumber);
+    this.k = 1;
+    this.xAxis = d3.axisBottom(this.x)
+      .ticks(this.mean_variable1 >= 10000 ? 5 : 10)
+      .tickFormat(formatNumber);
+    this.yAxis = d3.axisLeft(this.y)
+      .ticks(10 * height / width)
+      .tickFormat(formatNumber);
+    this.xAxis2 = d3.axisBottom(this.x)
+      .ticks(this.mean_variable1 >= 10000 ? 5 : 10)
+      .tickFormat(formatNumber);
+    this.yAxis2 = d3.axisLeft(this.y)
+      .ticks(10 * height / width)
+      .tickFormat(formatNumber);
 
     this.brush = d3.brush()
       .extent([[0, 0], [width, height]])
       .on('brush end', this.brushed);
+
+    this.zoom = d3.zoom()
+      .scaleExtent([1, 5])
+      .translateExtent([[0, 0], [width, height]])
+      .on('zoom', () => this.zoomed(d3.event.transform));
 
     this.xInversed = false;
     this.yInversed = false;
@@ -163,7 +180,9 @@ export default class ScatterPlot2 {
 
     this.scatter.append('g')
       .attr('class', 'brush')
-      .call(this.brush);
+      .call(this.brush)
+      .call(this.zoom)
+      .on('dblclick', () => { this.zoomed(d3.zoomIdentity); });
 
     this.makeGrid();
 
@@ -684,7 +703,7 @@ export default class ScatterPlot2 {
     const _trans = dots.transition().duration(100);
     const num_name = app.current_config.pop_field;
     const size_func = this.proportionnal_symbols
-      ? new PropSizer(d3.max(data, d => d[app.current_config.pop_field]), 30).scale
+      ? new PropSizer(d3.max(data, d => d[num_name]), 30).scale
       : () => 5;
 
     if (this.type === 'rank') {
@@ -705,7 +724,7 @@ export default class ScatterPlot2 {
       dots
         .transition(_trans)
         .attrs(d => ({
-          r: size_func(d[num_name]),
+          r: size_func(d[num_name]) / this.k,
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
         }))
@@ -726,7 +745,7 @@ export default class ScatterPlot2 {
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
         }))
         .attrs(d => ({
-          r: size_func(d[num_name]),
+          r: size_func(d[num_name]) / this.k,
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
           class: 'dot',
@@ -756,7 +775,7 @@ export default class ScatterPlot2 {
       dots
         .transition(_trans)
         .attrs(d => ({
-          r: size_func(d[num_name]),
+          r: size_func(d[num_name]) / this.k,
           cx: x(d[variable1]),
           cy: y(d[variable2]),
         }))
@@ -777,7 +796,7 @@ export default class ScatterPlot2 {
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
         }))
         .attrs(d => ({
-          r: size_func(d[num_name]),
+          r: size_func(d[num_name]) / this.k,
           cx: x(d[variable1]),
           cy: y(d[variable2]),
           class: 'dot',
@@ -788,6 +807,68 @@ export default class ScatterPlot2 {
     dots.order();
     this.updateMeanMedianValue();
     this.updateAxisGrid();
+  }
+
+  zoomed(transform) {
+    if (transform.k === 1) {
+      transform.x = 0; // eslint-disable-line no-param-reassign
+      transform.y = 0; // eslint-disable-line no-param-reassign
+    }
+    this.k = transform.k;
+    const new_xScale = transform.rescaleX(this.x);
+    const new_yScale = transform.rescaleY(this.y);
+    const num_name = app.current_config.pop_field;
+    const size_func = this.proportionnal_symbols
+      ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
+      : () => 5;
+    const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(350);
+    trans.attrs(d => ({
+      transform: transform,
+      r: size_func(d[num_name]) / this.k,
+      'stroke-width': 1 / this.k,
+    }));
+
+    this.plot.select('#axis--x')
+      .transition(trans)
+      .call(this.xAxis.scale(new_xScale));
+
+    this.plot.select('.grid-x')
+      .transition(trans)
+      .call(this.xAxis2.scale(new_xScale)
+        .tickSize(-height)
+        .tickFormat(''))
+      .selectAll('line')
+      .attr('stroke', 'lightgray');
+
+    this.plot.select('#axis--y')
+      .transition(trans)
+      .call(this.yAxis.scale(new_yScale));
+
+    this.plot.select('.grid-y')
+      .transition(trans)
+      .call(this.yAxis2.scale(new_yScale)
+        .tickSize(-width)
+        .tickFormat(''))
+      .selectAll('line')
+      .attr('stroke', 'lightgray');
+
+    this.plot.select('.brush')
+      .transition(trans)
+      .attr('transform', transform);
+
+    this.plot.selectAll('.mean_line')
+      .transition(trans)
+      .attrs({
+        transform: transform,
+        'stroke-width': 2 / this.k,
+      });
+
+    this.plot.selectAll('.transp_mean_line')
+      .transition(trans)
+      .attrs({
+        transform: transform,
+        'stroke-width': 14 / this.k,
+      });
   }
 
   /**
@@ -983,6 +1064,7 @@ export default class ScatterPlot2 {
       this.map_elem.removeRectBrush();
       this.map_elem.updateLegend();
       this.map_elem.resetColors(this.current_ids);
+      this.zoomed(d3.zoomIdentity);
       this.update();
     }
   }
@@ -1020,6 +1102,7 @@ export default class ScatterPlot2 {
     this.ref_value2 = tmp_my_region[this.variable2];
 
     this.map_elem.removeRectBrush();
+    this.zoomed(d3.zoomIdentity);
     this.updateItemsCtxMenu();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1067,6 +1150,7 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value1 = tmp_my_region[this.variable1];
+    this.zoomed(d3.zoomIdentity);
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1113,6 +1197,7 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value2 = tmp_my_region[this.variable2];
+    this.zoomed(d3.zoomIdentity);
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1200,6 +1285,7 @@ export default class ScatterPlot2 {
         menu.select('#ind_ranks').attr('class', 'choice_ind noselect');
         menu.select('#btn_above_mean').text('inférieures à la moyenne');
         menu.select('#btn_below_mean').text('supérieures à la moyenne');
+        self.zoomed(d3.zoomIdentity);
         self.update();
       });
 
@@ -1213,6 +1299,7 @@ export default class ScatterPlot2 {
         menu.select('#ind_raw_values').attr('class', 'choice_ind noselect');
         menu.select('#btn_above_mean').text('inférieures à la médiane');
         menu.select('#btn_below_mean').text('supérieures à la médiane');
+        self.zoomed(d3.zoomIdentity);
         self.update();
       });
 

@@ -7,7 +7,7 @@ import { filterLevelGeom } from './prepare_data';
 import { prepareTooltip } from './tooltip';
 
 
-const svg_map = d3.select('svg#svg_map').on('contextmenu', svgContextMenu);
+const svg_map = d3.select('svg#svg_map').on('contextmenu', () => svgContextMenu(app.map, svg_map));
 const width_map = fixed_dimension.map.width;
 const height_map = fixed_dimension.map.height;
 let styles;
@@ -175,8 +175,8 @@ function getLegendElems(type) {
         { color: color_default_dissim, text: 'Région la plus ressemblante' },
         { color: color_q1, text: 'Régions très ressemblantes' },
         { color: color_q2, text: 'Régions ressemblantes' },
-        { color: color_q3, text: 'Régions éloignées' },
-        { color: color_q4, text: 'Régions très éloignées' },
+        { color: color_q3, text: 'Régions dissemblantes' },
+        { color: color_q4, text: 'Régions très dissemblantes' },
       ],
       '120', '60',
     ];
