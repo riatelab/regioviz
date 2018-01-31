@@ -205,6 +205,7 @@ export default class Similarity1plus {
       const nb_variables = self.ratios.length;
       const offset = height / nb_variables + 1;
       let height_to_use = offset / 2;
+      const trans = d3.transition().duration(125);
       for (let i = 0; i < nb_variables; i++) {
         const ratio_name = self.ratios[i];
         const selector_ratio_name = `l_${ratio_name}`;
@@ -337,11 +338,11 @@ export default class Similarity1plus {
           layer_top = g.select('g.top');
         }
         // g.attr('transform', `translate(0, ${height_to_use})`);
-        const _trans = this.draw_group.select(`#${selector_ratio_name}`)
-          .transition()
-          .duration(225);
+        // const _trans = this.draw_group.select(`#${selector_ratio_name}`)
+        //   .transition()
+        //   .duration(125);
         g = this.draw_group.select(`#${selector_ratio_name}`)
-          .transition(_trans)
+          .transition(trans)
           .attr('transform', `translate(0, ${height_to_use})`);
         g.select('#up_arrow')
           // .transition(_trans)
@@ -395,16 +396,14 @@ export default class Similarity1plus {
           .range([0, width]);
 
         axis
-          .transition()
-          .duration(125)
+          .transition(trans)
           .call(d3.axisBottom(xScale).tickFormat(formatNumber));
 
         const bubbles1 = layer_other.selectAll('.bubble')
           .data(data.filter(d => app.colors[d.id] === undefined), d => d.id);
 
         bubbles1
-          .transition()
-          .duration(125)
+          .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -434,8 +433,7 @@ export default class Similarity1plus {
             'stroke-width': 0.75,
             'stroke-opacity': 0.75,
           })
-          .transition()
-          .duration(125)
+          .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -458,8 +456,7 @@ export default class Similarity1plus {
             d => d.id);
 
         bubbles2
-          .transition()
-          .duration(125)
+          .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -489,8 +486,7 @@ export default class Similarity1plus {
             'stroke-width': d.globalrank === self.highlight_selection.length ? 0.9 : 0.75,
             'stroke-opacity': d.globalrank === self.highlight_selection.length ? 0.95 : 0.75,
           }))
-          .transition()
-          .duration(125)
+          .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -511,8 +507,7 @@ export default class Similarity1plus {
           .data(data.filter(d => d.id === app.current_config.my_region), d => d.id);
 
         bubbles3
-          .transition()
-          .duration(125)
+          .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -542,8 +537,7 @@ export default class Similarity1plus {
             'stroke-width': 0.75,
             'stroke-opacity': 0.75,
           }))
-          .transition()
-          .duration(125)
+          .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -559,14 +553,13 @@ export default class Similarity1plus {
           });
 
         bubbles3.exit().remove();
-
         height_to_use += offset;
-        setTimeout(() => {
-          bubbles1.order();
-          bubbles2.order();
-        }, 145);
+        // setTimeout(() => {
+        //   bubbles1.order();
+        //   bubbles2.order();
+        // }, 225);
       }
-      setTimeout(() => { this.makeTooltips(); }, 145);
+      setTimeout(() => { this.makeTooltips(); }, 200);
     } else if (self.type === 'global') {
       data.sort((a, b) => a.dist - b.dist);
       const values = data.map(ft => ft.dist);
@@ -628,8 +621,10 @@ export default class Similarity1plus {
           });
 
         g.append('g')
-          .attr('class', 'axis-top-v axis--x')
-          .attr('transform', `translate(0,${height})`)
+          .attrs({
+            class: 'axis-top-v axis--x',
+            transform: `translate(0,${height})`,
+          })
           .call(xAxis);
 
         const cell = g.append('g')
@@ -638,8 +633,10 @@ export default class Similarity1plus {
           .data(voro, d => d.data.id)
           .enter()
           .append('g')
-          .attr('class', 'cell')
-          .attr('id', d => `c_${d.data.id}`);
+          .attrs(d => ({
+            class: 'cell',
+            id: `c_${d.data.id}`,
+          }));
         cell.append('circle')
           .attrs(d => ({
             class: 'circle',
@@ -693,8 +690,10 @@ export default class Similarity1plus {
 
         const a = cells.enter()
           .insert('g')
-          .attr('class', 'cell')
-          .attr('id', d => `c_${d.data.id}`);
+          .attrs(d => ({
+            class: 'cell',
+            id: `c_${d.data.id}`,
+          }));
 
         a.append('circle')
           .attrs(d => ({
@@ -710,8 +709,10 @@ export default class Similarity1plus {
           }));
 
         a.append('path')
-          .attr('class', 'polygon')
-          .attr('d', d => `M${d.join('L')}Z`)
+          .attrs(d => ({
+            class: 'polygon',
+            d: `M${d.join('L')}Z`,
+          }))
           .style('fill', 'none');
 
         cells.exit().remove();
@@ -729,31 +730,17 @@ export default class Similarity1plus {
 
   updateMapRegio() {
     if (!this.map_elem) return;
-    if (this.type === 'detailled') {
-      this.map_elem.target_layer.selectAll('path')
-        .attr('fill', (d) => {
-          const _id = d.id;
-          if (_id === app.current_config.my_region) {
-            return color_highlight;
-          } else if (this.current_ids.indexOf(_id) > -1) {
-            if (app.colors[_id]) return color_default_dissim;
-            return color_countries;
-          }
-          return color_disabled;
-        });
-    } else if (this.type === 'global') {
-      this.map_elem.target_layer.selectAll('path')
-        .attr('fill', (d) => {
-          const _id = d.id;
-          if (_id === app.current_config.my_region) {
-            return color_highlight;
-          } else if (this.current_ids.indexOf(_id) > -1) {
-            if (app.colors[_id]) return app.colors[_id];
-            return color_countries;
-          }
-          return color_disabled;
-        });
-    }
+    this.map_elem.target_layer.selectAll('path')
+      .attr('fill', (d) => {
+        const _id = d.id;
+        if (_id === app.current_config.my_region) {
+          return color_highlight;
+        } else if (this.current_ids.indexOf(_id) > -1) {
+          if (app.colors[_id]) return color_default_dissim;
+          return color_countries;
+        }
+        return color_disabled;
+      });
   }
 
   handleClickMap(d, parent) {
@@ -795,11 +782,7 @@ export default class Similarity1plus {
         this.highlighted.push(id);
         d3.select(parent).attr('fill', 'purple');
         this.draw_group.select(`#c_${id}.cell > circle`)
-          .styles({
-            fill: 'purple',
-            stroke: 'black',
-            'stroke-width': 2,
-          });
+          .style('fill', 'purple');
       }
     }
   }
@@ -959,8 +942,8 @@ export default class Similarity1plus {
             .each(function (ft) {
               if (ft.id === id) {
                 circle.style.fill = 'purple';
-                circle.style.stroke = 'black';
-                circle.style.strokeWidth = '2';
+                // circle.style.stroke = 'black';
+                // circle.style.strokeWidth = '2';
                 this.setAttribute('fill', 'purple');
               }
             });
@@ -970,7 +953,7 @@ export default class Similarity1plus {
     this.draw_group.append('g')
       .attr('class', 'brush')
       .call(this.brush)
-      .on('dblclick', function () {
+      .on('dblclick', () => {
         self.highlighted = [];
         self.draw_group.selectAll('.circle')
           .style('fill', d => app.colors[d.data.id]);
