@@ -1,7 +1,5 @@
 import babel from 'rollup-plugin-babel';
-import cleaner from 'rollup-plugin-cleaner';
 import commonjs from 'rollup-plugin-commonjs';
-import copy from 'rollup-plugin-copy';
 import eslint from 'rollup-plugin-eslint';
 import resolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
@@ -9,7 +7,6 @@ import uglify from 'rollup-plugin-uglify';
 import serve from 'rollup-plugin-serve';
 import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
-// import cssnano from 'cssnano';
 
 export default {
   input: 'src/scripts/main.js',
@@ -20,17 +17,6 @@ export default {
     sourcemap: 'inline',
   },
   plugins: [
-    cleaner({
-      targets: ['./build/'],
-    }),
-    copy({
-      "src/index.html": "build/index.html",
-      "src/img/favicon.ico": "build/favicon.ico",
-      "src/img": "build/img",
-      "src/data": "build/data",
-      "src/vendor": "build/vendor",
-    verbose: true
-    }),
     resolve({
       jsnext: true,
       main: true,

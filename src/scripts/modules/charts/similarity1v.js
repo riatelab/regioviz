@@ -200,6 +200,7 @@ export default class Similarity1plus {
     const self = this;
     const data = self.data;
     this.draw_group.select('.brush').remove();
+    this.draw_group.select('#axis-title-global-dist').remove();
     if (self.type === 'detailled') {
       const highlight_selection = self.highlight_selection;
       const nb_variables = self.ratios.length;
@@ -610,6 +611,18 @@ export default class Similarity1plus {
         .x(d => d.x)
         .y(d => d.y)
         .polygons(data);
+
+      this.draw_group.append('text')
+        .attrs({
+          x: width / 2,
+          y: height + 40,
+          id: 'axis-title-global-dist'
+        })
+        .styles({
+          'text-anchor': 'middle',
+          'font-size': '12px',
+        })
+        .text('Indice de similarité');
 
       let g = this.draw_group.select('#global_dist');
       if (!g.node()) {
