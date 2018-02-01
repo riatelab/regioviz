@@ -449,7 +449,7 @@ export default class Similarity1plus {
             };
           });
 
-        bubbles1.exit().remove();
+        bubbles1.exit().transition(trans).remove();
 
         const bubbles2 = layer_highlighted.selectAll('.bubble')
           .data(
@@ -502,7 +502,7 @@ export default class Similarity1plus {
             };
           });
 
-        bubbles2.exit().remove();
+        bubbles2.exit().transition(trans).remove();
 
         const bubbles3 = layer_top.selectAll('.bubbleMyRegion')
           .data(data.filter(d => d.id === app.current_config.my_region), d => d.id);
@@ -553,7 +553,7 @@ export default class Similarity1plus {
             };
           });
 
-        bubbles3.exit().remove();
+        bubbles3.exit().transition(trans).remove();
         height_to_use += offset;
         // setTimeout(() => {
         //   bubbles1.order();
@@ -1147,6 +1147,7 @@ export default class Similarity1plus {
   bindMenu() {
     const self = this;
     const menu = d3.select('#menu_selection');
+    let ts;
     const applychange = function () {
       // self.map_elem.removeRectBrush();
       const value = +this.value;
@@ -1154,7 +1155,8 @@ export default class Similarity1plus {
         this.value = 1;
         return;
       }
-      self.applySelection(value);
+      clearTimeout(ts);
+      ts = setTimeout(() => { self.applySelection(value); clearTimeout(ts); }, 75);
     };
     menu.select('.nb_select')
       .on('change', applychange);
