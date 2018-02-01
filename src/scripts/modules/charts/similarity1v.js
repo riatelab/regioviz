@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu, getElementsFromPoint } from './../helpers';
+import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
@@ -749,7 +749,8 @@ export default class Similarity1plus {
         if (_id === app.current_config.my_region) {
           return color_highlight;
         } else if (this.current_ids.indexOf(_id) > -1) {
-          if (app.colors[_id]) return color_default_dissim;
+          if (app.colors[_id] && this.type === 'detailled') return color_default_dissim;
+          else if (app.colors[_id] && this.type === 'global') return app.colors[_id];
           return color_countries;
         }
         return color_disabled;
@@ -814,6 +815,8 @@ export default class Similarity1plus {
         t = setTimeout(() => { this.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
       })
       .on('mousemove mousedown', function (d) {
+        if (isContextMenuDisplayed()) return;
+        clearTimeout(t);
         const content = [];
         let _h = 75;
         const ratio_n = this.parentElement.parentElement.id.replace('l_', '');
@@ -851,7 +854,6 @@ export default class Similarity1plus {
             content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
-        clearTimeout(t);
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));
@@ -904,6 +906,8 @@ export default class Similarity1plus {
         t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
       })
       .on('mousemove.tooltip', function (d) {
+        if (isContextMenuDisplayed()) return;
+        clearTimeout(t);
         self.draw_group.selectAll('circle')
           .styles({ stroke: 'darkgray', 'stroke-width': '0.45' });
         const circle = this.previousSibling;
@@ -922,7 +926,6 @@ export default class Similarity1plus {
             content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
-        clearTimeout(t);
         self.tooltip.select('.title')
           .attr('class', d.data.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html(`${d.data.name} (${d.data.id})`);
@@ -983,6 +986,7 @@ export default class Similarity1plus {
           });
       })
       .on('mousemove mousedown mouseover', () => {
+        if (isContextMenuDisplayed()) return;
         const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
         const elem = elems.find(e => e.className.baseVal === 'polygon' || e.className.baseVal === 'circle');
         if (elem) {

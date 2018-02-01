@@ -1,5 +1,5 @@
 import tingle from 'tingle.js';
-import generateHtmlRapport from './report';
+import { makeModalReport, generateHtmlRapport } from './report';
 import { app } from './../main';
 import { clickDlPdf } from './helpers';
 /**
@@ -161,6 +161,9 @@ export function makeHeaderChart() {
     .on('click', () => {
       const content = `<div id="prep_rapport"><h3>Données en cours de préparation...</h3>
 <div class="spinner"><div class="cube1"></div><div class="cube2"></div></div></div>`;
+
+      const href_geojson = URL.createObjectURL(new Blob([app.geo_layer], { type: 'application/geo+json' }));
+
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
         stickyFooter: false,
@@ -171,6 +174,7 @@ export function makeHeaderChart() {
         },
         onClose() {
           modal.destroy();
+          URL.revokeObjectURL(href_geojson);
         },
       });
       modal.setContent(content);
@@ -179,9 +183,10 @@ export function makeHeaderChart() {
         modal.setContent(`<h3>Téléchargements</h3><div style="text-align:center;">
 <p><a class="buttonDownload large" id="dl_data" href="#">Table de données (.csv)</a></p>
 <p><a class="buttonDownload large" id="dl_metadata" href="data/Metadonnees_Regioviz.pdf">Fiche de métadonnées (.pdf)</a></p>
-<p><a class="buttonDownload large" id="dl_geolayer" href="#" download>Fond de carte (.geojson)</a></p></div>`);
+<p><a class="buttonDownload large" download="CGET_nuts_all.geojson" id="dl_geolayer" href="${href_geojson}" download>Fond de carte (.geojson)</a></p></div>`);
         document.getElementById('dl_metadata').onclick = clickDlPdf;
-        document.getElementById('dl_data').onclick = () => {
+        document.getElementById('dl_data').onclick = (e) => {
+          e.preventDefault();
           const ratios = app.current_config.ratio;
           const nums = app.current_config.num;
           const denums = app.current_config.denum;
@@ -210,22 +215,19 @@ export function makeHeaderChart() {
           elem.click();
           document.body.removeChild(elem);
         };
-        document.getElementById('dl_geolayer').onclick = () => {
-          d3.request('data/CGET_nuts_all.geojson', (error, result) => {
-            if (error) throw error;
-            const elem = document.createElement('a');
-            elem.setAttribute('href', `data:application/geo+json;charset=utf-8,${encodeURIComponent(result.response)}`);
-            elem.setAttribute('download', 'CGET_nuts_all.geojson');
-            elem.style.display = 'none';
-            document.body.appendChild(elem);
-            elem.click();
-            document.body.removeAttribute(elem);
-          });
-          // window.open('data/CGET_nuts_all.geojson');
+        // document.getElementById('dl_geolayer').onclick = clickDlPdf;
+        document.getElementById('dl_geolayer').onclick = function (e) {
+          e.preventDefault();
+          const elem = document.createElement('a');
+          elem.setAttribute('href', this.href);
+          elem.setAttribute('download', 'CGET_nuts_all.geojson');
+          elem.style.display = 'none';
+          document.body.appendChild(elem);
+          elem.click();
+          document.body.removeChild(elem);
         };
       }, 1000);
     });
-// onclick="this.href='#'; window.open('data/Metadonnees_Regioviz.pdf'); event.preventDefault(); event.returnValue = false; this.href='data/Metadonnees_Regioviz.pdf';return false;"
 
   header_bar_section.insert('img')
     .attrs({
@@ -237,42 +239,7 @@ export function makeHeaderChart() {
       class: 'img_scale',
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
-    .on('click', () => {
-      let href;
-      const content = `<div id="prep_rapport"><h3>Rapport en cours de préparation...</h3>
-<div class="spinner"><div class="cube1"></div><div class="cube2"></div></div></div>`;
-      // eslint-disable-next-line new-cap
-      const modal = new tingle.modal({
-        stickyFooter: false,
-        closeMethods: ['overlay', 'escape'],
-        closeLabel: 'Close',
-        onOpen() {
-          document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
-          document.querySelector('div.tingle-modal-box').style.width = '40%';
-        },
-        onClose() {
-          modal.destroy();
-          URL.revokeObjectURL(href);
-        },
-      });
-      modal.setContent(content);
-      modal.open();
-      const sections = app.chart.getTemplateHelp();
-      const html_doc = generateHtmlRapport(sections, app.current_config.my_region_pretty_name);
-      // const href = `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`;
-      href = URL.createObjectURL(new Blob([html_doc], { type: 'text/html' }));
-      // elem.setAttribute('href', `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`);
-      // elem.setAttribute('download', 'rapport.html');
-      // elem.style.display = 'none';
-      setTimeout(() => {
-        modal.setContent(`<div style="text-align: center;margin: auto;padding: 15px;"><h3>Export d'un rapport</h3><br><img src="img/thumbnail_report.png" /></div><div style="text-align: center;margin: auto;"><p><a class="buttonDownload" id="dl_rapport" download="Regioviz_rapport.html" href="${href}">Télécharger</a></p></div>`);
-        // document.querySelector('#dl_rapport').onclick = function () {
-        //   document.body.appendChild(elem);
-        //   elem.click();
-        //   document.body.removeChild(elem);
-        // };
-      }, 250);
-    });
+    .on('click', makeModalReport);
 
   header_bar_section.insert('img')
     .attrs({

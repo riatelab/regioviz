@@ -1,3 +1,5 @@
+import tingle from 'tingle.js';
+import { app } from '../main';
 import { removeAll } from './helpers';
 
 /**
@@ -11,7 +13,7 @@ import { removeAll } from './helpers';
 * @return {String} - The HTML code of the report, ready to be exported.
 *
 */
-export default function generateHtmlRapport(sections, name_my_region) {
+export function generateHtmlRapport(sections, name_my_region) {
   const {
     section_selection,
     section_help,
@@ -108,4 +110,41 @@ ${extra_css || ''}
   </div>
 </body>`;
   return new_html_doc;
+}
+
+export function makeModalReport() {
+  let href;
+  const content = `<div id="prep_rapport"><h3>Rapport en cours de préparation...</h3>
+<div class="spinner"><div class="cube1"></div><div class="cube2"></div></div></div>`;
+  // eslint-disable-next-line new-cap
+  const modal = new tingle.modal({
+    stickyFooter: false,
+    closeMethods: ['overlay', 'escape'],
+    closeLabel: 'Close',
+    onOpen() {
+      document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
+      document.querySelector('div.tingle-modal-box').style.width = '40%';
+    },
+    onClose() {
+      modal.destroy();
+      URL.revokeObjectURL(href);
+    },
+  });
+  modal.setContent(content);
+  modal.open();
+  const sections = app.chart.getTemplateHelp();
+  const html_doc = generateHtmlRapport(sections, app.current_config.my_region_pretty_name);
+  // const href = `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`;
+  href = URL.createObjectURL(new Blob([html_doc], { type: 'text/html' }));
+  // elem.setAttribute('href', `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`);
+  // elem.setAttribute('download', 'rapport.html');
+  // elem.style.display = 'none';
+  setTimeout(() => {
+    modal.setContent(`<div style="text-align: center;margin: auto;padding: 15px;"><h3>Export d'un rapport</h3><br><img src="img/thumbnail_report.png" /></div><div style="text-align: center;margin: auto;"><p><a class="buttonDownload" id="dl_rapport" download="Regioviz_rapport.html" href="${href}">Télécharger</a></p></div>`);
+    // document.querySelector('#dl_rapport').onclick = function () {
+    //   document.body.appendChild(elem);
+    //   elem.click();
+    //   document.body.removeChild(elem);
+    // };
+  }, 250);
 }

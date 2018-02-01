@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, Rect, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu } from './../helpers';
+import { comp, math_round, math_abs, Rect, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -294,6 +294,7 @@ export default class BarChart1 {
       })
       .on('mousemove mousedown', () => {
         clearTimeout(t);
+        if (isContextMenuDisplayed()) return;
         const content = ['Moyenne de l\'espace d\'étude'];
         let _h = 65;
         if (app.current_config.my_category) {
@@ -626,6 +627,7 @@ export default class BarChart1 {
         }, 250);
       })
       .on('mousemove mousedown', (d) => {
+        if (isContextMenuDisplayed()) return;
         clearTimeout(t);
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
@@ -645,6 +647,7 @@ export default class BarChart1 {
 
     svg_container.select('.brush_top')
       .on('mousemove mousedown', () => {
+        if (isContextMenuDisplayed()) return;
         const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
         const elem = elems.find(e => e.className.baseVal === 'bar' || e.className.baseVal === 'transp_mean_line');
         if (elem) {

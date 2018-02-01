@@ -2,7 +2,7 @@ import centroid from '@turf/centroid';
 import { app } from './../main';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight,
   fixed_dimension, color_default_dissim, color_q1, color_q2, color_q3, color_q4 } from './options';
-import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, getElementsFromPoint, svgContextMenu } from './helpers';
+import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, getElementsFromPoint, svgContextMenu, isContextMenuDisplayed } from './helpers';
 import { filterLevelGeom } from './prepare_data';
 import { prepareTooltip } from './tooltip';
 
@@ -303,6 +303,7 @@ class MapSelect {
       })
       .on('mousemove mousedown', function () {
         // clearTimeout(t);
+        if (isContextMenuDisplayed()) return;
         self.tooltip.select('.title').html(this.getAttribute('title'));
         const b = self.tooltip.select('.title').node().getBoundingClientRect();
         const left = d3.event.clientX < (window.innerWidth - (b.width + 20))

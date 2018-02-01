@@ -1,4 +1,4 @@
-import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer } from './../helpers';
+import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
@@ -234,6 +234,7 @@ export default class ScatterPlot2 {
       })
       .on('mousemove mousedown', () => {
         clearTimeout(t);
+        if (isContextMenuDisplayed()) return;
         if (self.type === 'value') {
           const content = ['Moyenne de l\'espace d\'étude'];
           let _h = 65;
@@ -329,6 +330,7 @@ export default class ScatterPlot2 {
         }, 250);
       })
       .on('mousemove mousedown', () => {
+        if (isContextMenuDisplayed()) return;
         clearTimeout(t);
         if (self.type === 'value') {
           const content = ['Moyenne de l\'espace d\'étude'];
@@ -953,6 +955,7 @@ export default class ScatterPlot2 {
         // self.tooltip.style('display', null).select('.title').attr('class', 'title');
       })
       .on('mousemove.tooltip', (d) => {
+        if (isContextMenuDisplayed()) return;
         clearTimeout(t);
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')

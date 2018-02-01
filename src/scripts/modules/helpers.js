@@ -1,4 +1,5 @@
 import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
+import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise,
@@ -634,12 +635,14 @@ function svgContextMenu(current_chart, svg_elem) {
     },
     {
       name: 'Export d\'un rapport complet',
-      action: () => { null; },
+      action: () => { makeModalReport(); },
     },
   ];
   current_chart.tooltip.style('display', 'none');
   new ContextMenu().showMenu(d3.event, document.body, items_menu);
 }
+
+const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 
 /**
 * Catch the event when the user click on the download anchor of a pdf document and
@@ -699,4 +702,5 @@ export {
   removeAll,
   svgContextMenu,
   clickDlPdf,
+  isContextMenuDisplayed,
 };

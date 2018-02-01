@@ -57,20 +57,21 @@ export default class contextMenu {
     }, 150);
   }
 
-  hideMenu() {
+  removeMenu() {
     if (this.DOMobj && this.DOMobj.parentElement && this.DOMobj.parentElement.removeChild) {
       this.DOMobj.parentElement.removeChild(this.DOMobj);
       this.DOMobj = null;
     }
+  }
+
+  hideMenu() {
+    this.removeMenu();
     this.displayed = false;
     document.removeEventListener('click', this.hideMenu);
   }
 
   initMenu(parent) {
-    if (this.DOMobj && this.DOMobj.parentElement && this.DOMobj.parentElement.removeChild) {
-      this.DOMobj.parentElement.removeChild(this.DOMobj);
-      this.DOMobj = null;
-    }
+    this.removeMenu();
     const self = this;
     const menu = document.createElement('div');
     const list = document.createElement('ul');

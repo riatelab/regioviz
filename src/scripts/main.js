@@ -661,6 +661,11 @@ function loadData() {
       app.chart = chart;
       app.map = map_elem;
       Tooltipsify('[title-tooltip]');
+      // Fetch the layer in geographic coordinates now in case the user wants to download it later:
+      d3.request('data/CGET_nuts_all.geojson', (err, result) => {
+        if (err) console.log(err);
+        app.geo_layer = result.response;
+      });
     });
 }
 
@@ -669,7 +674,8 @@ loadData();
 window.onresize = function () {
   const width_value_map = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
   const width_value_chart = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
+  const height_legend = document.querySelector('#svg_legend').viewBox.baseVal.height;
   d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value_map}px`);
   d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value_chart}px`);
-  d3.select('.cont_svg.clgd').style('padding-top', `${(fixed_dimension.legend.height / fixed_dimension.legend.width) * width_value_map}px`);
+  d3.select('.cont_svg.clgd').style('padding-top', `${(height_legend / fixed_dimension.legend.width) * width_value_map}px`);
 };

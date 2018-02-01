@@ -1,7 +1,7 @@
 import alertify from 'alertifyjs';
 import {
   math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
-  getMean, formatNumber, svgContextMenu } from './../helpers';
+  getMean, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -737,12 +737,13 @@ export default class RadarChart3 {
         }, 250);
       })
       .on('mousemove mousedown', (d) => {
+        if (isContextMenuDisplayed()) return;
+        clearTimeout(t);
         const code_variable = d.axis;
         const id_feature = d.id;
         const direction = self.inversedAxis.has(code_variable)
           ? 'inférieure' : 'supérieure';
 
-        clearTimeout(t);
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([app.feature_names[id_feature], ' (', id_feature, ')'].join(''));
