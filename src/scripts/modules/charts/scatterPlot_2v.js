@@ -1,4 +1,4 @@
-import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed } from './../helpers';
+import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed, math_min, math_max } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
@@ -149,9 +149,9 @@ export default class ScatterPlot2 {
       .on('brush end', this.brushed);
 
     this.zoom = d3.zoom()
-      .scaleExtent([1, 5])
-      .translateExtent([[0, 0], [width, height]])
-      .on('zoom', () => this.zoomed(d3.event.transform));
+      .scaleExtent([1, 6])
+      .translateExtent([[-50, -50], [width + 50, height + 50]])
+      .on('zoom', () => { this.zoomed(d3.event.transform); });
 
     this.xInversed = false;
     this.yInversed = false;
@@ -597,27 +597,24 @@ export default class ScatterPlot2 {
   * Update both axis and grid.
   */
   updateAxisGrid() {
+    const trans = d3.transition().duration(125);
     this.plot.select('.grid-x')
-      .transition()
-      .duration(125)
+      .transition(trans)
       .call(this.xAxis2
         .ticks(this.mean_variable1 >= 10000 ? 5 : 10)
         .tickSize(-height)
         .tickFormat(''));
     this.plot.select('.grid-y')
-      .transition()
-      .duration(125)
+      .transition(trans)
       .call(this.yAxis2
         .tickSize(-width)
         .tickFormat(''));
     this.plot.select('#axis--x')
-      .transition()
-      .duration(125)
+      .transition(trans)
       .call(this.xAxis
         .ticks(this.mean_variable1 >= 10000 ? 5 : 10));
     this.plot.select('#axis--y')
-      .transition()
-      .duration(125)
+      .transition(trans)
       .call(this.yAxis);
     this.plot.selectAll('.grid')
       .selectAll('line')
@@ -652,6 +649,13 @@ export default class ScatterPlot2 {
         y: margin.top + height + margin.bottom / 2 + 15,
         'title-tooltip': this.pretty_name1,
       })
+      .styles({
+        'font-family': 'sans-serif',
+        'font-size': '13px',
+        'text-anchor': 'middle',
+        fill: 'black',
+        cursor: 'pointer',
+      })
       .html(`${this.variable1}  &#x25BE;`)
       .on('click', function () {
         const bbox = this.getBoundingClientRect();
@@ -669,6 +673,13 @@ export default class ScatterPlot2 {
         y: margin.top + (height / 2) - 10,
         transform: `rotate(-90, ${margin.left / 3}, ${margin.top + (height / 2)})`,
         'title-tooltip': this.pretty_name2,
+      })
+      .styles({
+        'font-family': 'sans-serif',
+        'font-size': '13px',
+        'text-anchor': 'middle',
+        fill: 'black',
+        cursor: 'pointer',
       })
       .html(`${this.variable2}  &#x25BE;`)
       .on('click', function () {
@@ -707,6 +718,16 @@ export default class ScatterPlot2 {
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(data, d => d[num_name]), 30).scale
       : () => 5;
+
+    if (this.k !== 1) {
+      this.plot.select('#scatterplot').selectAll('circle')
+        .attrs(d => ({
+          transform: '',
+          r: size_func(d[num_name]),
+          'stroke-width': 1,
+        }));
+      this.k = 1;
+    }
 
     if (this.type === 'rank') {
       const rank_variable1 = this.rank_variable1;
@@ -812,18 +833,23 @@ export default class ScatterPlot2 {
   }
 
   zoomed(transform) {
-    if (transform.k === 1) {
-      transform.x = 0; // eslint-disable-line no-param-reassign
-      transform.y = 0; // eslint-disable-line no-param-reassign
-    }
+    // if (transform.k === 1) {
+    //   transform.x = 0; // eslint-disable-line no-param-reassign
+    //   transform.y = 0; // eslint-disable-line no-param-reassign
+    // }
+    // eslint-disable-next-line no-param-reassign
+    transform.x = math_min(0, math_max(transform.x, width - width * transform.k));
+    // eslint-disable-next-line no-param-reassign
+    transform.y = math_min(0, math_max(transform.y, height - height * transform.k));
     this.k = transform.k;
     const new_xScale = transform.rescaleX(this.x);
     const new_yScale = transform.rescaleY(this.y);
+
     const num_name = app.current_config.pop_field;
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
       : () => 5;
-    const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(350);
+    const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
     trans.attrs(d => ({
       transform: transform,
       r: size_func(d[num_name]) / this.k,
@@ -1067,7 +1093,7 @@ export default class ScatterPlot2 {
       this.map_elem.removeRectBrush();
       this.map_elem.updateLegend();
       this.map_elem.resetColors(this.current_ids);
-      this.zoomed(d3.zoomIdentity);
+      // this.zoomed(d3.zoomIdentity);
       this.update();
     }
   }
@@ -1105,7 +1131,7 @@ export default class ScatterPlot2 {
     this.ref_value2 = tmp_my_region[this.variable2];
 
     this.map_elem.removeRectBrush();
-    this.zoomed(d3.zoomIdentity);
+    // this.zoomed(d3.zoomIdentity);
     this.updateItemsCtxMenu();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1153,7 +1179,7 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value1 = tmp_my_region[this.variable1];
-    this.zoomed(d3.zoomIdentity);
+    // this.zoomed(d3.zoomIdentity);
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1200,7 +1226,7 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value2 = tmp_my_region[this.variable2];
-    this.zoomed(d3.zoomIdentity);
+    // this.zoomed(d3.zoomIdentity);
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1288,7 +1314,7 @@ export default class ScatterPlot2 {
         menu.select('#ind_ranks').attr('class', 'choice_ind noselect');
         menu.select('#btn_above_mean').text('inférieures à la moyenne');
         menu.select('#btn_below_mean').text('supérieures à la moyenne');
-        self.zoomed(d3.zoomIdentity);
+        // self.zoomed(d3.zoomIdentity);
         self.update();
       });
 
@@ -1302,7 +1328,7 @@ export default class ScatterPlot2 {
         menu.select('#ind_raw_values').attr('class', 'choice_ind noselect');
         menu.select('#btn_above_mean').text('inférieures à la médiane');
         menu.select('#btn_below_mean').text('supérieures à la médiane');
-        self.zoomed(d3.zoomIdentity);
+        // self.zoomed(d3.zoomIdentity);
         self.update();
       });
 
@@ -1496,8 +1522,8 @@ Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur
     const help2 = `L'unité territoriale ${app.current_config.my_region_pretty_name} a une valeur de ${formatNumber(this.ref_value1, 1)} ${info_var1.unit} pour l’indicateur <b>${this.variable1}</b> représenté sur l’axe des abscisses
 et une valeur de ${formatNumber(this.ref_value2, 1)} ${info_var2.unit} pour l’indicateur <b>${this.variable2}</b> représenté sur l’axe des ordonnées.
 Cela place cette unité territoriale de référence au rang ${my_rank1} de la distribution pour l’espace d’étude <b>${name_study_zone}</b> pour l’indicateur <b>${this.pretty_name1}</b> ; et au ${my_rank2} rang pour l’indicateur <b>${this.pretty_name2}</b>.
-Pour cet espace d’étude, ${sup_both * 100 / nb_ft}% des unités territoriales sont définies par une situation plus favorable sur les deux indicateurs pour la unité territoriale sélectionnée, représentées en vert sur le graphique et sur la carte.
-${inf_both * 100 / nb_ft}% des unités territoriales sont caractérisées par une situation plus défavorables pour les deux indicateurs, représentées en rouge sur la carte.
+Pour cet espace d’étude, ${formatNumber(sup_both * 100 / nb_ft, 1)}% des unités territoriales sont définies par une situation plus favorable sur les deux indicateurs pour la unité territoriale sélectionnée, représentées en vert sur le graphique et sur la carte.
+${formatNumber(inf_both * 100 / nb_ft, 1)}% des unités territoriales sont caractérisées par une situation plus défavorables pour les deux indicateurs, représentées en rouge sur la carte.
 Enfin, l’unité territoriale ${app.current_config.my_region_pretty_name} se situe dans une situation contradictoire avec ${contrad * 100 / nb_ft}% des unité territoriales, représentées en violet et orange sur la carte (situation favorable/défavorable pour un des deux indicateurs).`;
 
     const source = `<b>Indicateur 1</b> : ${info_var1.source} (Date de téléchargement de la donnée : ${info_var1.last_update})<br>

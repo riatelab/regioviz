@@ -1,10 +1,11 @@
 export default class contextMenu {
-  constructor(items) {
+  constructor(items, excl_class = 'ctxchart') {
     if (items) {
       this.setItems(items);
     } else {
       this.items = [];
     }
+    if (excl_class) this.excl_class = excl_class;
   }
 
   addItem(item) {
@@ -38,6 +39,12 @@ export default class contextMenu {
     if (this.DOMobj) {
       this.hideMenu();
       return;
+    }
+    if (this.excl_class) {
+      const elems = document.querySelectorAll(`.${this.excl_class}`);
+      for (let i = 0, n = elems.length; i < n; i++) {
+        elems[i].remove();
+      }
     }
     if (items) {
       this.setItems(items);

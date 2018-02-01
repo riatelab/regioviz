@@ -159,10 +159,10 @@ export function makeHeaderChart() {
     })
     .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
     .on('click', () => {
+      let href_geojson;
+      let href_table;
       const content = `<div id="prep_rapport"><h3>Données en cours de préparation...</h3>
 <div class="spinner"><div class="cube1"></div><div class="cube2"></div></div></div>`;
-
-      const href_geojson = URL.createObjectURL(new Blob([app.geo_layer], { type: 'application/geo+json' }));
 
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
@@ -175,47 +175,56 @@ export function makeHeaderChart() {
         onClose() {
           modal.destroy();
           URL.revokeObjectURL(href_geojson);
+          URL.revokeObjectURL(href_table);
         },
       });
       modal.setContent(content);
       modal.open();
+
+      // Prepare the link for the GeoJSON file:
+      href_geojson = URL.createObjectURL(new Blob([app.geo_layer], { type: 'application/geo+json' }));
+
+      // Prepare the data table:
+      const ratios = app.current_config.ratio;
+      const nums = app.current_config.num;
+      const denums = app.current_config.denum;
+      const columns = ['id', 'name'];
+      ratios.forEach((v, i) => {
+        columns.push(v);
+        columns.push(nums[i]);
+        columns.push(denums[i]);
+        columns.push(`pr_${v}`);
+      });
+      let table_content = [
+        columns.join(','), '\r\n'];
+      app.chart.current_ids.forEach((idx) => {
+        const l1 = app.current_data.find(d => d.id === idx);
+        const l2 = app.chart.data.find(d => d.id === idx);
+        table_content.push(columns.map(c => l1[c] || l2[c]).join(','));
+        table_content.push('\r\n');
+      });
+      table_content = table_content.join('');
+
+      // Prepare the link for the CSV table:
+      href_table = URL.createObjectURL(new Blob([table_content], { type: 'text/plain' }));
+
       setTimeout(() => {
         modal.setContent(`<h3>Téléchargements</h3><div style="text-align:center;">
-<p><a class="buttonDownload large" id="dl_data" href="#">Table de données (.csv)</a></p>
+<p><a class="buttonDownload large" download="Regioviz_export.csv" id="dl_data" href="${href_table}">Table de données (.csv)</a></p>
 <p><a class="buttonDownload large" id="dl_metadata" href="data/Metadonnees_Regioviz.pdf">Fiche de métadonnées (.pdf)</a></p>
 <p><a class="buttonDownload large" download="CGET_nuts_all.geojson" id="dl_geolayer" href="${href_geojson}" download>Fond de carte (.geojson)</a></p></div>`);
         document.getElementById('dl_metadata').onclick = clickDlPdf;
-        document.getElementById('dl_data').onclick = (e) => {
+        document.getElementById('dl_data').onclick = function (e) {
           e.preventDefault();
-          const ratios = app.current_config.ratio;
-          const nums = app.current_config.num;
-          const denums = app.current_config.denum;
-          const columns = ['id', 'name'];
-          ratios.forEach((v, i) => {
-            columns.push(v);
-            columns.push(nums[i]);
-            columns.push(denums[i]);
-            columns.push(`pr_${v}`);
-          });
-          let table_content = [
-            columns.join(','), '\r\n'];
-          app.chart.current_ids.forEach((idx) => {
-            const l1 = app.current_data.find(d => d.id === idx);
-            const l2 = app.chart.data.find(d => d.id === idx);
-            table_content.push(columns.map(c => l1[c] || l2[c]).join(','));
-            table_content.push('\r\n');
-          });
-          // app.current_data.map(d => columns.map(c => d[c]).join(',')).join('\r\n'),
-          table_content = table_content.join('');
           const elem = document.createElement('a');
-          elem.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(table_content)}`);
+          elem.setAttribute('href', this.href);
           elem.setAttribute('download', 'Regioviz_export.csv');
           elem.style.display = 'none';
           document.body.appendChild(elem);
           elem.click();
           document.body.removeChild(elem);
         };
-        // document.getElementById('dl_geolayer').onclick = clickDlPdf;
+
         document.getElementById('dl_geolayer').onclick = function (e) {
           e.preventDefault();
           const elem = document.createElement('a');
@@ -226,7 +235,7 @@ export function makeHeaderChart() {
           elem.click();
           document.body.removeChild(elem);
         };
-      }, 1000);
+      }, 550);
     });
 
   header_bar_section.insert('img')

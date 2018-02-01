@@ -1218,12 +1218,16 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
       sup_median.forEach((v) => {
         help2.push(` - ${v.axis}, indice ${formatNumber(v.value, 1)}, valeur ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit};<br>`);
       });
+    } else {
+      help2.push('Cette unité territoriale n\'est positionnée <b>au-dessus de la valeur médiane</b> pour aucun de ces indicateurs.<br>');
     }
     if (inf_median.length > 0) {
       help2.push('Cette unité territoriale se positionne <b>sous la valeur médiane</b> pour les indicateurs suivants :<br>');
       inf_median.forEach((v) => {
         help2.push(` - ${v.axis}, indice ${formatNumber(v.value, 1)}, valeur ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit};<br>`);
       });
+    } else {
+      help2.push('Cette unité territoriale n\'est positionnée <b>sous la valeur médiane</b> pour aucun de ces indicateurs.<br>');
     }
 
     if (this.data.length > 1) {
@@ -1242,6 +1246,9 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
             _inf_my_reg.forEach((v) => {
               help2.push(` - ${v.axis} (${formatNumber(v.value, 1)});<br>`);
             });
+          } else {
+            help2.push(
+              `L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence d'indices normalisés plus importants par rapport à l’unité territoriale <b>${o_region.name}</b> (${o_region.id} - ${o_region.UNIT_SUP}).<br>`);
           }
           if (_sup_my_reg.length > 0) {
             // _sup_my_reg.sort((a, b) => b.dist - a.dist);
@@ -1249,6 +1256,8 @@ Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la 
             _sup_my_reg.forEach((v) => {
               help2.push(` - ${v.axis} (${formatNumber(v.value, 1)});<br>`);
             });
+          } else {
+            help2.push(`L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de scores moins importants pour l'ensembme des idnicateurs.<br>`);
           }
         }
       });

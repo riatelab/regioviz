@@ -275,7 +275,11 @@ class MapSelect {
         d: path,
       }));
     selection
-      .attr('d', path);
+      .attrs(d => ({
+        title: `${d.properties[app.current_config.name_field]} (${d.id})`,
+        fill: d.id !== app.current_config.my_region ? color_countries : color_highlight,
+        d: path,
+      }));
     selection
       .exit()
       .remove();
@@ -286,22 +290,23 @@ class MapSelect {
         this._pts = undefined;
       });
     this.bindTooltips();
+    this.brushToTooltip();
   }
 
   bindTooltips() {
     const self = this;
     this.target_layer.selectAll('path')
-      .on('mouseover', () => {
-        // clearTimeout(t);
-        this.tooltip.style('display', null);
-      })
+      // .on('mouseover', () => {
+      //   // clearTimeout(t);
+      //   this.tooltip.style('display', null);
+      // })
       .on('mouseout', () => {
         // clearTimeout(t);
         // t = setTimeout(() => {
         this.tooltip.style('display', 'none');
       // }, 250);
       })
-      .on('mousemove mousedown', function () {
+      .on('mouseover mousemove mousedown', function () {
         // clearTimeout(t);
         if (isContextMenuDisplayed()) return;
         self.tooltip.select('.title').html(this.getAttribute('title'));
@@ -349,6 +354,32 @@ class MapSelect {
     svg_map.select('.brush_map').call(this.brush_map.move, selection);
   }
 
+  brushToTooltip() {
+    const self = this;
+    svg_map.select('.brush_map')
+      .on('mousemove mousedown', () => {
+        const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
+        const elem = elems.find(e => e.className.baseVal === 'tg_ft');
+        if (elem) {
+          const new_click_event = new MouseEvent('mousemove', {
+            pageX: d3.event.pageX,
+            pageY: d3.event.pageY,
+            clientX: d3.event.clientX,
+            clientY: d3.event.clientY,
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          });
+          elem.dispatchEvent(new_click_event);
+        } else {
+          self.tooltip.style('display', 'none');
+        }
+      })
+      .on('mouseout', () => {
+        self.tooltip.style('display', 'none');
+      });
+  }
+
   bindBrushClick(chart) {
     svg_map.on('.zoom', null);
     this.resetZoom();
@@ -373,28 +404,7 @@ class MapSelect {
         .attr('class', 'brush_map')
         .call(this.brush_map);
 
-      svg_map.select('.brush_map')
-        .on('mousemove mousedown', () => {
-          const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
-          const elem = elems.find(e => e.className.baseVal === 'tg_ft');
-          if (elem) {
-            const new_click_event = new MouseEvent('mousemove', {
-              pageX: d3.event.pageX,
-              pageY: d3.event.pageY,
-              clientX: d3.event.clientX,
-              clientY: d3.event.clientY,
-              bubbles: true,
-              cancelable: true,
-              view: window,
-            });
-            elem.dispatchEvent(new_click_event);
-          } else {
-            self.tooltip.style('display', 'none');
-          }
-        })
-        .on('mouseout', () => {
-          self.tooltip.style('display', 'none');
-        });
+      self.brushToTooltip();
     } else {
       document.getElementById('img_rect_selec').classList.remove('active');
       document.getElementById('img_rect_selec').classList.add('disabled');
@@ -452,7 +462,8 @@ function makeSourceSection() {
       y: height_map - 8,
       'text-anchor': 'middle',
     })
-    .style('font-size', '8px')
+    .style('font-size', '9px')
+    .style('font-family', 'sans-serif')
     .text('Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA');
 }
 

@@ -584,16 +584,27 @@ export function exportSVG(elem) {
 }
 
 export function exportPNG(elem) {
-  const b = elem.getBoundingClientRect();
+  const _h = elem.viewBox.baseVal.height;
+  const _w = elem.viewBox.baseVal.width;
   const targetCanvas = d3.select('body')
     .append('canvas')
-    .attrs({ id: 'canvas_export', height: b.height, width: b.width })
+    .attrs({ id: 'canvas_export', height: _h, width: _w })
     .node();
+  const bg_rect = document.createElementNS(d3.namespaces.svg, 'rect');
+  bg_rect.setAttribute('id', 'background');
+  bg_rect.setAttribute('height', '100%');
+  bg_rect.setAttribute('width', '100%');
+  bg_rect.setAttribute('x', 0);
+  bg_rect.setAttribute('y', 0);
+  bg_rect.setAttribute('fill', '#ffffff');
+  elem.insertBefore(bg_rect, elem.firstChild);
   const targetSvg = elem.cloneNode(true);
   targetSvg.removeAttribute('viewBox');
-  targetSvg.setAttribute('width', b.width);
-  targetSvg.setAttribute('height', b.height);
-  const svg_src = (new XMLSerializer()).serializeToString(elem);
+  targetSvg.removeAttribute('preserveAspectRatio');
+  targetSvg.setAttribute('width', _w);
+  targetSvg.setAttribute('height', _h);
+  bg_rect.remove();
+  const svg_src = (new XMLSerializer()).serializeToString(targetSvg);
   const ctx = targetCanvas.getContext('2d');
   const img = new Image();
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg_src)}`;
@@ -602,14 +613,15 @@ export function exportPNG(elem) {
     targetCanvas.toBlob((blob) => {
       const href = URL.createObjectURL(new Blob([blob], { type: 'image/png' }));
       const a = document.createElement('a');
-      a.setAttribute('download', 'chart.png');
+      a.setAttribute('download', 'export.png');
       a.setAttribute('href', href);
       a.style.display = 'none';
       document.body.append(a);
       a.click();
+      targetCanvas.remove();
       a.remove();
       URL.revokeObjectURL(href);
-    }, 'image/png')
+    }, 'image/png');
   };
 }
 

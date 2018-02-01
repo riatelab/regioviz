@@ -211,11 +211,6 @@ body {
 /* End of style for the notification zone */
 
 /* Styles for svg elements */
-.area {
-  fill: steelblue;
-  clip-path: url(#clip);
-}
-
 .zoom {
   cursor: move;
   fill: none;
@@ -804,14 +799,6 @@ span.arrow_right:before {
   margin-right: 5px;
   margin-left: 2px;
   font-weight: 800;
-}
-
-.title-axis {
-  font-family: sans-serif;
-  font-size: 13px;
-  text-anchor: middle;
-  fill: black;
-  cursor: pointer;
 }
 
 .axis {
