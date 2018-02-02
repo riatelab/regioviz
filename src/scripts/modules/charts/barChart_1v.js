@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, Rect, getMean, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
+import { comp, math_round, math_abs, Rect, getMean, getMean2, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -947,6 +947,8 @@ export default class BarChart1 {
     const ratio_to_use = this.ratio_to_use;
     const grp_mean = this._focus.select('.mean');
     this.mean_value = getMean(this.data.map(d => d[ratio_to_use]));
+    console.log(this.mean_value);
+    console.log(getMean2(this.data, this.ratio_to_use, variables_info))
     grp_mean.select('text')
       .attr('y', y(this.mean_value) + 20)
       .text(`Valeur moyenne : ${formatNumber(this.mean_value, 1)} ${this.unit}`);

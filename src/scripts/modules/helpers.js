@@ -158,6 +158,10 @@ const math_cos = Math.cos;
 const math_sqrt = Math.sqrt;
 const HALF_PI = Math.PI / 2;
 
+// eslint-disable-next-line no-restricted-globals
+const isNumber = value => value != null && value !== '' && isFinite(value) && !Number.isNaN(+value);
+
+
 /**
 * Function to dispatch, according to their availability,
 * between the appropriate 'elementsFromPoint' function
@@ -391,6 +395,47 @@ const getMean = (serie) => {
     sum += serie[i];
   }
   return sum / nb_values;
+};
+
+const getMean2 = (data, var_name, info_var) => {
+  const o_info = info_var.find(ft => ft.id === var_name);
+
+  if (o_info.formula === 'not relevant') {
+    return getMean(data.map(d => +d[var_name]));
+  }
+  let id1;
+  let id2;
+  let sp1;
+  if (o_info.formula.startsWith('(')) {
+    sp1 = o_info.formula.slice(1).split(')');
+    [id1, id2] = sp1[0].split('*');
+  } else {
+    sp1 = o_info.formula.split('*');
+    [id1, id2] = sp1[0].split('/');
+  }
+
+  const mult = sp1.length > 1 ? sp1[1] : 1;
+  let s1 = 0;
+  let s2 = 0;
+  const serie1 = data.map(d => +d[o_info[id1]]);
+  const serie2 = data.map(d => +d[o_info[id2]]);
+  const nb_values = data.length;
+  for (let i = 0; i < nb_values; i++) {
+    s1 += serie1[i];
+    s2 += serie2[i];
+  }
+  console.log(o_info.formula);
+  if (o_info.formula.startsWith('(')) {
+    return ((s1 * s2) / s2) / 100;
+  }
+  if (isNumber(mult)) {
+    return (s1 / s2) * +mult;
+  } else if (mult === 'id1') {
+    return (s1 / s2) * s1;
+  } else if (mult === 'id2') {
+    return (s1 / s2) * s2;
+  }
+  return '';
 };
 
 /**
@@ -705,6 +750,7 @@ export {
   computePercentileRank,
   _getPR,
   getMean,
+  getMean2,
   getStdDev,
   getStandardizedMeanStdDev,
   shuffle,
