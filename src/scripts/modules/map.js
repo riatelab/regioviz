@@ -117,7 +117,7 @@ function makeMapLegend(legend_elems, size, translateY) {
   const grp_lgd = d3.select('#svg_legend')
     .attr('viewBox', `0 0 ${fixed_dimension.legend.width} ${size}`)
     .append('g')
-    .styles({ 'font-size': '12px', 'font-family': '\'Signika\', sans-serif' });
+    .styles({ 'font-size': '14px', 'font-family': '\'Signika\', sans-serif' });
 
   const legends = grp_lgd.selectAll('.legend')
     .data(legend_elems)
@@ -461,9 +461,9 @@ function makeSourceSection() {
       x: width_map / 2,
       y: height_map - 8,
       'text-anchor': 'middle',
+      'font-family': '"Signika",sans-serif',
+      'font-size': '11px',
     })
-    .style('font-size', '9px')
-    .style('font-family', 'sans-serif')
     .text('Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA');
 }
 

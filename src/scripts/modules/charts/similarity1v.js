@@ -240,7 +240,7 @@ export default class Similarity1plus {
               y: -7.5,
               class: `title_axis ${selector_ratio_name} noselect`,
               fill: '#4f81bd',
-              'font-size': '11px',
+              'font-size': '14px',
               'font-weight': 'bold',
               'font-family': '"Signika",sans-serif',
               'title-tooltip': ratio_pretty_name,
@@ -616,11 +616,12 @@ export default class Similarity1plus {
         .attrs({
           x: width / 2,
           y: height + 40,
-          id: 'axis-title-global-dist'
+          id: 'axis-title-global-dist',
         })
         .styles({
           'text-anchor': 'middle',
-          'font-size': '12px',
+          'font-size': '14px',
+          'font-family': '"Signika",sans-serif',
         })
         .text('Indice de similarité');
 

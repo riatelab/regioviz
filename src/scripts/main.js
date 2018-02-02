@@ -31,7 +31,6 @@ export const variables_info = [];
 
 export const study_zones = [
   { id: 'no_filter', name: 'UE28', display_level: '' },
-  { id: 'filter_dist', name: 'Région dans un rayon de ', display_level: '' },
 ];
 export const territorial_mesh = [];
 
@@ -137,7 +136,7 @@ function updateAvailableRatios(my_region) {
 function setDefaultConfigMenu(code = 'FRE', variable = 'REVMEN', level = 'N1') {
   document.querySelector(`.target_region.square[value="${code}"]`).classList.add('checked');
   document.querySelector(`.target_variable.small_square[value="${variable}"]`).classList.add('checked');
-  document.querySelector('.filter_v.square[filter-value="no_filter"]').classList.add('checked');
+  document.querySelector('p[filter-value="no_filter"] > .filter_v.square').classList.add('checked');
   document.querySelector(`.territ_level.square[value="${level}"]`).classList.add('checked');
   document.querySelector('.regio_name > #search').value = app.feature_names[code];
   document.querySelector('.regio_name > #autocomplete').value = app.feature_names[code];
@@ -226,8 +225,8 @@ function bindUI_chart(chart, map_elem) {
       if (!this.classList.contains('checked')) {
         d3.selectAll('span.filter_v').attr('class', 'filter_v square');
         this.classList.add('checked');
-        const filter_type = this.getAttribute('filter-value');
-        if (filter_type === 'filter_dist') {
+        const filter_type = this.parentElement.getAttribute('filter-value');
+        if (filter_type === 'SPAT') {
           const input_elem = document.getElementById('dist_filter');
           input_elem.removeAttribute('disabled');
           const dist = +input_elem.value;
@@ -350,7 +349,7 @@ function bindUI_chart(chart, map_elem) {
     .on('click', function () {
       if (!this.classList.contains('checked')) {
         // Reset the study zone :
-        d3.select('span.filter_v[filter-value="no_filter"]').dispatch('click');
+        d3.select('p[filter-value="no_filter"] > span.filter_v').dispatch('click');
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
         this.classList.add('checked');
         const level_value = this.getAttribute('value');
@@ -511,7 +510,7 @@ function bindHelpMenu() {
   Array.prototype.slice.call(helps_buttons_study_zone).forEach((btn_i) => {
     // eslint-disable-next-line no-param-reassign, func-names
     btn_i.onclick = function () {
-      const filter_id = this.previousSibling.previousSibling.getAttribute('filter-value');
+      const filter_id = this.parentElement.getAttribute('filter-value');
       const o = study_zones.find(d => d.id === filter_id);
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
@@ -533,7 +532,9 @@ function bindHelpMenu() {
       }
       modal.setContent(content);
       modal.open();
-      document.querySelector('a.buttonDownload').onclick = clickDlPdf;
+      if (['SPAT', 'UNIT_SUP'].indexOf(filter_id) < 0) {
+        document.querySelector('a.buttonDownload').onclick = clickDlPdf;
+      }
     };
   });
 

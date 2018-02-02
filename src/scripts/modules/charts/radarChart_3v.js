@@ -646,12 +646,13 @@ export default class RadarChart3 {
         class: 'legend',
         dy: '0.35em',
         'text-anchor': 'middle',
+        'font-family': '"Signika",sans-serif',
         'title-tooltip': variables_info.find(ft => ft.id === d).name,
         x: rScale(maxValue * cfg.labelFactor) * math_cos(angleSlice * i - HALF_PI),
         y: rScale(maxValue * cfg.labelFactor) * math_sin(angleSlice * i - HALF_PI),
       }))
       .styles(d => ({
-        'font-size': '12px',
+        'font-size': '14px',
         fill: (self.inversedAxis.has(d) ? 'red' : 'black'),
       }))
       .text(d => d);

@@ -248,10 +248,16 @@ function unbindUI() {
 *
 */
 const comp = (test_value, ref_value, serie_inversed) => {
-  if (test_value < ref_value) {
-    return serie_inversed ? color_sup : color_inf;
+  if (serie_inversed) {
+    if (test_value <= ref_value) {
+      return color_sup;
+    }
+    return color_inf;
   }
-  return serie_inversed ? color_inf : color_sup;
+  if (test_value < ref_value) {
+    return color_inf;
+  }
+  return color_sup;
 };
 
 

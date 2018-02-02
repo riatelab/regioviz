@@ -202,7 +202,7 @@ export default class ScatterPlot2 {
         y1: 0,
         y2: width,
         'stroke-dasharray': '10, 5',
-        'stroke-width': '2px',
+        'stroke-width': 2,
         'clip-path': 'url(#clip)',
       })
       .style('stroke', 'red');
@@ -217,7 +217,7 @@ export default class ScatterPlot2 {
         x2: this.x(this.mean_variable1),
         y1: 0,
         y2: width,
-        'stroke-width': '14px',
+        'stroke-width': 14,
       })
       .style('stroke', 'transparent')
       .on('mouseover', () => {
@@ -300,7 +300,7 @@ export default class ScatterPlot2 {
         y2: this.y(this.mean_variable2),
         'clip-path': 'url(#clip)',
         'stroke-dasharray': '10, 5',
-        'stroke-width': '2px',
+        'stroke-width': 2,
       });
 
     // Transparent line with a larger width (to access more easily the tooltip)
@@ -314,7 +314,7 @@ export default class ScatterPlot2 {
         x2: width,
         y1: this.y(this.mean_variable2),
         y2: this.y(this.mean_variable2),
-        'stroke-width': '14px',
+        'stroke-width': 14,
       })
       .on('mouseover', () => {
         clearTimeout(t);
@@ -650,8 +650,8 @@ export default class ScatterPlot2 {
         'title-tooltip': this.pretty_name1,
       })
       .styles({
-        'font-family': 'sans-serif',
-        'font-size': '13px',
+        'font-family': '"Signika",sans-serif',
+        'font-size': '14px',
         'text-anchor': 'middle',
         fill: 'black',
         cursor: 'pointer',
@@ -675,8 +675,8 @@ export default class ScatterPlot2 {
         'title-tooltip': this.pretty_name2,
       })
       .styles({
-        'font-family': 'sans-serif',
-        'font-size': '13px',
+        'font-family': '"Signika",sans-serif',
+        'font-size': '14px',
         'text-anchor': 'middle',
         fill: 'black',
         cursor: 'pointer',
@@ -763,6 +763,7 @@ export default class ScatterPlot2 {
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
           transform: transform,
+          'stroke-width': 1 / this.k,
         }))
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
@@ -781,6 +782,7 @@ export default class ScatterPlot2 {
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
         }))
         .attrs(d => ({
+          'stroke-width': 1 / this.k,
           r: size_func(d[num_name]) / this.k,
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),

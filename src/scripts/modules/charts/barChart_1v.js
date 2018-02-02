@@ -98,8 +98,7 @@ export default class BarChart1 {
       if (!this._focus || !this.map_elem) return;
 
       const d3_event = d3.event;
-      const ratio_to_use = this.ratio_to_use;
-      const ref_value = this.ref_value;
+      const my_region = app.current_config.my_region;
 
       // const elems = document.elementsFromPoint(
       //   d3_event.sourceEvent.pageX, d3_event.sourceEvent.pageY);
@@ -133,14 +132,15 @@ export default class BarChart1 {
         ];
         // this.x.domain(this.data.slice(current_range_brush[0] + 1, current_range_brush[1])
         //   .map(ft => ft.id));
+        const ix_ref = this.data.findIndex(d => d.id === my_region);
         app.colors = {};
         this._focus.selectAll('.bar')
           .style('fill', (d, i) => {
-            if (d.id === app.current_config.my_region) {
+            if (d.id === my_region) {
               app.colors[d.id] = color_highlight;
               return color_highlight;
             } else if (i > current_range_brush[0] && i < current_range_brush[1]) {
-              const color = comp(d[ratio_to_use], ref_value, this.serie_inversed);
+              const color = comp(i, ix_ref, this.serie_inversed);
               app.colors[d.id] = color;
               return color;
             }
@@ -156,7 +156,7 @@ export default class BarChart1 {
             && d3_event.sourceEvent && d3_event.sourceEvent.detail !== undefined) {
           this.map_elem.removeRectBrush();
           app.colors = {};
-          app.colors[app.current_config.my_region] = color_highlight;
+          app.colors[my_region] = color_highlight;
           this.updateMapRegio();
         }
         this._focus.selectAll('.bar')
@@ -576,7 +576,21 @@ export default class BarChart1 {
         y: this.y(d[ratio_to_use]),
         width: this.x.bandwidth(),
         height: height - this.y(d[ratio_to_use]),
-      }));
+      }))
+      .styles((d) => {
+        let to_display = this.x(d.id) != null;
+        if (to_display) {
+          displayed += 1;
+          to_display = 'initial';
+        } else {
+          to_display = 'none';
+        }
+        return {
+          display: to_display,
+          fill: app.colors[d.id] || color_countries,
+        };
+      });
+
 
     bar.exit().remove();
 
@@ -837,8 +851,7 @@ export default class BarChart1 {
       return;
     }
     this.map_elem.tooltip.style('display', 'none');
-    const ratio_to_use = this.ratio_to_use;
-    const ref_value = this.ref_value;
+    const my_region = app.current_config.my_region;
     const self = this;
     svg_bar.select('.brush_top').call(self.brush_top.move, null);
     const [topleft, bottomright] = event.selection;
@@ -849,11 +862,12 @@ export default class BarChart1 {
     // bottomright[0] = (bottomright[0] - transform.x) / transform.k;
     // bottomright[1] = (bottomright[1] - transform.y) / transform.k;
     const rect = new Rect(topleft, bottomright);
+    const ix_ref = this.data.findIndex(d => d.id === my_region);
     app.colors = {};
     self.map_elem.target_layer.selectAll('path')
       .attr('fill', function (d) {
         const id = d.id;
-        if (id === app.current_config.my_region) {
+        if (id === my_region) {
           app.colors[id] = color_highlight;
           return color_highlight;
         } else if (self.current_ids.indexOf(id) < 0) {
@@ -865,8 +879,8 @@ export default class BarChart1 {
         const pts = this._pts;
         for (let ix = 0, nb_pts = pts.length; ix < nb_pts; ix++) {
           if (rect.contains(pts[ix])) {
-            const value = d.properties[ratio_to_use];
-            const color = comp(value, ref_value, this.serie_inversed);
+            const _ix_regio = self.data.findIndex(_ft => _ft.id === id);
+            const color = comp(_ix_regio, ix_ref, self.serie_inversed);
             app.colors[id] = color;
             return color;
           }
@@ -903,10 +917,9 @@ export default class BarChart1 {
       app.colors[id] = undefined;
       d3.select(parent).attr('fill', color_countries);
     } else {
-      const color = comp(
-        d.properties[this.ratio_to_use],
-        this.ref_value,
-        this.serie_inversed);
+      const ix_ref = this.data.findIndex(_d => _d.id === app.current_config.my_region);
+      const ix_ft = this.data.findIndex(_d => _d.id === id);
+      const color = comp(ix_ft, ix_ref, this.serie_inversed);
       app.colors[id] = color;
       d3.select(parent).attr('fill', color);
     }
@@ -970,13 +983,12 @@ export default class BarChart1 {
     this.x2.domain(this.x.domain());
     this.y2.domain(this.y.domain());
     this.updateMeanValue();
-    this.update();
-    this.updateContext(0, this.data.length);
-
     svg_bar.select('.brush_bottom').call(this.brush_bottom.move, this.x2.range());
     this.map_elem.removeRectBrush();
     app.colors = {};
     app.colors[app.current_config.my_region] = color_highlight;
+    this.update();
+    this.updateContext(0, this.data.length);
     this.updateTableStats();
     this.updateCompletude();
     this.updateMapRegio();
