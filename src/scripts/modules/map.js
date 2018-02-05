@@ -260,6 +260,7 @@ class MapSelect {
       });
     this.tooltip = prepareTooltip(d3.select(svg_map.node().parentElement), null, 'tooltip_map');
     this.bindTooltips();
+    this.brushToTooltip();
   }
 
   updateLevelRegion(filter = 'N1') {
@@ -270,12 +271,14 @@ class MapSelect {
     selection.enter()
       .append('path')
       .attrs(d => ({
+        class: 'tg_ft',
         title: `${d.properties[app.current_config.name_field]} (${d.id})`,
         fill: d.id !== app.current_config.my_region ? color_countries : color_highlight,
         d: path,
       }));
     selection
       .attrs(d => ({
+        class: 'tg_ft',
         title: `${d.properties[app.current_config.name_field]} (${d.id})`,
         fill: d.id !== app.current_config.my_region ? color_countries : color_highlight,
         d: path,
@@ -403,7 +406,7 @@ class MapSelect {
       svg_map.append('g')
         .attr('class', 'brush_map')
         .call(this.brush_map);
-
+      self.bindTooltips();
       self.brushToTooltip();
     } else {
       document.getElementById('img_rect_selec').classList.remove('active');
@@ -458,9 +461,9 @@ function makeSourceSection() {
   const src_group = svg_map.append('g').attr('id', 'source');
   src_group.append('text')
     .attrs({
-      x: width_map / 2,
-      y: height_map - 8,
-      'text-anchor': 'middle',
+      x: 3,
+      y: height_map - 5,
+      'text-anchor': 'left',
       'font-family': '"Signika",sans-serif',
       'font-size': '11px',
     })

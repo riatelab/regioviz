@@ -494,11 +494,19 @@ function bindHelpMenu() {
           modal.destroy();
         },
       });
+
+      let name_variable = o.name;
+      const unit = o.unit;
+      const year = name_variable.match(/\([^)]*\)$/)[0];
+      const unit_year = `${year.slice(0, 1)}${unit}, ${year.slice(1, 6)}`;
+      name_variable = name_variable.replace(year, unit_year);
+
       modal.setContent(
-        `<p style="color: #4f81bd;font-size: 1.2rem;">Description de l'indicateur</p>
+        `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Description de l'indicateur</b></p>
+        <p style="color: #4f81bd;font-size: 1.2rem;">${name_variable} (${code_variable})</p>
         <p style="text-align: justify;">${o.methodo.split('\n').join('<br>')}</p>
-        <p>${o.source}</p>
-        <p>Date de téléchargement de la donnée : ${o.last_update}</p>`);
+        <p><i>${o.source}</i></p>
+        <p><i>Date de téléchargement de la donnée : ${o.last_update}</i></p>`);
       modal.open();
     };
   });
@@ -524,12 +532,12 @@ function bindHelpMenu() {
       let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
 <p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
 
-      if (['SPAT', 'UNIT_SUP'].indexOf(filter_id) < 0) {
+      if (['SPAT', 'DEFAULT'].indexOf(filter_id) < 0) {
         content += `<p><a class="buttonDownload" href="data/${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
       }
       modal.setContent(content);
       modal.open();
-      if (['SPAT', 'UNIT_SUP'].indexOf(filter_id) < 0) {
+      if (['SPAT', 'DEFAULT'].indexOf(filter_id) < 0) {
         document.querySelector('a.buttonDownload').onclick = clickDlPdf;
       }
     };

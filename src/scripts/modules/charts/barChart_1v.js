@@ -7,12 +7,12 @@ import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
 import { prepareTooltip } from './../tooltip';
 
-let svg_bar = d3.select('svg#svg_bar').attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`);
-let margin = { top: 10, right: 20, bottom: 100, left: 60 };
-let margin2 = { top: 430, right: 20, bottom: 15, left: 60 };
-let width = fixed_dimension.chart.width - margin.left - margin.right;
-let height = fixed_dimension.chart.height - margin.top - margin.bottom;
-let height2 = fixed_dimension.chart.height - margin2.top - margin2.bottom;
+let svg_bar;
+let margin;
+let margin2;
+let width;
+let height;
+let height2;
 let svg_container;
 let t;
 let nbFt;
@@ -21,7 +21,9 @@ let current_range = [0, 0];
 let displayed;
 
 function updateDimensions() {
-  svg_bar = d3.select('svg#svg_bar').on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); });
+  svg_bar = d3.select('svg#svg_bar')
+    .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); });
   margin = {
     top: 10,
     right: 20,

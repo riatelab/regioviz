@@ -695,13 +695,13 @@ export default class ScatterPlot2 {
   * Recolor the dots without calling the `update` method.
   */
   updateLight() {
-    const default_color = 'gray';
+    const default_color = 'lightgray';
     this.scatter.selectAll('.dot')
       .transition()
       .duration(125)
       .styles(d => ({
         fill: app.colors[d.id] || default_color,
-        stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
+        stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
       }));
   }
 
@@ -754,7 +754,7 @@ export default class ScatterPlot2 {
       this.xAxis2.scale(this.x);
       const x = this.x;
       const y = this.y;
-      const default_color = 'gray';
+      const default_color = 'lightgray';
 
       dots
         .transition(_trans)
@@ -767,7 +767,7 @@ export default class ScatterPlot2 {
         }))
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
-          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
+          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
         }))
         .on('end', () => {
           self.bindTooltips(true);
@@ -779,7 +779,7 @@ export default class ScatterPlot2 {
         .append('circle')
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
-          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
+          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
         }))
         .attrs(d => ({
           'stroke-width': 1 / this.k,
@@ -814,7 +814,7 @@ export default class ScatterPlot2 {
 
       const x = this.x;
       const y = this.y;
-      const default_color = 'gray';
+      const default_color = 'lightgray';
 
       dots
         .transition(_trans)
@@ -826,7 +826,7 @@ export default class ScatterPlot2 {
         }))
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
-          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
+          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
         }))
         .on('end', () => {
           self.bindTooltips(false);
@@ -838,7 +838,7 @@ export default class ScatterPlot2 {
         .append('circle')
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
-          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(206, 206, 206)',
+          stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
         }))
         .attrs(d => ({
           r: size_func(d[num_name]) / this.k,

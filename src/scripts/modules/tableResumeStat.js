@@ -11,7 +11,7 @@ export default class TableResumeStat {
     const headers = doc.createElement('thead');
     const table_body = doc.createElement('tbody');
     const headers_row = doc.createElement('tr');
-    myTable.className = 'minitable';
+    myTable.className = 'minitable selectable';
     container_div.className = 'minitable_container';
     for (let i = 0; i < nb_columns; i++) {
       const cell = doc.createElement('th');

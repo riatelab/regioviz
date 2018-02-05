@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed } from './../helpers';
+import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect, svgPathToCoords } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
@@ -30,6 +30,7 @@ const updateDimensions = () => {
 export default class Similarity1plus {
   constructor(ref_data) {
     updateDimensions();
+    this.handle_brush_map = this._handle_brush_map;
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 1;
     this.ratios = app.current_config.ratio;
@@ -566,27 +567,8 @@ export default class Similarity1plus {
       data.sort((a, b) => a.dist - b.dist);
       const values = data.map(ft => ft.dist);
       const _values = values.slice().splice(2);
-      const q1 = d3.quantile(_values, 0.25);
-      const q2 = d3.quantile(_values, 0.5);
-      const q3 = d3.quantile(_values, 0.75);
       const num_name = app.current_config.pop_field;
-      app.colors = {};
-      data.forEach((ft, i) => {
-        if (ft.id === app.current_config.my_region) {
-          app.colors[app.current_config.my_region] = color_highlight;
-        } else if (i === 1) {
-          app.colors[ft.id] = color_default_dissim;
-        } else if (ft.dist < q1) {
-          app.colors[ft.id] = color_q1;
-        } else if (ft.dist < q2) {
-          app.colors[ft.id] = color_q2;
-        } else if (ft.dist < q3) {
-          app.colors[ft.id] = color_q3;
-        } else {
-          app.colors[ft.id] = color_q4;
-        }
-      });
-
+      self.makeClassifColors(_values);
       const size_func = self.proportionnal_symbols
         ? new PropSizer(d3.max(data, d => +d[num_name]), 30).scale
         : () => 4.5;
@@ -761,6 +743,28 @@ export default class Similarity1plus {
       });
   }
 
+  makeClassifColors(_values) {
+    const q1 = d3.quantile(_values, 0.25);
+    const q2 = d3.quantile(_values, 0.5);
+    const q3 = d3.quantile(_values, 0.75);
+    app.colors = {};
+    this.data.forEach((ft, i) => {
+      if (ft.id === app.current_config.my_region) {
+        app.colors[app.current_config.my_region] = color_highlight;
+      } else if (i === 1) {
+        app.colors[ft.id] = color_default_dissim;
+      } else if (ft.dist < q1) {
+        app.colors[ft.id] = color_q1;
+      } else if (ft.dist < q2) {
+        app.colors[ft.id] = color_q2;
+      } else if (ft.dist < q3) {
+        app.colors[ft.id] = color_q3;
+      } else {
+        app.colors[ft.id] = color_q4;
+      }
+    });
+  }
+
   handleClickMap(d, parent) {
     if (this.type === 'detailled') {
       let to_display = false;
@@ -807,6 +811,8 @@ export default class Similarity1plus {
 
   makeTooltips() {
     const self = this;
+    // Tooltip used for the title of each axis:
+    Tooltipsify('[title-tooltip]');
     // Tooltips for bubble on detailled distance:
     this.draw_group.selectAll('g.grp_var')
       .selectAll('circle')
@@ -884,7 +890,7 @@ export default class Similarity1plus {
               cloned.style.strokeWidth = '1.25px';
               cloned.classList.add('cloned');
               self.map_elem.layers.select('#temp').node().appendChild(cloned);
-              setTimeout(() => { cloned.remove(); }, 5000);
+              setTimeout(() => { cloned.remove(); }, 10000);
             }
           });
       });
@@ -1174,7 +1180,6 @@ export default class Similarity1plus {
     this.updateCompletude();
     this.updateTableStat();
     this.updateMapRegio();
-    Tooltipsify('[title-tooltip]');
   }
 
   removeVariable(code_variable) {
@@ -1232,12 +1237,15 @@ export default class Similarity1plus {
         if (this.classList.contains('active')) {
           return;
         }
+        self.handle_brush_map = self._handle_brush_map;
         self.removeLines();
         self.type = 'global';
         this.classList.add('active');
         menu.select('#ind_dist_detailled').attr('class', 'choice_ind noselect');
         menu.select('.selection_display').style('display', 'none');
         self.draw_group.selectAll('g').remove();
+        self.map_elem.unbindBrushClick();
+        self.map_elem.bindBrushClick(self);
         self.update();
         self.updateMapRegio();
         self.map_elem.displayLegend(4);
@@ -1248,11 +1256,14 @@ export default class Similarity1plus {
         if (this.classList.contains('active')) {
           return;
         }
+        self.handle_brush_map = null;
         self.type = 'detailled';
         this.classList.add('active');
         menu.select('#ind_dist_global').attr('class', 'choice_ind noselect');
         menu.select('.selection_display').style('display', null);
         self.draw_group.selectAll('g').remove();
+        self.map_elem.unbindBrushClick();
+        self.map_elem.bindBrushClick(self);
         self.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
         self.map_elem.displayLegend(2);
       });
@@ -1260,6 +1271,41 @@ export default class Similarity1plus {
 
   removeLines() {
     this.draw_group.selectAll('.regio_line').remove();
+  }
+
+  _handle_brush_map(event) {
+    if (!event || !event.selection) {
+      svg_container.select('.brush').call(this.brush.move, [[0, 0], [0, 0]]);
+      this.last_map_selection = [[0, 0], [0, 0]];
+      return;
+    }
+    this.map_elem.tooltip.style('display', 'none');
+    svg_container.select('.brush').call(this.brush.move, [[0, 0], [0, 0]]);
+    const self = this;
+    const [topleft, bottomright] = event.selection;
+    this.last_map_selection = [topleft, bottomright];
+    const rect = new Rect(topleft, bottomright);
+    self.map_elem.target_layer.selectAll('path')
+      .attr('fill', function (d) {
+        const id = d.id;
+        if (id === app.current_config.my_region) {
+          app.colors[id] = color_highlight;
+          return color_highlight;
+        } else if (self.current_ids.indexOf(id) < 0) {
+          return color_disabled;
+        }
+        if (!this._pts) {
+          this._pts = svgPathToCoords(this.getAttribute('d'), app.type_path);
+        }
+        const pts = this._pts;
+        for (let ix = 0, nb_pts = pts.length; ix < nb_pts; ix++) {
+          if (rect.contains(pts[ix])) {
+            app.colors[id] = 'purple';
+            return 'purple';
+          }
+        }
+        return color_countries;
+      });
   }
 
   remove() {

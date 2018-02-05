@@ -171,7 +171,9 @@ body {
 .noselect {
   user-select: none;
 }
-
+.selectable {
+  user-select: initial !important;
+}
 /* Styles for the spinner displayed while the data is loading: */
 .spinner {
   margin: 100px auto !important;
@@ -402,6 +404,7 @@ span.link:hover {
   display: none;
   cursor: pointer;
   margin: auto;
+  color: #4f81bd;
 }
 
 .completude_section > p.active {
