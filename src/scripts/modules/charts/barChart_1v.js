@@ -1,4 +1,4 @@
-import { comp, math_round, math_abs, Rect, getMean, getMean2, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
+import { comp, math_round, math_abs, math_max, Rect, getMean, getMean2, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -221,12 +221,11 @@ export default class BarChart1 {
 
     this._focus = focus;
     this.context = context;
-
+    let min_serie = d3.min(this.data, d => d[ratio_to_use]);
+    min_serie = min_serie >= 0 ? 0 : min_serie + min_serie / 10;
+    const max_serie = d3.max(this.data, d => d[ratio_to_use]);
     x.domain(this.current_ids);
-    y.domain([
-      0,
-      d3.max(this.data, d => d[ratio_to_use]),
-    ]);
+    y.domain([min_serie, max_serie]);
     x2.domain(x.domain());
     y2.domain(y.domain());
 
@@ -550,9 +549,9 @@ export default class BarChart1 {
     bar
       .attrs(d => ({
         x: this.x(d.id),
-        y: this.y(d[ratio_to_use]),
+        y: this.y(math_max(0, d[ratio_to_use])),
         width: this.x.bandwidth(),
-        height: height - this.y(d[ratio_to_use]),
+        height: math_abs(this.y(0) - this.y(d[ratio_to_use])),
       }))
       .styles((d) => {
         let to_display = this.x(d.id) != null;
@@ -573,9 +572,9 @@ export default class BarChart1 {
       .attrs(d => ({
         class: 'bar',
         x: this.x(d.id),
-        y: this.y(d[ratio_to_use]),
+        y: this.y(math_max(0, d[ratio_to_use])),
         width: this.x.bandwidth(),
-        height: height - this.y(d[ratio_to_use]),
+        height: math_abs(this.y(0) - this.y(d[ratio_to_use])),
       }))
       .styles((d) => {
         let to_display = this.x(d.id) != null;
@@ -598,6 +597,7 @@ export default class BarChart1 {
       .call(this.yAxis);
 
     const axis_x = this._focus.select('.axis--x')
+      // .attr('transform', `translate(0, ${this.y(0)})`)
       .attr('font-size', () => (displayed > 75 ? 6 : 10))
       .call(this.xAxis);
     axis_x
