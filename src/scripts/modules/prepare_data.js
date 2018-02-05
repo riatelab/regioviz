@@ -142,7 +142,7 @@ export function prepareVariablesInfo(metadata_indicateurs) {
 export function applyFilter(app, filter_type) {
   if (filter_type === 'filter_country') {
     app.current_config.filter_key = 'Pays';
-  } else if (filter_type === 'no_filter') {
+  } else if (filter_type === 'DEFAULT') {
     app.current_config.filter_key = undefined;
   } else if (filter_type instanceof Array) {
     app.current_config.filter_key = filter_type;

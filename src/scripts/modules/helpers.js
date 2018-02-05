@@ -1,3 +1,4 @@
+import jsep from 'jsep';
 import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
@@ -161,7 +162,13 @@ const HALF_PI = Math.PI / 2;
 // eslint-disable-next-line no-restricted-globals
 const isNumber = value => value != null && value !== '' && isFinite(value) && !Number.isNaN(+value);
 
-
+const operators = new Map([
+  ['+', function (a, b) { return a + b; }],
+  ['-', function (a, b) { return a - b; }],
+  ['/', function (a, b) { if (b === 0) { return ''; } return a / b; }],
+  ['*', function (a, b) { return a * b; }],
+  ['^', function (a, b) { return Math.pow(a, b); }],
+]);
 /**
 * Function to dispatch, according to their availability,
 * between the appropriate 'elementsFromPoint' function
@@ -399,43 +406,72 @@ const getMean = (serie) => {
 
 const getMean2 = (data, var_name, info_var) => {
   const o_info = info_var.find(ft => ft.id === var_name);
-
+  const nb_values = data.length;
   if (o_info.formula === 'not relevant') {
     return getMean(data.map(d => +d[var_name]));
   }
   let id1;
   let id2;
-  let sp1;
-  if (o_info.formula.startsWith('(')) {
-    sp1 = o_info.formula.slice(1).split(')');
-    [id1, id2] = sp1[0].split('*');
-  } else {
-    sp1 = o_info.formula.split('*');
-    [id1, id2] = sp1[0].split('/');
-  }
-
-  const mult = sp1.length > 1 ? sp1[1] : 1;
   let s1 = 0;
   let s2 = 0;
-  const serie1 = data.map(d => +d[o_info[id1]]);
-  const serie2 = data.map(d => +d[o_info[id2]]);
-  const nb_values = data.length;
-  for (let i = 0; i < nb_values; i++) {
-    s1 += serie1[i];
-    s2 += serie2[i];
+  const formula = jsep(o_info.formula);
+  if (!formula.left.left && !formula.right.right) {
+    id1 = o_info[formula.left.name];
+    id2 = o_info[formula.right.name];
+    console.log(id1, id2);
+    const serie1 = data.map(d => +d[id1]);
+    const serie2 = data.map(d => +d[id2]);
+    const mult1 = info_var.find(ft => ft.id === id1).formula;
+    const mult2 = info_var.find(ft => ft.id === id2).formula;
+    for (let i = 0; i < nb_values; i++) {
+      s1 += serie1[i];
+      s2 += serie2[i];
+    }
+    if (isNumber(mult1)) {
+      s1 /= +mult1;
+    }
+    if (isNumber(mult2)) {
+      s2 /= +mult2;
+    }
+    console.log('forumula : ', o_info.forumula);
+    console.log('id1 :', id1, 'id2 :', id2);
+    console.log('mult1 :', mult1, 'mult2', mult2);
+    const fun = operators.get(formula.operator);
+    return fun(s1, s2);
+  } else if (formula.left.left && !formula.right.left) {
+    id1 = o_info[formula.left.left.name];
+    id2 = o_info[formula.left.right.name];
+    const serie1 = data.map(d => +d[id1]);
+    const serie2 = data.map(d => +d[id2]);
+    const mult1 = info_var.find(ft => ft.id === id1).formula;
+    const mult2 = info_var.find(ft => ft.id === id2).formula;
+    for (let i = 0; i < nb_values; i++) {
+      s1 += serie1[i];
+      s2 += serie2[i];
+    }
+    if (isNumber(mult1)) {
+      s1 /= +mult1;
+    }
+    if (isNumber(mult2)) {
+      s2 /= +mult2;
+    }
+    let fun = operators.get(formula.left.operator);
+    const left = fun(s1, s2);
+    fun = operators.get(formula.operator);
+    let right;
+    if (formula.right.type === 'Identifier') {
+      right = formula.right.name === 'id1' ? s1 : s2;
+    } else {
+      right = formula.right.value;
+    }
+    console.log('forumula : ', o_info.forumula);
+    console.log('id1 :', id1, 'id2 :', id2);
+    console.log('mult1 :', mult1, 'mult2', mult2);
+    return fun(left, right);
   }
+  console.log('Error');
+  console.log(' ');
   console.log(o_info.formula);
-  if (o_info.formula.startsWith('(')) {
-    return ((s1 * s2) / s2) / 100;
-  }
-  if (isNumber(mult)) {
-    return (s1 / s2) * +mult;
-  } else if (mult === 'id1') {
-    return (s1 / s2) * s1;
-  } else if (mult === 'id2') {
-    return (s1 / s2) * s2;
-  }
-  return '';
 };
 
 /**

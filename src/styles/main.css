@@ -558,17 +558,20 @@ input.nb_select::-webkit-outer-spin-button {
 }
 
 thead > tr {
-  background: #4f81bd;
+  /*background: #4f81bd;*/
+  background: #838587;
   color: white;
 }
 
 tr td:nth-child(1){
-  background: #4f81bd;
+  /*background: #4f81bd;*/
+  background: #838587;
   color: white;
 }
 
 tr {
-  color: #4f81bd;
+  color: #838587;
+  /*color: #4f81bd;*/
 }
 /* End of style for minitable */
 

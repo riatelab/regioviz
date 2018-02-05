@@ -201,6 +201,7 @@ export default class Similarity1plus {
     const data = self.data;
     this.draw_group.select('.brush').remove();
     this.draw_group.select('#axis-title-global-dist').remove();
+    this.draw_group.selectAll('.overlayrect').remove();
     if (self.type === 'detailled') {
       const highlight_selection = self.highlight_selection;
       const nb_variables = self.ratios.length;
@@ -668,7 +669,6 @@ export default class Similarity1plus {
           .attr('class', 'polygon')
           .attr('d', d => `M${d.join('L')}Z`)
           .style('fill', 'none');
-
       } else {
         g.selectAll('.axis-top-v')
           .transition()
@@ -731,7 +731,10 @@ export default class Similarity1plus {
 
         cells.exit().remove();
       }
-      self.makeTooltips();
+      setTimeout(() => {
+        self.makeTooltips();
+        self.appendOverlayRect();
+      }, 200);
     }
   }
   /* eslint-enable no-loop-func */
@@ -904,7 +907,11 @@ export default class Similarity1plus {
         circle.style.stroke = 'darkgray';
         circle.style.strokeWidth = '0.45';
         clearTimeout(t);
-        t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
+        t = setTimeout(() => {
+          self.tooltip.style('display', 'none').selectAll('p').html('');
+          circle.style.stroke = 'darkgray';
+          circle.style.strokeWidth = '0.45';
+        }, 250);
       })
       .on('mousemove.tooltip', function (d) {
         if (isContextMenuDisplayed()) return;
@@ -1009,6 +1016,49 @@ export default class Similarity1plus {
       .on('mouseout', () => {
         clearTimeout(t);
         t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
+      });
+  }
+
+  appendOverlayRect() {
+    let miny = Infinity;
+    let maxy = -Infinity;
+    this.draw_group.selectAll('circle')
+      .each(function () {
+        const cy = +this.getAttribute('cy');
+        if (cy > maxy) maxy = cy;
+        if (cy < miny) miny = cy;
+      });
+    miny -= 45;
+    maxy += 45;
+    if (miny > 0) {
+      this.draw_group.append('rect')
+        .attrs({
+          class: 'overlayrect',
+          x: 0,
+          y: 0,
+          width: width,
+          height: miny,
+          fill: 'white',
+        });
+    }
+    if ((height - maxy) > 0) {
+      this.draw_group.append('rect')
+        .attrs({
+          class: 'overlayrect',
+          x: 0,
+          y: maxy,
+          width: width,
+          height: height - maxy,
+          fill: 'white',
+        });
+    }
+    this.draw_group.selectAll('.overlayrect')
+      .on('mouseover', () => {
+        this.draw_group.selectAll('circle')
+          .styles({ stroke: 'darkgray', 'stroke-width': '0.45' });
+      })
+      .on('click dblclick', () => {
+        this.draw_group.select('.brush').call(this.brush.move, [[0, 0], [0, 0]]);
       });
   }
 

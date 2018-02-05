@@ -26,12 +26,9 @@ import {
   prepareVariablesInfo,
 } from './modules/prepare_data';
 
-
+// Variables filled after reading the metadata file:
 export const variables_info = [];
-
-export const study_zones = [
-  { id: 'no_filter', name: 'UE28', display_level: '' },
-];
+export const study_zones = [];
 export const territorial_mesh = [];
 
 export const app = {
@@ -136,7 +133,7 @@ function updateAvailableRatios(my_region) {
 function setDefaultConfigMenu(code = 'FRE', variable = 'REVMEN', level = 'N1') {
   document.querySelector(`.target_region.square[value="${code}"]`).classList.add('checked');
   document.querySelector(`.target_variable.small_square[value="${variable}"]`).classList.add('checked');
-  document.querySelector('p[filter-value="no_filter"] > .filter_v.square').classList.add('checked');
+  document.querySelector('p[filter-value="DEFAULT"] > .filter_v.square').classList.add('checked');
   document.querySelector(`.territ_level.square[value="${level}"]`).classList.add('checked');
   document.querySelector('.regio_name > #search').value = app.feature_names[code];
   document.querySelector('.regio_name > #autocomplete').value = app.feature_names[code];
@@ -349,7 +346,7 @@ function bindUI_chart(chart, map_elem) {
     .on('click', function () {
       if (!this.classList.contains('checked')) {
         // Reset the study zone :
-        d3.select('p[filter-value="no_filter"] > span.filter_v').dispatch('click');
+        d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
         this.classList.add('checked');
         const level_value = this.getAttribute('value');

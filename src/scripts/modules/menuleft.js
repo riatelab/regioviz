@@ -83,8 +83,10 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
     const zone = study_zones[i];
     const entry = document.createElement('p');
     entry.setAttribute('filter-value', zone.id);
-    if (zone.id === 'SPAT') {
-      entry.innerHTML = `<span display_level="" class='filter_v square'></span><span class="label_chk">Région dans un rayon de </span><input value="450" disabled="disabled" style="width: 55px; height: 13px;" type="number" min="0" max="100000" id="dist_filter"></input><span> km</span><span class="i_info">i</span>`;
+    if (zone.id === 'DEFAULT') {
+      entry.innerHTML = '<span display_level="" class="filter_v square"></span><span class="label_chk">UE28</span><span class="i_info">i</span>';
+    } else if (zone.id === 'SPAT') {
+      entry.innerHTML = '<span display_level="" class="filter_v square"></span><span class="label_chk">Région dans un rayon de </span><input value="450" disabled="disabled" style="width: 55px; height: 13px;" type="number" min="0" max="100000" id="dist_filter"></input><span> km</span><span class="i_info">i</span>';
     } else {
       entry.innerHTML = `<span display_level="${zone.display_level}" class='filter_v square'></span><span class="label_chk">${zone.name}</span><span class="i_info">i</span>`;
     }
