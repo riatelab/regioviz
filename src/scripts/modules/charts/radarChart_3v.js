@@ -1019,6 +1019,7 @@ export default class RadarChart3 {
     d3.select('#svg_bar').text('').html('');
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getElemBelow(e) {
     const elems = getElementsFromPoint(e.clientX, e.clientY);
     const elem = elems.find(el => el.className.baseVal === 'radarArea');
@@ -1175,6 +1176,7 @@ export default class RadarChart3 {
     this.table_stats = new TableResumeStat(features);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
 <h3>Position  - 3 indicateurs</h3>

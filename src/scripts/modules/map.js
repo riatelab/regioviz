@@ -345,6 +345,7 @@ class MapSelect {
       .call(this.zoom_map.transform, d3.zoomIdentity);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   updateLegend() {
     d3.select('#svg_legend > g > .legend > text')
       .text(`Ma région : ${app.current_config.my_region_pretty_name}`);
@@ -429,6 +430,10 @@ class MapSelect {
     return this.dist_to_my_region.filter(d => d.dist <= dist).map(d => d.id);
   }
 
+  getClosestUnit() {
+    return this.dist_to_my_region[1];
+  }
+
   computeDistMat() {
     const features = Array.prototype.slice
       .call(this.target_layer.node().querySelectorAll('path'));
@@ -443,9 +448,11 @@ class MapSelect {
         my_region_centroid, centroid(features[i].__data__.geometry));
       result_dist.push({ id, dist });
     }
+    result_dist.sort((a, b) => a.dist - b.dist);
     this.dist_to_my_region = result_dist;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   isMap(){
     return true;
   }

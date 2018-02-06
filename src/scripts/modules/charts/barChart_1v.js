@@ -950,7 +950,7 @@ export default class BarChart1 {
     const grp_mean = this._focus.select('.mean');
     this.mean_value = getMean(this.data.map(d => d[ratio_to_use]));
     console.log(this.mean_value);
-    console.log(getMean2(this.data, this.ratio_to_use, variables_info))
+    console.log(getMean2(this.data, this.ratio_to_use, variables_info));
     grp_mean.select('text')
       .attr('y', y(this.mean_value) + 20)
       .text(`Valeur moyenne : ${formatNumber(this.mean_value, 1)} ${this.unit}`);
@@ -1043,10 +1043,10 @@ export default class BarChart1 {
         `${name_variable.replace(/\(/, '&&&').split('&&&').join('<br>(')} &#x25BE;`);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getElemBelow(e) {
     const elems = getElementsFromPoint(e.clientX, e.clientY);
     const elem = elems.find(el => el.className.baseVal === 'bar');
-    console.log(elem); console.log(elem.__data__.id);
     return elem && elem.__data__ ? elem.__data__.id : null;
   }
 
@@ -1090,6 +1090,7 @@ export default class BarChart1 {
     this.table_stats = new TableResumeStat([feature]);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
 <h3>Position – 1 Indicateur</h3>
@@ -1103,7 +1104,7 @@ La carte et le graphique sont interactifs dans la mesure où l’utilisateur peu
   }
 
   getTemplateHelp() {
-    const [my_region, my_rank] = this.data.map((d, i) => [d.id, i])
+    const [, my_rank] = this.data.map((d, i) => [d.id, i])
       .find(d => d[0] === app.current_config.my_region);
     const values = this.data.map(d => d[this.ratio_to_use]).sort((a, b) => a - b);
     const info_var = variables_info.find(ft => ft.id === this.ratio_to_use);

@@ -84,6 +84,10 @@ function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NU
   app.colors[app.current_config.my_region] = color_highlight;
 }
 
+export const isIE = (() => (/MSIE/i.test(navigator.userAgent)
+    || /Trident\/\d./i.test(navigator.userAgent)
+    || /Edge\/\d./i.test(navigator.userAgent)))();
+
 /**
 * Function to update the availables ratios in the left menu (after changing region)
 * If a selected variable is not available anymore it will be deselected.
@@ -240,7 +244,10 @@ function bindUI_chart(chart, map_elem) {
     });
 
   d3.select('#dist_filter')
-    .on('change, keyup', function () {
+    .on('change keyup', function () {
+      if (+this.value < app.current_config.min_km_closest_unit) {
+        this.value = app.current_config.min_km_closest_unit;
+      }
       const ids = map_elem.getUnitsWithin(+this.value);
       applyFilter(app, ids);
       chart.changeStudyZone();
@@ -669,10 +676,10 @@ function loadData() {
       Tooltipsify('[title-tooltip]');
       // Fetch the layer in geographic coordinates now in case the user wants to download it later:
       d3.request('data/CGET_nuts_all.geojson', (err, result) => {
-        if (err) console.log(err);
         app.geo_layer = result.response;
       });
       updateMyCategorySection();
+      changeRegion(app, start_region, map_elem);
     });
 }
 

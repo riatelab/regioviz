@@ -1,11 +1,12 @@
 import jsep from 'jsep';
+import tingle from 'tingle.js';
 import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise,
 no-extend-native, prefer-rest-params, no-prototype-builtins,
-no-restricted-syntax */
+no-restricted-syntax, lines-around-directive, no-unused-vars */
 (function () {
   /*
   Polyfill for 'Element.remove'
@@ -146,7 +147,23 @@ no-restricted-syntax */
 })();
 /* eslint-enable wrap-iife, object-shorthand, no-bitwise,
 no-extend-native, prefer-rest-params, no-prototype-builtins,
-no-restricted-syntax */
+no-restricted-syntax, lines-around-directive, no-unused-vars  */
+
+const canvasToBlob = (canvas, callback, type, quality) => {
+  if (canvas.toBlob) {
+    canvas.toBlob(callback, type, quality);
+  } else {
+    setTimeout(() => {
+      const binStr = atob(canvas.toDataURL(type, quality).split(',')[1]);
+      const len = binStr.length;
+      const arr = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        arr[i] = binStr.charCodeAt(i);
+      }
+      callback(new Blob([arr], { type: type || 'image/png' }));
+    });
+  }
+};
 
 // eslint-disable-next-line no-restricted-properties
 const math_pow = Math.pow;
@@ -167,7 +184,7 @@ const operators = new Map([
   ['-', function (a, b) { return a - b; }],
   ['/', function (a, b) { if (b === 0) { return ''; } return a / b; }],
   ['*', function (a, b) { return a * b; }],
-  ['^', function (a, b) { return Math.pow(a, b); }],
+  ['^', function (a, b) { return Math.pow(a, b); }], // eslint-disable-line no-restricted-properties
 ]);
 /**
 * Function to dispatch, according to their availability,
@@ -472,6 +489,7 @@ const getMean2 = (data, var_name, info_var) => {
   console.log('Error');
   console.log(' ');
   console.log(o_info.formula);
+  return NaN;
 };
 
 /**
@@ -652,6 +670,18 @@ const removeAll = (elems) => {
   array_slice.call(elems).forEach((el) => { el.remove(); });
 };
 
+function dataURIToBlob(dataURI) {
+  const _dataURI = dataURI.replace(/^data:/, '');
+  const type = _dataURI.match(/image\/[^;]+/);
+  const base64 = _dataURI.replace(/^[^,]+,/, '');
+  const arrayBuffer = new ArrayBuffer(base64.length);
+  const typedArray = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < base64.length; i++) {
+    typedArray[i] = base64.charCodeAt(i);
+  }
+  return new Blob([arrayBuffer], { type });
+}
+
 export function exportSVG(elem, filename) {
   const targetSvg = elem.cloneNode(true);
   const serializer = new XMLSerializer();
@@ -664,7 +694,7 @@ export function exportSVG(elem, filename) {
   a.setAttribute('download', filename);
   a.setAttribute('href', href);
   a.style.display = 'none';
-  document.body.append(a);
+  document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(href);
@@ -697,18 +727,82 @@ export function exportPNG(elem, filename) {
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg_src)}`;
   img.onload = function () {
     ctx.drawImage(img, 0, 0);
-    targetCanvas.toBlob((blob) => {
-      const href = URL.createObjectURL(new Blob([blob], { type: 'image/png' }));
-      const a = document.createElement('a');
-      a.setAttribute('download', filename);
-      a.setAttribute('href', href);
-      a.style.display = 'none';
-      document.body.append(a);
-      a.click();
-      targetCanvas.remove();
-      a.remove();
-      URL.revokeObjectURL(href);
-    }, 'image/png');
+    const dataurl = targetCanvas.toDataURL('image/png');
+    console.log(dataurl);
+    fetch(dataurl)
+      .then(res => res.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute('href', blobUrl);
+        dlAnchorElem.setAttribute('download', filename);
+        if (window.isIE) {
+          // eslint-disable-next-line new-cap
+          const modal = new tingle.modal({
+            stickyFooter: false,
+            closeMethods: ['overlay', 'button', 'escape'],
+            closeLabel: 'Close',
+            onOpen() {
+              dlAnchorElem.innerHTML = filename;
+              const content = document.getElementsByClassName('link_download')[0];
+              content.appendChild(dlAnchorElem);
+            },
+            onClose() {
+              modal.destroy();
+            },
+          });
+          modal.setContent('<div class="link_download"><p>Lien de téléchargement</p></div>');
+          modal.open();
+        } else {
+          dlAnchorElem.style.display = 'none';
+          document.body.appendChild(dlAnchorElem);
+          dlAnchorElem.click();
+          dlAnchorElem.remove();
+          URL.revokeObjectURL(blobUrl);
+        }
+      });
+
+    // console.log(dataurl);
+    // const blob = dataURIToBlob(dataurl);
+    // console.log(blob);
+    // const href = URL.createObjectURL(blob);
+    // const a = document.createElement('a');
+    // a.setAttribute('download', filename);
+    // a.setAttribute('href', href);
+    // a.style.display = 'none';
+    // document.body.appendChild(a);
+    // a.click();
+    // targetCanvas.remove();
+    // a.remove();
+    // URL.revokeObjectURL(href);
+    // canvasToBlob(targetCanvas, (blob) => {
+    //   const href = URL.createObjectURL(blob);
+    //   console.log(href);
+    //   const a = document.createElement('a');
+    //   a.setAttribute('download', filename);
+    //   a.setAttribute('href', href);
+    //   a.style.display = 'none';
+    //   document.body.appendChild(a);
+    //   a.click();
+    //   targetCanvas.remove();
+    //   console.log(a);
+    //   setTimeout(() => {
+    //     a.remove();
+    //     URL.revokeObjectURL(href);
+    //   }, 125);
+    // }, 'image/png');
+    // targetCanvas.toBlob((blob) => {
+    //   const href = URL.createObjectURL(new Blob([blob], { type: 'image/png' }));
+    //   const a = document.createElement('a');
+    //   a.setAttribute('download', filename);
+    //   a.setAttribute('href', href);
+    //   a.style.display = 'none';
+    //   document.body.append(a);
+    //   a.click();
+    //   targetCanvas.remove();
+    //   a.remove();
+    //   URL.revokeObjectURL(href);
+    // }, 'image/png');
   };
 }
 

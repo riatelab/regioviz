@@ -454,10 +454,8 @@ export default class Similarity1plus {
 
         bubbles1.exit().transition(trans).remove();
 
-        const bubbles2 = layer_highlighted.selectAll('.bubble')
-          .data(
-            data.filter(d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined),
-            d => d.id);
+        const bubbles2 = layer_highlighted.selectAll('.bubble').data(data.filter(
+          d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined), d => d.id);
 
         bubbles2
           .transition(trans)
@@ -595,7 +593,8 @@ export default class Similarity1plus {
         .x(d => d.x)
         .y(d => d.y)
         .polygons(data);
-
+      console.log(data);
+      console.log(voro);
       this.draw_group.append('text')
         .attrs({
           x: width / 2,
@@ -848,7 +847,8 @@ export default class Similarity1plus {
           _h += 30;
           // content.push(
           //   `Écart absolu normalisé : ${formatNumber(
-          //     math_abs(100 * (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
+          //     math_abs(100 *
+          //       (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
           if (+indic_rank === 2) {
             content.push('<br><b>Région la plus proche</b> sur cet indicateur');
           } else {
@@ -1280,14 +1280,12 @@ export default class Similarity1plus {
       const elem_overlay = elems.find(el => el.className.baseVal === 'overlayrect');
       if (elem_overlay) return null;
       const elem = elems.find(el => el.className.baseVal === 'polygon' || el.className.baseVal === 'circle');
-      console.log(elem); console.log(elem.__data__.data.id);
       return elem && elem.__data__ ? elem.__data__.data.id : null;
-    } else {
-      const elems = getElementsFromPoint(e.clientX, e.clientY);
-      const elem = elems.find(el => el.className.baseVal === 'bubble');
-      console.log(elem); console.log(elem.__data__.id);
-      return elem && elem.__data__ ? elem.__data__.id : null;
     }
+    // if this.type === 'detailled' :
+    const elems = getElementsFromPoint(e.clientX, e.clientY);
+    const elem = elems.find(el => el.className.baseVal === 'bubble');
+    return elem && elem.__data__ ? elem.__data__.id : null;
   }
 
   _handle_brush_map(event) {
@@ -1381,6 +1379,7 @@ export default class Similarity1plus {
     this.table_stats = new TableResumeStat(features);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
 <h3>Ressemblances</h3>
@@ -1404,7 +1403,8 @@ Sur le graphique apparaissent les n unités territoriales les plus proches pour 
 Par défaut, la taille des cercles sur le graphique est constante. Mais l’utilisateur peut activer l’option « cercles proportionnels au numérateur » pour visualiser graphiquement la masse des unités territoriales. Par exemple, si l’indicateur PIB par habitant est sélectionné, la taille des cercles sera proportionnelle à la masse de PIB des unités territoriales. Si c’est la part des 0-24 ans dans la population totale, la taille des figurés sera proportionnelle à la masse de la population âgée de 0 à 24 ans. Cette option a été créée afin de pouvoir restituer les ordres de grandeur potentiellement hétérogènes des unités territoriales proposées dans l’application.`;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getTemplateHelp() {
-    return ``;
+    return '';
   }
 }
