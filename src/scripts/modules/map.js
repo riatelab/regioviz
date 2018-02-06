@@ -52,15 +52,16 @@ function map_zoomed() {
 
   layers.selectAll('g')
     .transition(t)
+    .attr('transform', transform)
     .style('stroke-width', function () {
       return styles[this.id] ?
         `${styles[this.id]['stroke-width'] / transform.k}px`
         : null;
     });
 
-  layers.selectAll('g')
-    .transition(t)
-    .attr('transform', transform);
+  // layers.selectAll('g')
+  //   .transition(t)
+  //   .attr('transform', transform);
 
   svg_map.select('.brush_map')
     .transition(t)
@@ -443,6 +444,44 @@ class MapSelect {
       result_dist.push({ id, dist });
     }
     this.dist_to_my_region = result_dist;
+  }
+
+  isMap(){
+    return true;
+  }
+
+  zoomOnFeature(ft_id) {
+    this.target_layer.selectAll('path')
+      .each((d) => {
+        if (d.id === ft_id) {
+          const bounds = path.bounds(d);
+          const dx = bounds[1][0] - bounds[0][0];
+          const dy = bounds[1][1] - bounds[0][1];
+          const x = (bounds[0][0] + bounds[1][0]) / 2;
+          const y = (bounds[0][1] + bounds[1][1]) / 2;
+          let scale = 0.9 / Math.max(dx / width_map, dy / height_map);
+          if (scale > 5) scale = 5;
+          const translate = [width_map / 2 - scale * x, height_map / 2 - scale * y];
+          const layers = svg_map.select('#layers');
+          const transf = `translate(${translate})scale(${scale})`;
+          const t = d3
+            .transition()
+            .duration(125);
+
+          layers.selectAll('g')
+            .transition(t)
+            .attr('transform', transf)
+            .style('stroke-width', function () {
+              return styles[this.id] ?
+                `${styles[this.id]['stroke-width'] / scale}px`
+                : null;
+            });
+
+          svg_map.select('.brush_map')
+            .transition(t)
+            .attr('transform', transf);
+        }
+      });
   }
 
   unbindBrushClick() {

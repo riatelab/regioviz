@@ -17,7 +17,7 @@ let t;
 const updateDimensions = () => {
   svg_bar = d3.select('svg#svg_bar')
     .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
-    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); })
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map); })
     .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
@@ -1272,6 +1272,22 @@ export default class Similarity1plus {
 
   removeLines() {
     this.draw_group.selectAll('.regio_line').remove();
+  }
+
+  getElemBelow(e) {
+    if (this.type === 'global') {
+      const elems = getElementsFromPoint(e.clientX, e.clientY);
+      const elem_overlay = elems.find(el => el.className.baseVal === 'overlayrect');
+      if (elem_overlay) return null;
+      const elem = elems.find(el => el.className.baseVal === 'polygon' || el.className.baseVal === 'circle');
+      console.log(elem); console.log(elem.__data__.data.id);
+      return elem && elem.__data__ ? elem.__data__.data.id : null;
+    } else {
+      const elems = getElementsFromPoint(e.clientX, e.clientY);
+      const elem = elems.find(el => el.className.baseVal === 'bubble');
+      console.log(elem); console.log(elem.__data__.id);
+      return elem && elem.__data__ ? elem.__data__.id : null;
+    }
   }
 
   _handle_brush_map(event) {

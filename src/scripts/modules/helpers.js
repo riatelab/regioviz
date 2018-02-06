@@ -652,7 +652,7 @@ const removeAll = (elems) => {
   array_slice.call(elems).forEach((el) => { el.remove(); });
 };
 
-export function exportSVG(elem) {
+export function exportSVG(elem, filename) {
   const targetSvg = elem.cloneNode(true);
   const serializer = new XMLSerializer();
   removeAll(targetSvg.querySelectorAll('.brush_map'));
@@ -661,7 +661,7 @@ export function exportSVG(elem) {
 
   const href = URL.createObjectURL(new Blob([source], { type: 'image/svg+xml' }));
   const a = document.createElement('a');
-  a.setAttribute('download', 'chart.svg');
+  a.setAttribute('download', filename);
   a.setAttribute('href', href);
   a.style.display = 'none';
   document.body.append(a);
@@ -670,7 +670,7 @@ export function exportSVG(elem) {
   URL.revokeObjectURL(href);
 }
 
-export function exportPNG(elem) {
+export function exportPNG(elem, filename) {
   const _h = elem.viewBox.baseVal.height;
   const _w = elem.viewBox.baseVal.width;
   const targetCanvas = d3.select('body')
@@ -700,7 +700,7 @@ export function exportPNG(elem) {
     targetCanvas.toBlob((blob) => {
       const href = URL.createObjectURL(new Blob([blob], { type: 'image/png' }));
       const a = document.createElement('a');
-      a.setAttribute('download', 'export.png');
+      a.setAttribute('download', filename);
       a.setAttribute('href', href);
       a.style.display = 'none';
       document.body.append(a);
@@ -721,22 +721,46 @@ export function exportPNG(elem) {
 *  current chart in use in the application.
 * @return {Void}
 */
-function svgContextMenu(current_chart, svg_elem) {
-  console.log(current_chart, svg_elem);
-  const items_menu = [
-    {
-      name: 'Export au format PNG',
-      action: () => { exportPNG(svg_elem.node()); },
-    },
-    {
-      name: 'Export au format SVG',
-      action: () => { exportSVG(svg_elem.node()); },
-    },
-    {
-      name: 'Export d\'un rapport complet',
-      action: () => { makeModalReport(); },
-    },
-  ];
+function svgContextMenu(current_chart, svg_elem, map_elem) {
+  let items_menu;
+  if (current_chart.isMap) {
+    items_menu = [
+      {
+        name: 'Export au format PNG',
+        action: () => { exportPNG(svg_elem.node(), 'regioviz_map.png'); },
+      },
+      {
+        name: 'Export au format SVG',
+        action: () => { exportSVG(svg_elem.node(), 'regioviz_map.svg'); },
+      },
+      {
+        name: 'Export d\'un rapport complet',
+        action: () => { makeModalReport(); },
+      },
+    ];
+  } else {
+    const elem_id = current_chart.getElemBelow(d3.event);
+    items_menu = [
+      {
+        name: 'Export au format PNG',
+        action: () => { exportPNG(svg_elem.node(), 'regioviz_chart.png'); },
+      },
+      {
+        name: 'Export au format SVG',
+        action: () => { exportSVG(svg_elem.node(), 'regioviz_chart.svg'); },
+      },
+      {
+        name: 'Export d\'un rapport complet',
+        action: () => { makeModalReport(); },
+      },
+    ];
+    if (elem_id) {
+      items_menu.push({
+        name: 'Zoomer la carte sur la région sélectionnée',
+        action: () => { map_elem.zoomOnFeature(elem_id); },
+      });
+    }
+  }
   current_chart.tooltip.style('display', 'none');
   new ContextMenu().showMenu(d3.event, document.body, items_menu);
 }

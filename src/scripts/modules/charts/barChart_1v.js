@@ -23,7 +23,7 @@ let displayed;
 function updateDimensions() {
   svg_bar = d3.select('svg#svg_bar')
     .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
-    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); });
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map); });
   margin = {
     top: 10,
     right: 20,
@@ -1041,6 +1041,13 @@ export default class BarChart1 {
       .attr('title-tooltip', content_tooltip)
       .html(
         `${name_variable.replace(/\(/, '&&&').split('&&&').join('<br>(')} &#x25BE;`);
+  }
+
+  getElemBelow(e) {
+    const elems = getElementsFromPoint(e.clientX, e.clientY);
+    const elem = elems.find(el => el.className.baseVal === 'bar');
+    console.log(elem); console.log(elem.__data__.id);
+    return elem && elem.__data__ ? elem.__data__.id : null;
   }
 
   remove() {

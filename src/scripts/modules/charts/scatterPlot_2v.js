@@ -1,4 +1,4 @@
-import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed, math_min, math_max } from './../helpers';
+import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed, math_min, math_max, getElementsFromPoint } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
@@ -17,7 +17,7 @@ let t;
 const updateDimensions = () => {
   svg_bar = d3.select('svg#svg_bar')
     .attr('viewBox', `-5 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
-    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); })
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map); })
     .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 60 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
@@ -1336,6 +1336,12 @@ export default class ScatterPlot2 {
       const new_var_y = this.itemsY.filter(ft => ft.name !== this.variable1)[0].name;
       this.changeVariableY(new_var_y);
     }
+  }
+
+  getElemBelow(e) {
+    const elems = getElementsFromPoint(e.clientX, e.clientY);
+    const elem = elems.find(el => el.className.baseVal === 'dot');
+    return elem && elem.__data__ ? elem.__data__.id : null;
   }
 
   remove() {

@@ -1,7 +1,7 @@
 import alertify from 'alertifyjs';
 import {
   math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
-  getMean, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
+  getMean, formatNumber, svgContextMenu, isContextMenuDisplayed, getElementsFromPoint } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -18,7 +18,9 @@ let t;
 let tm;
 
 const updateDimensions = () => {
-  svg_bar = d3.select('svg#svg_bar').attr('viewBox', `-5 -5 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`).on('contextmenu', () => { svgContextMenu(app.chart, svg_bar); });
+  svg_bar = d3.select('svg#svg_bar')
+    .attr('viewBox', `-5 -5 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map); });
   margin = { top: 60, right: 80, bottom: 60, left: 80 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
@@ -1016,6 +1018,13 @@ export default class RadarChart3 {
     this.map_elem = null;
     d3.select('#svg_bar').text('').html('');
   }
+
+  getElemBelow(e) {
+    const elems = getElementsFromPoint(e.clientX, e.clientY);
+    const elem = elems.find(el => el.className.baseVal === 'radarArea');
+    return elem && elem.__data__ ? elem.__data__.name : null;
+  }
+
 
   updateChangeRegion() {
     this.changeStudyZone();
