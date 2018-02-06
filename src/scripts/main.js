@@ -672,6 +672,7 @@ function loadData() {
         if (err) console.log(err);
         app.geo_layer = result.response;
       });
+      updateMyCategorySection();
     });
 }
 

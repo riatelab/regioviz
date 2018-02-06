@@ -113,39 +113,40 @@ export default class Similarity1plus {
 
   brushed() {
     const e = d3.event;
-    if (!e.selection && e.type === 'end') {
-      if (!this.last_selection) {
-        const elems = getElementsFromPoint(e.sourceEvent.clientX, e.sourceEvent.clientY);
-        const elem = elems.find(el => el.className.baseVal === 'polygon' || el.className.baseVal === 'circle');
-        if (elem) {
-          const new_click_event = new MouseEvent('click', {
-            pageX: e.sourceEvent.pageX,
-            pageY: e.sourceEvent.pageY,
-            clientX: e.sourceEvent.clientX,
-            clientY: e.sourceEvent.clientY,
-            bubbles: true,
-            cancelable: true,
-            view: window,
-          });
-          elem.dispatchEvent(new_click_event);
-        }
-      } else {
-        this.draw_group.selectAll('.circle')
-          .style('fill', d => app.colors[d.data.id]);
-        this.map_elem.target_layer.selectAll('path')
-          .attr('fill', (d) => {
-            const _id = d.id;
-            if (_id === app.current_config.my_region) {
-              return color_highlight;
-            } else if (this.current_ids.indexOf(_id) > -1) {
-              if (app.colors[_id]) return app.colors[_id];
-              return color_countries;
-            }
-            return color_disabled;
-          });
+    console.log(e);
+    if (!e.selection && e.type === 'end' && !this.last_selection && !e.sourceEvent.sourceEvent) {
+      this.map_elem.removeRectBrush();
+      const elems = getElementsFromPoint(e.sourceEvent.clientX, e.sourceEvent.clientY);
+      const elem = elems.find(el => el.className.baseVal === 'polygon' || el.className.baseVal === 'circle');
+      if (elem) {
+        const new_click_event = new MouseEvent('click', {
+          pageX: e.sourceEvent.pageX,
+          pageY: e.sourceEvent.pageY,
+          clientX: e.sourceEvent.clientX,
+          clientY: e.sourceEvent.clientY,
+          bubbles: true,
+          cancelable: true,
+          view: window,
+        });
+        elem.dispatchEvent(new_click_event);
       }
+    } else if (e.sourceEvent.sourceEvent) {
+      this.draw_group.selectAll('.circle')
+        .style('fill', d => app.colors[d.data.id]);
+      this.map_elem.target_layer.selectAll('path')
+        .attr('fill', (d) => {
+          const _id = d.id;
+          if (_id === app.current_config.my_region) {
+            return color_highlight;
+          } else if (this.current_ids.indexOf(_id) > -1) {
+            if (app.colors[_id]) return app.colors[_id];
+            return color_countries;
+          }
+          return color_disabled;
+        });
       this.last_selection = null;
     } else {
+      this.map_elem.removeRectBrush();
       this.map_elem.layers.selectAll('.cloned').remove();
       const selection = [d3.event.selection[0] - 1, d3.event.selection[1] + 1.5];
       this.highlighted = [];
@@ -1275,15 +1276,17 @@ export default class Similarity1plus {
 
   _handle_brush_map(event) {
     if (!event || !event.selection) {
-      svg_container.select('.brush').call(this.brush.move, [[0, 0], [0, 0]]);
-      this.last_map_selection = [[0, 0], [0, 0]];
+      this.last_map_selection = null;
+      this.last_selection = null;
       return;
     }
     this.map_elem.tooltip.style('display', 'none');
-    svg_container.select('.brush').call(this.brush.move, [[0, 0], [0, 0]]);
+    svg_container.select('.brush').call(this.brush.move, null);
     const self = this;
     const [topleft, bottomright] = event.selection;
     this.last_map_selection = [topleft, bottomright];
+    this.highlighted = [];
+    this.last_selection = null;
     const rect = new Rect(topleft, bottomright);
     self.map_elem.target_layer.selectAll('path')
       .attr('fill', function (d) {
@@ -1300,11 +1303,23 @@ export default class Similarity1plus {
         const pts = this._pts;
         for (let ix = 0, nb_pts = pts.length; ix < nb_pts; ix++) {
           if (rect.contains(pts[ix])) {
-            app.colors[id] = 'purple';
+            self.highlighted.push(id);
             return 'purple';
           }
         }
+        if (app.colors[id]) return app.colors[id];
         return color_countries;
+      });
+
+    this.draw_group.selectAll('.circle')
+      .style('fill', (d) => {
+        const _id = d.data.id;
+        if (_id === app.current_config.my_region) {
+          return color_highlight;
+        } else if (this.highlighted.indexOf(_id) > -1) {
+          return 'purple';
+        }
+        return app.colors[_id];
       });
   }
 
