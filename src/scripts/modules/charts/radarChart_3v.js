@@ -202,7 +202,7 @@ export default class RadarChart3 {
       .attr('transform', `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`);
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement.parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
 
     this.prepareData(data);
     this.drawAxisGrid();

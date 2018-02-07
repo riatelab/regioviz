@@ -144,6 +144,57 @@ no-restricted-syntax, lines-around-directive, no-unused-vars */
       },
     });
   }
+  if (!Array.prototype.findIndex) {
+    Object.defineProperty(Array.prototype, 'findIndex', {
+      value: function (predicate) {
+        // 1. Let O be ? ToObject(this value).
+        if (this == null) {
+          throw new TypeError('"this" is null or not defined');
+        }
+        const o = Object(this);
+        // 2. Let len be ? ToLength(? Get(O, "length")).
+        const len = o.length >>> 0;
+        // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+        if (typeof predicate !== 'function') {
+          throw new TypeError('predicate must be a function');
+        }
+        // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+        const thisArg = arguments[1];
+        // 5. Let k be 0.
+        let k = 0;
+        // 6. Repeat, while k < len
+        while (k < len) {
+          // a. Let Pk be ! ToString(k).
+          // b. Let kValue be ? Get(O, Pk).
+          // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+          // d. If testResult is true, return k.
+          const kValue = o[k];
+          if (predicate.call(thisArg, kValue, k, o)) {
+            return k;
+          }
+          // e. Increase k by 1.
+          k += 1;
+        }
+        // 7. Return -1.
+        return -1;
+      },
+    });
+  }
+  try {
+    const a = new MouseEvent('test');
+    return false; // No need to polyfill
+  } catch (e) {
+    const MouseEvent = function (eventType, params) {
+      params = params || { bubbles: false, cancelable: false };
+      const mouseEvent = document.createEvent('MouseEvent');
+      mouseEvent.initMouseEvent(
+        eventType, params.bubbles, params.cancelable, window,
+        0, 0, 0, 0, 0, false, false, false, false, 0, null);
+      return mouseEvent;
+    };
+    MouseEvent.prototype = Event.prototype;
+    window.MouseEvent = MouseEvent;
+  }
 })();
 /* eslint-enable wrap-iife, object-shorthand, no-bitwise,
 no-extend-native, prefer-rest-params, no-prototype-builtins,
@@ -159,16 +210,19 @@ const math_sin = Math.sin;
 const math_cos = Math.cos;
 const math_sqrt = Math.sqrt;
 const HALF_PI = Math.PI / 2;
-
+const _isNaN = Number.isNaN || isNaN; // eslint-disable-line no-restricted-globals
 // eslint-disable-next-line no-restricted-globals
-const isNumber = value => value != null && value !== '' && isFinite(value) && !Number.isNaN(+value);
+const isNumber = value => value != null && value !== '' && isFinite(value) && !_isNaN(+value);
 
-const operators = new Map([
+const operators = new Map();
+[
   ['+', function (a, b) { return a + b; }],
   ['-', function (a, b) { return a - b; }],
   ['/', function (a, b) { if (b === 0) { return ''; } return a / b; }],
   ['*', function (a, b) { return a * b; }],
-]);
+].forEach((el) => {
+  operators.set(el[0], el[1]);
+});
 /**
 * Function to dispatch, according to their availability,
 * between the appropriate 'elementsFromPoint' function
@@ -917,4 +971,5 @@ export {
   svgContextMenu,
   clickDlPdf,
   isContextMenuDisplayed,
+  _isNaN,
 };

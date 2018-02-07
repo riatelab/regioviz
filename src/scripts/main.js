@@ -664,14 +664,17 @@ function loadData() {
       makeHeaderMapSection();
       setDefaultConfigMenu(start_region, start_variable, 'N1');
       filterLevelVar(app);
-      const other_layers = new Map([
+      const other_layers = new Map();
+      [
         ['borders', borders], ['boxes', boxes],
         ['countries', countries], ['countries_remote', countries_remote],
         ['coasts', coasts], ['coasts_remote', coasts_remote],
         ['cyprus_non_espon_space', cyprus_non_espon_space],
         ['countries_remote_boundaries', countries_remote_boundaries],
         ['frame', frame], ['line', line], ['boxes2', boxes],
-      ]);
+      ].forEach((el) => {
+        other_layers.set(el[0], el[1]);
+      });
       const map_elem = new MapSelect(nuts, other_layers, styles_map);
       const chart = new BarChart1(app.current_data);
       makeSourceSection();

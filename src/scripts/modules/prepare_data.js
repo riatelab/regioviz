@@ -1,5 +1,6 @@
 import { color_highlight } from './options';
 import { variables_info, study_zones, territorial_mesh } from './../main';
+import { _isNaN } from './helpers';
 
 /* eslint-disable no-param-reassign */
 
@@ -342,7 +343,7 @@ export function calcPopCompletudeSubset(app, vars) {
   }
   let total_pop = 0;
   for (let i = 0, len = temp.length; i < len; i++) {
-    total_pop += Number.isNaN(+temp[i][pop_field]) ? 0 : +temp[i][pop_field];
+    total_pop += _isNaN(+temp[i][pop_field]) ? 0 : +temp[i][pop_field];
   }
   // Compute the population stock of the dataset if we filter empty features
   // on all the variables of "vars":
@@ -358,7 +359,7 @@ export function calcPopCompletudeSubset(app, vars) {
   }).filter(ft => vars.map(ratio_name => !!ft[ratio_name]).every(v => v === true));
   let subset_pop = 0;
   for (let i = 0, len = temp.length; i < len; i++) {
-    subset_pop += Number.isNaN(temp[i].pop) ? 0 : temp[i].pop;
+    subset_pop += _isNaN(temp[i].pop) ? 0 : temp[i].pop;
   }
   // Return the ratio of population values ("complétude") within
   // the study zone selected by the user:

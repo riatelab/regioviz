@@ -1,4 +1,6 @@
-import { comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect, svgPathToCoords } from './../helpers';
+import {
+  comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, _isNaN,
+  formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect, svgPathToCoords } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
@@ -838,7 +840,7 @@ export default class Similarity1plus {
           const o = variables_info.find(ft => ft.id === num_n);
           const unit_num = o.unit;
           let coef = +o.formula;
-          coef = Number.isNaN(coef) || coef === 0 ? 1 : coef;
+          coef = _isNaN(coef) || coef === 0 ? 1 : coef;
           content.push(`${num_n} (numérateur) : ${formatNumber(d[num_n] * coef, 1)} ${unit_num}`);
         }
         if (+globalrank > 0) { // No need to display that part if this is "my region":
@@ -853,7 +855,7 @@ export default class Similarity1plus {
             content.push(`<br><b>${indic_rank - 1}ème</b> région la plus proche sur cet indicateur`);
           }
         }
-        if (!Number.isNaN(globalrank)) {
+        if (!_isNaN(globalrank)) {
           _h += 30;
           if (+globalrank === 0) {
             content.push('<br><b>Ma région</b>');
@@ -928,7 +930,7 @@ export default class Similarity1plus {
         circle.style.strokeWidth = '2';
         const content = [];
         const globalrank = d.data.globalrank;
-        if (!Number.isNaN(globalrank)) {
+        if (!_isNaN(globalrank)) {
           if (+globalrank === 0) {
             content.push('<b>Ma région</b>');
           } else if (+globalrank === 1) {
