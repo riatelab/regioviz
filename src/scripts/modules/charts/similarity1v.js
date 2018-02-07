@@ -113,7 +113,6 @@ export default class Similarity1plus {
 
   brushed() {
     const e = d3.event;
-    console.log(e);
     if (!e.selection && e.type === 'end' && !this.last_selection && !e.sourceEvent.sourceEvent) {
       this.map_elem.removeRectBrush();
       const elems = getElementsFromPoint(e.sourceEvent.clientX, e.sourceEvent.clientY);
@@ -148,7 +147,8 @@ export default class Similarity1plus {
     } else {
       this.map_elem.removeRectBrush();
       this.map_elem.layers.selectAll('.cloned').remove();
-      const selection = [d3.event.selection[0] - 1, d3.event.selection[1] + 1.5];
+      if (!e.selection || e.selection.length < 2) { return; }
+      const selection = [e.selection[0] - 1, e.selection[1] + 1.5];
       this.highlighted = [];
       this.draw_group.selectAll('.circle')
         .style('fill', (d) => {
@@ -593,8 +593,6 @@ export default class Similarity1plus {
         .x(d => d.x)
         .y(d => d.y)
         .polygons(data);
-      console.log(data);
-      console.log(voro);
       this.draw_group.append('text')
         .attrs({
           x: width / 2,

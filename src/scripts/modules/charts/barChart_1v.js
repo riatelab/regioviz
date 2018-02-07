@@ -664,8 +664,9 @@ export default class BarChart1 {
     svg_container.select('.brush_top')
       .on('mousemove mousedown', () => {
         if (isContextMenuDisplayed()) return;
-        const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
-        const elem = elems.find(e => e.className.baseVal === 'bar' || e.className.baseVal === 'transp_mean_line');
+        // const elems = getElementsFromPoint(d3.event.clientX, d3.event.clientY);
+        const elem = getElementsFromPoint(d3.event.clientX, d3.event.clientY)
+          .find(e => e.className.baseVal === 'bar' || e.className.baseVal === 'transp_mean_line');
         if (elem) {
           const new_click_event = new MouseEvent('mousemove', {
             pageX: d3.event.pageX,
@@ -1045,8 +1046,8 @@ export default class BarChart1 {
 
   // eslint-disable-next-line class-methods-use-this
   getElemBelow(e) {
-    const elems = getElementsFromPoint(e.clientX, e.clientY);
-    const elem = elems.find(el => el.className.baseVal === 'bar');
+    const elem = getElementsFromPoint(e.clientX, e.clientY)
+      .find(el => el.className.baseVal === 'bar');
     return elem && elem.__data__ ? elem.__data__.id : null;
   }
 

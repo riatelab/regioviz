@@ -169,7 +169,13 @@ export function changeRegion(app, id_region, map_elem) {
   app.current_config.my_region = id_region;
   app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
   map_elem.computeDistMat();
-  app.current_config.min_km_closest_unit = Math.round(map_elem.dist_to_my_region[1].dist / 1000);
+  app.current_config.min_km_closest_unit = Math.round(
+    map_elem.dist_to_my_region[2].dist / 1000) + 1;
+  const input_dist = document.querySelector('#dist_filter');
+  input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
+  if (input_dist.value < app.current_config.min_km_closest_unit) {
+    input_dist.value = app.current_config.min_km_closest_unit + 100;
+  }
   if (app.current_config.filter_key instanceof Array) {
     app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
     filterLevelVar(app);

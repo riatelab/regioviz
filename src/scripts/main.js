@@ -209,6 +209,10 @@ function updateMyCategorySection() {
 *
 */
 function bindUI_chart(chart, map_elem) {
+  // Variable for slight timeout used for
+  // some input fields to avoid refreshing as soon as the value is entered:
+  let tm;
+
   // User click on the arrow next to the input element in the first section
   // of the left menu:
   d3.select('span.down_arrow')
@@ -245,13 +249,16 @@ function bindUI_chart(chart, map_elem) {
 
   d3.select('#dist_filter')
     .on('change keyup', function () {
-      if (+this.value < app.current_config.min_km_closest_unit) {
-        this.value = app.current_config.min_km_closest_unit;
-      }
-      const ids = map_elem.getUnitsWithin(+this.value);
-      applyFilter(app, ids);
-      chart.changeStudyZone();
-      chart.updateCompletude();
+      clearTimeout(tm);
+      tm = setTimeout(() => {
+        if (+this.value < app.current_config.min_km_closest_unit) {
+          this.value = app.current_config.min_km_closest_unit;
+        }
+        const ids = map_elem.getUnitsWithin(+this.value);
+        applyFilter(app, ids);
+        chart.changeStudyZone();
+        chart.updateCompletude();
+      }, 150);
     });
 
   // User change the targeted region:

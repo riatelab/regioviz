@@ -149,22 +149,6 @@ no-restricted-syntax, lines-around-directive, no-unused-vars */
 no-extend-native, prefer-rest-params, no-prototype-builtins,
 no-restricted-syntax, lines-around-directive, no-unused-vars  */
 
-const canvasToBlob = (canvas, callback, type, quality) => {
-  if (canvas.toBlob) {
-    canvas.toBlob(callback, type, quality);
-  } else {
-    setTimeout(() => {
-      const binStr = atob(canvas.toDataURL(type, quality).split(',')[1]);
-      const len = binStr.length;
-      const arr = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        arr[i] = binStr.charCodeAt(i);
-      }
-      callback(new Blob([arr], { type: type || 'image/png' }));
-    });
-  }
-};
-
 // eslint-disable-next-line no-restricted-properties
 const math_pow = Math.pow;
 const math_abs = Math.abs;
@@ -184,7 +168,6 @@ const operators = new Map([
   ['-', function (a, b) { return a - b; }],
   ['/', function (a, b) { if (b === 0) { return ''; } return a / b; }],
   ['*', function (a, b) { return a * b; }],
-  ['^', function (a, b) { return Math.pow(a, b); }], // eslint-disable-line no-restricted-properties
 ]);
 /**
 * Function to dispatch, according to their availability,
@@ -197,26 +180,39 @@ const operators = new Map([
 * @return {Array of Nodes} - An Array created from the resulting NodeList.
 *
 */
-const getElementsFromPoint = (x, y, context = document.body) => {
+/* eslint-disable no-cond-assign, no-plusplus */
+const getElementsFromPoint = (x, y) => {
   if (document.elementsFromPoint) {
     return Array.prototype.slice.call(document.elementsFromPoint(x, y));
   } else if (document.msElementsFromPoint) {
     return Array.prototype.slice.call(document.msElementsFromPoint(x, y));
   }
   const elements = [];
-  const children = context.children;
+  const previousPointerEvents = [];
+  let current;
   let i;
-  let l;
-  let pos;
+  let d;
+  // get all elements via elementFromPoint, and remove them from hit-testing in order
+  while ((current = document.elementFromPoint(x, y))
+      && elements.indexOf(current) === -1 && current != null) {
+    // push the element and its current style
+    elements.push(current);
+    previousPointerEvents.push({
+      value: current.style.getPropertyValue('pointer-events'),
+      priority: current.style.getPropertyPriority('pointer-events'),
+    });
 
-  for (i = 0, l = children.length; i < l; i++) {
-    pos = children[i].getBoundingClientRect();
-    if (pos.left <= x && x <= pos.right && pos.top <= y && y <= pos.bottom) {
-      elements.push(children[i]);
-    }
+    // add "pointer-events: none", to get to the underlying element
+    current.style.setProperty('pointer-events', 'none', 'important');
+  }
+
+  // restore the previous pointer-events values
+  for (i = previousPointerEvents.length; d = previousPointerEvents[--i];) {
+    elements[i].style.setProperty('pointer-events', d.value ? d.value : '', d.priority);
   }
   return elements;
 };
+/* eslint-enable no-cond-assign, no-plusplus */
 
 /**
 * Function to get the computed style value of an element.
