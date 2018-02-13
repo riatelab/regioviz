@@ -198,7 +198,7 @@ export default class BarChart1 {
     resetColors();
     this.current_ranks = this.data.map((d, i) => i + 1);
     nbFt = this.data.length;
-    this.mean_value = getMean(this.data.map(d => d[ratio_to_use]));
+    this.mean_value = getMean2(this.data, ratio_to_use, variables_info);
     this.ref_value = this.data.filter(
       ft => ft.id === app.current_config.my_region)[0][ratio_to_use];
     svg_container.append('defs')
@@ -949,9 +949,7 @@ export default class BarChart1 {
     const y = this.y;
     const ratio_to_use = this.ratio_to_use;
     const grp_mean = this._focus.select('.mean');
-    this.mean_value = getMean(this.data.map(d => d[ratio_to_use]));
-    console.log(this.mean_value);
-    console.log(getMean2(this.data, this.ratio_to_use, variables_info));
+    this.mean_value = getMean2(this.data, ratio_to_use, variables_info);
     grp_mean.select('text')
       .attr('y', y(this.mean_value) + 20)
       .text(`Valeur moyenne : ${formatNumber(this.mean_value, 1)} ${this.unit}`);
@@ -1074,14 +1072,15 @@ export default class BarChart1 {
   }
 
   prepareTableStat() {
-    const values = this.data.map(d => d[this.ratio_to_use]);
+    const ratio_to_use = this.ratio_to_use;
+    const values = this.data.map(d => d[ratio_to_use]);
     return {
       Min: d3.min(values),
       Max: d3.max(values),
-      Moy: getMean(values),
+      Moy: getMean2(this.data, ratio_to_use, variables_info),
       Med: d3.median(values),
-      id: this.ratio_to_use,
-      Variable: this.ratio_to_use,
+      id: ratio_to_use,
+      Variable: ratio_to_use,
       'Ma région': this.ref_value,
     };
   }
@@ -1095,8 +1094,8 @@ export default class BarChart1 {
   getHelpMessage() {
     return `
 <h3>Position – 1 Indicateur</h3>
-
 <b>Aide générale</b>
+
 Ce graphique représente l’indicateur sélectionné ordonné de la valeur minimale à la valeur maximale (barres bleues) pour l’espace d’étude et le maillage territorial d’analyse sélectionné. La valeur de l’unité territoriale sélectionnée apparaît en surbrillance (jaune). La ligne représentée par un tireté rouge représente la moyenne de l’espace d’étude (non pondérée).
 
 Sur ce graphique, il est possible d’inverser l’ordre de classement de l’indicateur (appuyer sur le « + »).

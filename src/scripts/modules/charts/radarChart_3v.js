@@ -1,7 +1,7 @@
 import alertify from 'alertifyjs';
 import {
   math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
-  getMean, formatNumber, svgContextMenu, isContextMenuDisplayed, getElementsFromPoint } from './../helpers';
+  getMean2, formatNumber, svgContextMenu, isContextMenuDisplayed, getElementsFromPoint } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -1107,7 +1107,7 @@ export default class RadarChart3 {
     const features = all_values.map((values, i) => ({
       Min: d3.min(values),
       Max: d3.max(values),
-      Moy: getMean(values),
+      Moy: getMean2(this.ref_data, this.variables[i], variables_info),
       Med: d3.median(values),
       id: this.variables[i],
       Variable: this.variables[i],
@@ -1180,16 +1180,24 @@ export default class RadarChart3 {
   getHelpMessage() {
     return `
 <h3>Position  - 3 indicateurs</h3>
-
 <b>Aide générale</b>
 
-Ce graphique construit tel « une cible » permet de représenter la position de l’unité territoriale de référence pour 3 à 8 indicateurs simultanément. Les cercles concentriques qui constituent le graphique expriment les déciles de la distribution pour chacun des indicateurs sélectionnés (premier cercle = premier décile, valeurs minimales par défaut / cercle extérieur = dernier décile, valeurs maximales par défaut). Les indicateurs représentés sur ce graphique sont de fait normalisés selon leur rang respectif dans la distribution statistique pour chacun des indicateurs : 0 correspondant à la valeur minimale (100 % des unités territoriales disposent de valeurs plus fortes) et 100 la valeur maximale (100 % des unité territoriales sont caractérisées par des valeurs moins fortes).
+Ce graphique en radar permet de comparer la situation d’une région sélectionnée en fonction d’un jeu de <b>3 indicateurs et plus</b>. Afin de rendre comparables les indicateurs exprimés dans des ordres de grandeur et des unités de mesure hétérogènes, ceux-ci sont préalablement normalisés au regard du rang des régions sur chacun des indicateurs sélectionnés. Ainsi, pour un indicateur donné, une valeur d’indice sera comprise entre 0 et 100. Par exemple, une valeur de 60 signifiera que 60 % des régions sont caractérisées par des valeurs inférieures sur cet indicateur et 40 % par des valeurs supérieures.
+Le rang normalisé X’ d’une région i est calculé en effectuant le rapport entre la valeur du rang absolu et le nombre total d’observations multiplié par 100 :
+<p id="formula" style="text-align: center; font-size: 0.9em;">
+$Rang\\ Normalisé\\ X’ (Région\\ i) = {Rang\\ X\\ (Région\\ i) - 1 \\over {N - 1}} * 100$
+</p>
+<small>
+Avec :
+X : Indicateur X
+Rang : position décroissante dans la distribution (croissant lorsque l’indicateur est inversé)
+N : Nombre total de régions de l’espace d’étude
+</small>
+Cette méthode permet de rendre comparables les positions relatives des régions sur différents indicateurs en termes de rangs, mais elle ne restitue pas d’information sur l’ampleur des écarts entre ces régions.
+A partir de ces indices, on peut construire un graphique en radar qui correspond à un graphique multidimensionnel de rangs relatifs.
 
-Le cercle représenté en tireté rouge représente la valeur médiane (50) pour l’espace d’étude. Si pour un indicateur la unité territoriale se situe à l’intérieur de ce cercle, cela signifie que la valeur pour cet indicateur se situe en-dessous de la médiane de l’espace d’étude. Si pour un autre indicateur la unité territoriale se situe à l’extérieur de ce cercle, cela signifie que la valeur pour cet indicateur se situe au dessus de la médiane de l’espace d’étude.
 
-Il est possible de cliquer sur la carte pour visualiser le positionnement d’autres unités territoriales par rapport à l’unité territoriale de référence. Il est déconseillé de représenter simultanément plus de 3 unités territoriales sur le même graphique, au risque de rendre sa lecture aléatoire.
-
-Ce n’est pas tant la forme créée sur ce graphique qu’il faut analyser (la forme dépend largement de la position des indicateurs sur le graphique, aléatoire par définition) que la position au regard de l’espace de référence ou d’autres unités territoriales sélectionnées sur le graphique. L’utilisateur peut dès lors inverser le sens du classement (clic droit sur le label de l’indicateur, adapté pour des indicateurs comme le taux de chômage ou un taux élevé ne signifie pas forcément une situation favorable) ou peut inverser l’ordre d’apparition des variables sur le graphique (clic gauche) si l’on souhaite par exemple rapprocher des indicateurs de même thématique côte à côte.`;
+<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_3ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   getTemplateHelp() {

@@ -690,6 +690,12 @@ function loadData() {
       });
       updateMyCategorySection();
       changeRegion(app, start_region, map_elem);
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          processEscapes: true,
+        },
+      });
     });
 }
 

@@ -1,5 +1,5 @@
 import {
-  comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean, getStdDev, _isNaN,
+  comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean2, getStdDev, _isNaN,
   formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect, svgPathToCoords } from './../helpers';
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
@@ -1131,7 +1131,7 @@ export default class Similarity1plus {
     this.stddevs = {};
     this.ratios.forEach((v) => {
       const values = this.data.map(ft => +ft[v]);
-      const mean = getMean(values);
+      const mean = getMean2(this.data, v, variables_info);
       this.means[v] = mean;
       this.stddevs[v] = getStdDev(values, mean);
     });
@@ -1360,7 +1360,7 @@ export default class Similarity1plus {
     const features = all_values.map((values, i) => ({
       Min: d3.min(values),
       Max: d3.max(values),
-      Moy: getMean(values),
+      Moy: getMean2(this.data, this.ratios[i], variables_info),
       Med: d3.median(values),
       id: this.ratios[i],
       Variable: this.ratios[i],
@@ -1383,24 +1383,14 @@ export default class Similarity1plus {
   getHelpMessage() {
     return `
 <h3>Ressemblances</h3>
-
 <b>Aide générale</b>
 
-Les graphiques de ressemblance permettent de visualiser pour 1 à 8 indicateurs les unités territoriales les plus proches statistiquement à l’unité territoriale de référence.
+Les graphiques de ressemblance permettent de visualiser pour un indicateur et plus 1 les régions les plus proches statistiquement d’une région de référence. Cette proximité statistique est évaluée selon une méthode classique : la distance euclidienne (ou distance à vol d’oiseau) prenant en compte des données préalablement standardisées. Si la valeur de l’indice équivaut à 0, la similarité est totale entre ces deux unités territoriales. Plus la valeur de la distance est élevée, moins la similarité est importante.
+L’interface Regioviz propose deux niveaux pour la visualisation de ces ressemblances : la ressemblance globale et la ressemblance détaillée indicateur par indicateur.
+L’option de distance globale propose une visualisation synthétique de l’éloignement statistique existant entre « ma région » et les autres régions de l’espace d’étude sur les n indicateurs sélectionnés. Ce module est composé d’un graphique de Beeswarm qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre ma région et les autres régions de l’espace d’étude. La carte associée à la représentation graphique rend compte de l’organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (régions les plus ressemblantes) apparaissent dans des tonalités rouges, les 25 % les plus importantes (régions les moins ressemblantes) sont représentées par des tonalités bleues.
+Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d’évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l’application décompose cette ressemblance pour l’unité territoriale qui ressemble le plus à « ma région » de référence d’après la mesure globale de ressemblance. Libre ensuite à l’utilisateur de choisir plus ou moins d’unités territoriales de comparaison (les n unités les plus ressemblantes) en fonction de ses objectifs d’analyse.
 
-Cette proximité est mesurée par la distance euclidienne. Cette fonction permet d’évaluer la distance normalisée globale (exprimée en rang) séparant l’unité territoriale de référence avec l’ensemble des autres unités territoriales pour un ensemble d’indicateurs. La formule de la fonction est la suivante :
-
-<p style="text-align:center;font-size: 1em;"><b>Σ(xi - yi)²</b></p>
-
-Si la valeur de l’indice équivaut à 0, la similarité est totale entre deux unités territoriales. Plus la valeur de l’indice est élevée, plus la dissimilarité est importante. A noter que cette métrique euclidienne est assez sensible aux ordres de grandeur hétérogènes entre plusieurs indicateurs (un fort écart pour un indicateur peut affecter significativement la valeur de l’indice).
-
-Pour éviter de potentielles erreurs d’interprétation liées à cet indice de similarité synthétique, Regioviz propose systématiquement une représentation graphique permettant d’évaluer visuellement le degré de similarité indicateur par indicateur.
-
-Par défaut, l’application renvoie les 5 unités territoriales pour l’espace d’étude et les indicateurs sélectionnées qui sont définis par la distance euclidienne la plus faible. Libre à l’utilisateur de choisir plus ou moins d’unités territoriales de comparaison en fonction de ses objectifs d’analyse.
-
-Sur le graphique apparaissent les n unités territoriales les plus proches pour chaque indicateur dans leurs unités de mesure respectives. L’unité territoriale de référence apparaît systématiquement au centre de chacun des graphiques. Un clic gauche sur une des unités territoriales sur le graphique ou sur la carte génère une ligne entre chaque indicateur permettant d’évaluer le degré de ressemblance avec l’unité territoriale de référence et visualiser ainsi si celle-ci se positionne au-dessus ou en dessous, et pour quel indicateur.
-
-Par défaut, la taille des cercles sur le graphique est constante. Mais l’utilisateur peut activer l’option « cercles proportionnels au numérateur » pour visualiser graphiquement la masse des unités territoriales. Par exemple, si l’indicateur PIB par habitant est sélectionné, la taille des cercles sera proportionnelle à la masse de PIB des unités territoriales. Si c’est la part des 0-24 ans dans la population totale, la taille des figurés sera proportionnelle à la masse de la population âgée de 0 à 24 ans. Cette option a été créée afin de pouvoir restituer les ordres de grandeur potentiellement hétérogènes des unités territoriales proposées dans l’application.`;
+<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_ressemblances.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   // eslint-disable-next-line class-methods-use-this

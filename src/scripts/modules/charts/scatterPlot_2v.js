@@ -1,4 +1,4 @@
-import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed, math_min, math_max, getElementsFromPoint } from './../helpers';
+import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean2, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed, math_min, math_max, getElementsFromPoint } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
@@ -106,14 +106,14 @@ export default class ScatterPlot2 {
     this.unit2 = variables_info.find(ft => ft.id === this.variable2).unit;
     this.pretty_name1 = app.current_config.ratio_pretty_name[0];
     this.pretty_name2 = app.current_config.ratio_pretty_name[1];
-    this.data = ref_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
-      .map((d) => {
-        const res = { id: d.id, name: d.name };
-        res[this.variable1] = d[this.variable1];
-        res[this.variable2] = d[this.variable2];
-        res[pop_field] = d[pop_field];
-        return res;
-      });
+    this.data = ref_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
+      // .map((d) => {
+      //   const res = { id: d.id, name: d.name };
+      //   res[this.variable1] = d[this.variable1];
+      //   res[this.variable2] = d[this.variable2];
+      //   res[pop_field] = d[pop_field];
+      //   return res;
+      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     const tmp_my_region = this.data.splice(
       this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
@@ -809,8 +809,8 @@ export default class ScatterPlot2 {
       this.xAxis.scale(this.x);
       this.xAxis2.scale(this.x);
 
-      this.mean_variable1 = getMean(serie_x);
-      this.mean_variable2 = getMean(serie_y);
+      this.mean_variable1 = getMean2(data, variable1, variables_info);
+      this.mean_variable2 = getMean2(data, variable2, variables_info);
 
       const x = this.x;
       const y = this.y;
@@ -1103,13 +1103,9 @@ export default class ScatterPlot2 {
   */
   updateMeanMedianValue() {
     if (this.type === 'value') {
-      this.mean_variable1 = getMean(this.data.map(d => d[this.variable1]));
-      this.mean_variable2 = getMean(this.data.map(d => d[this.variable2]));
+      this.mean_variable1 = getMean2(this.data, this.variable1, variables_info);
+      this.mean_variable2 = getMean2(this.data, this.variable2, variables_info);
     } else if (this.type === 'rank') {
-      // this.mean_variable1 = _getPR(
-      //   getMean(this.data.map(d => d[this.variable1])), this.data.map(d => d[this.variable1]));
-      // this.mean_variable2 = _getPR(
-      //   getMean(this.data.map(d => d[this.variable2])), this.data.map(d => d[this.variable2]));
       this.mean_variable1 = 50;
       this.mean_variable2 = 50;
     }
@@ -1153,14 +1149,14 @@ export default class ScatterPlot2 {
   changeStudyZone() {
     // Fetch the new data subset for this study zone and theses variables:
     const pop_field = app.current_config.pop_field;
-    this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
-      .map((d) => {
-        const res = { id: d.id, name: d.name };
-        res[this.variable1] = d[this.variable1];
-        res[this.variable2] = d[this.variable2];
-        res[pop_field] = d[pop_field];
-        return res;
-      });
+    this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
+      // .map((d) => {
+      //   const res = { id: d.id, name: d.name };
+      //   res[this.variable1] = d[this.variable1];
+      //   res[this.variable2] = d[this.variable2];
+      //   res[pop_field] = d[pop_field];
+      //   return res;
+      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Put "my region" at the end of the serie so it will be displayed on
     // the top of the chart:
@@ -1211,14 +1207,14 @@ export default class ScatterPlot2 {
     this.updateItemsCtxMenu();
     // Filter the data to only keep data in which we are interested:
     const pop_field = app.current_config.pop_field;
-    this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
-      .map((d) => {
-        const res = { id: d.id, name: d.name };
-        res[this.variable1] = d[this.variable1];
-        res[this.variable2] = d[this.variable2];
-        res[pop_field] = d[pop_field];
-        return res;
-      });
+    this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
+      // .map((d) => {
+      //   const res = { id: d.id, name: d.name };
+      //   res[this.variable1] = d[this.variable1];
+      //   res[this.variable2] = d[this.variable2];
+      //   res[pop_field] = d[pop_field];
+      //   return res;
+      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
@@ -1258,14 +1254,14 @@ export default class ScatterPlot2 {
     this.updateItemsCtxMenu();
     // Filter the data to only keep data in which we are interested:
     const pop_field = app.current_config.pop_field;
-    this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2])
-      .map((d) => {
-        const res = { id: d.id, name: d.name };
-        res[this.variable1] = d[this.variable1];
-        res[this.variable2] = d[this.variable2];
-        res[pop_field] = d[pop_field];
-        return res;
-      });
+    this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
+      // .map((d) => {
+      //   const res = { id: d.id, name: d.name };
+      //   res[this.variable1] = d[this.variable1];
+      //   res[this.variable2] = d[this.variable2];
+      //   res[pop_field] = d[pop_field];
+      //   return res;
+      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
@@ -1404,8 +1400,8 @@ export default class ScatterPlot2 {
   }
 
   selectBelowMean() {
-    const mean1 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable1]));
-    const mean2 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable2]));
+    const mean1 = this.type === 'rank' ? 50 : getMean2(this.data, this.variable1, variables_info);
+    const mean2 = this.type === 'rank' ? 50 : getMean2(this.data, this.variable2, variables_info);
     const v1 = this.type === 'rank' ? this.rank_variable1 : this.variable1;
     const v2 = this.type === 'rank' ? this.rank_variable2 : this.variable2;
 
@@ -1445,8 +1441,8 @@ export default class ScatterPlot2 {
   }
 
   selectAboveMean() {
-    const mean1 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable1]));
-    const mean2 = this.type === 'rank' ? 50 : getMean(this.data.map(ft => ft[this.variable2]));
+    const mean1 = this.type === 'rank' ? 50 : getMean2(this.data, this.variable1, variables_info);
+    const mean2 = this.type === 'rank' ? 50 : getMean2(this.data, this.variable2, variables_info);
     const v1 = this.type === 'rank' ? this.rank_variable1 : this.variable1;
     const v2 = this.type === 'rank' ? this.rank_variable2 : this.variable2;
 
@@ -1492,7 +1488,7 @@ export default class ScatterPlot2 {
       {
         Min: d3.min(values1),
         Max: d3.max(values1),
-        Moy: getMean(values1),
+        Moy: getMean2(this.data, this.variable1, variables_info),
         Med: d3.median(values1),
         id: this.variable1,
         Variable: this.variable1,
@@ -1501,7 +1497,7 @@ export default class ScatterPlot2 {
       {
         Min: d3.min(values2),
         Max: d3.max(values2),
-        Moy: getMean(values2),
+        Moy: getMean2(this.data, this.variable2, variables_info),
         Med: d3.median(values2),
         id: this.variable2,
         Variable: this.variable2,
@@ -1524,7 +1520,6 @@ export default class ScatterPlot2 {
   getHelpMessage() {
     return `
 <h3>Position  - 2 indicateurs</h3>
-
 <b>Aide générale</b>
 Ce graphique bidimensionnel représente la position de l’unité territoriale de référence sur deux indicateurs pour un espace d’étude et un maillage territorial d’analyse donné. La valeur de l’unité territoriale de référence apparaît en surbrillance (jaune). Les lignes représentées par un tireté rouge représentent la moyenne de l’espace d’étude pour chacun des indicateurs sélectionnés (non pondérée).
 

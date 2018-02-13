@@ -481,60 +481,44 @@ const getMean2 = (data, var_name, info_var) => {
   let id2;
   let s1 = 0;
   let s2 = 0;
+  let left = 0;
   const formula = jsep(o_info.formula);
+  console.log(formula);
   if (!formula.left.left && !formula.right.right) {
     id1 = o_info[formula.left.name];
     id2 = o_info[formula.right.name];
-    console.log(id1, id2);
+    console.log('formula : ', o_info.formula);
+    console.log('id1 : ', id1, ' id2 :', id2);
     const serie1 = data.map(d => +d[id1]);
     const serie2 = data.map(d => +d[id2]);
-    const mult1 = info_var.find(ft => ft.id === id1).formula;
-    const mult2 = info_var.find(ft => ft.id === id2).formula;
+    const fun = operators.get(formula.operator);
     for (let i = 0; i < nb_values; i++) {
       s1 += serie1[i];
       s2 += serie2[i];
     }
-    if (isNumber(mult1)) {
-      s1 /= +mult1;
-    }
-    if (isNumber(mult2)) {
-      s2 /= +mult2;
-    }
-    console.log('forumula : ', o_info.forumula);
-    console.log('id1 :', id1, 'id2 :', id2);
-    console.log('mult1 :', mult1, 'mult2', mult2);
-    const fun = operators.get(formula.operator);
+    // console.log('mult1 : ', mult1, ' mult2 : ', mult2);
+
     return fun(s1, s2);
   } else if (formula.left.left && !formula.right.left) {
     id1 = o_info[formula.left.left.name];
     id2 = o_info[formula.left.right.name];
+    console.log('formula : ', o_info.formula);
+    console.log('id1 :', id1, 'id2 :', id2);
     const serie1 = data.map(d => +d[id1]);
     const serie2 = data.map(d => +d[id2]);
-    const mult1 = info_var.find(ft => ft.id === id1).formula;
-    const mult2 = info_var.find(ft => ft.id === id2).formula;
+    let fun = operators.get(formula.left.operator);
     for (let i = 0; i < nb_values; i++) {
       s1 += serie1[i];
       s2 += serie2[i];
     }
-    if (isNumber(mult1)) {
-      s1 /= +mult1;
-    }
-    if (isNumber(mult2)) {
-      s2 /= +mult2;
-    }
-    let fun = operators.get(formula.left.operator);
-    const left = fun(s1, s2);
+    left = fun(s1, s2);
     fun = operators.get(formula.operator);
-    let right;
     if (formula.right.type === 'Identifier') {
-      right = formula.right.name === 'id1' ? s1 : s2;
+      const right = formula.right.name === 'id1' ? s1 : s2;
+      return fun(left, right);
     } else {
-      right = formula.right.value;
+      return fun(left, formula.right.value);
     }
-    console.log('forumula : ', o_info.forumula);
-    console.log('id1 :', id1, 'id2 :', id2);
-    console.log('mult1 :', mult1, 'mult2', mult2);
-    return fun(left, right);
   }
   console.log('Error');
   console.log(' ');

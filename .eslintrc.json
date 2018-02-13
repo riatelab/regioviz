@@ -6,7 +6,8 @@
   "globals": {
     "ENV": true,
     "d3": false,
-    "document": true
+    "document": true,
+    "MathJax": true
   },
   "env": {
     "browser": true

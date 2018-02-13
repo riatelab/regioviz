@@ -269,6 +269,10 @@ export function makeHeaderChart() {
         closeLabel: 'Close',
         onOpen() {
           document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
+          setTimeout(() => {
+            const formula = document.querySelector('.tingle-modal-box__content').querySelector('#formula');
+            if (formula) MathJax.Hub.Queue(['Typeset', MathJax.Hub, formula]);
+          }, 15);
         },
         onClose() {
           modal.destroy();
