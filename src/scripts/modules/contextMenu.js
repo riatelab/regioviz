@@ -65,8 +65,8 @@ export default class contextMenu {
   }
 
   removeMenu() {
-    if (this.DOMobj && this.DOMobj.parentElement && this.DOMobj.parentElement.removeChild) {
-      this.DOMobj.parentElement.removeChild(this.DOMobj);
+    if (this.DOMobj && this.DOMobj.parentNode && this.DOMobj.parentNode.removeChild) {
+      this.DOMobj.parentNode.removeChild(this.DOMobj);
       this.DOMobj = null;
     }
   }

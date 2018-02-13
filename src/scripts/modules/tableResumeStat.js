@@ -82,7 +82,7 @@ export default class TableResumeStat {
   }
 
   remove() {
-    this.table_body.parentElement.parentElement.remove();
+    this.table_body.parentNode.parentNode.remove();
     this.table_body = null;
   }
 }

@@ -259,7 +259,7 @@ class MapSelect {
       .each(function () {
         this._pts = svgPathToCoords(this.getAttribute('d'), app.type_path);
       });
-    this.tooltip = prepareTooltip(d3.select(svg_map.node().parentElement), null, 'tooltip_map');
+    this.tooltip = prepareTooltip(d3.select(svg_map.node().parentNode), null, 'tooltip_map');
     this.bindTooltips();
     this.brushToTooltip();
   }

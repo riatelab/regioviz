@@ -50,7 +50,7 @@ export default class Similarity1plus {
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentNode), null);
 
     this.completude = new CompletudeSection();
     this.completude.update(
@@ -298,7 +298,7 @@ export default class Similarity1plus {
               this.classList.remove('arrow-shadow');
             })
             .on('click', function () {
-              const that_ratio = this.parentElement.id.slice(2);
+              const that_ratio = this.parentNode.id.slice(2);
               const current_position = self.ratios.indexOf(that_ratio);
               if (current_position === 0) { return; }
               self.ratios.splice(current_position, 1);
@@ -326,7 +326,7 @@ export default class Similarity1plus {
               this.classList.remove('arrow-shadow');
             })
             .on('click', function () {
-              const that_ratio = this.parentElement.id.slice(2);
+              const that_ratio = this.parentNode.id.slice(2);
               const current_position = self.ratios.indexOf(that_ratio);
               if (current_position === self.ratios.length) { return; }
               self.ratios.splice(current_position, 1);
@@ -829,14 +829,14 @@ export default class Similarity1plus {
         clearTimeout(t);
         const content = [];
         let _h = 75;
-        const ratio_n = this.parentElement.parentElement.id.replace('l_', '');
+        const ratio_n = this.parentNode.parentNode.id.replace('l_', '');
         const unit_ratio = variables_info.find(ft => ft.id === ratio_n).unit;
         const globalrank = +this.getAttribute('globalrank');
         const indic_rank = self.current_ids.length - +d[`rank_${ratio_n}`];
         content.push(`${ratio_n} : ${formatNumber(d[ratio_n], 1)} ${unit_ratio}`);
         if (self.proportionnal_symbols) {
           _h += 25;
-          const num_n = this.parentElement.parentElement.getAttribute('num');
+          const num_n = this.parentNode.parentNode.getAttribute('num');
           const o = variables_info.find(ft => ft.id === num_n);
           const unit_num = o.unit;
           let coef = +o.formula;
@@ -955,7 +955,7 @@ export default class Similarity1plus {
       })
       .on('click', function (d) {
         const id = d.data.id;
-        const circle = this.parentElement.querySelector('circle');
+        const circle = this.parentNode.querySelector('circle');
         if (self.highlighted.indexOf(id) > -1) {
           self.highlighted.splice(self.highlighted.indexOf(id), 1);
           self.map_elem.target_layer

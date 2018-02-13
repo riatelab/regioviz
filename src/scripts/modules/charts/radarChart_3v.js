@@ -202,7 +202,7 @@ export default class RadarChart3 {
       .attr('transform', `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`);
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentNode), null);
 
     this.prepareData(data);
     this.drawAxisGrid();
@@ -251,10 +251,10 @@ export default class RadarChart3 {
     const nb_var = app.current_config.ratio.length;
 
     const colorLabel = function colorLabel(label) {
-      const el = this.parentElement.querySelector('text');
+      const el = this.parentNode.querySelector('text');
       el.style.fill = 'darkblue';
       el.style.fontWeight = '800';
-      const ix = +this.parentElement.id.slice(2);
+      const ix = +this.parentNode.id.slice(2);
       let ix1 = ix + 1;
       if (ix1 > nb_var - 1) {
         ix1 = 0;
@@ -263,14 +263,14 @@ export default class RadarChart3 {
     };
 
     const unColorLabel = function unColorLabel(label) {
-      const el = this.parentElement.querySelector('text');
+      const el = this.parentNode.querySelector('text');
       if (self.inversedAxis.has(label)) {
         el.style.fill = 'red';
       } else {
         el.style.fill = 'black';
       }
       el.style.fontWeight = null;
-      const ix = +this.parentElement.id.slice(2);
+      const ix = +this.parentNode.id.slice(2);
       let ix1 = ix + 1;
       if (ix1 > nb_var - 1) {
         ix1 = 0;
@@ -280,7 +280,7 @@ export default class RadarChart3 {
     };
 
     const swapAxis = function swapAxis() {
-      const ix = +this.parentElement.id.slice(2);
+      const ix = +this.parentNode.id.slice(2);
       if (ix + 1 === self.allAxis.length) {
         for (let i = 0; i < self.data.length; i++) {
           swap(self.data[i].axes, ix, 0);
@@ -295,7 +295,7 @@ export default class RadarChart3 {
     };
 
     const reverseAxis = function reverseAxis(label) {
-      const id_axis = this.parentElement.id;
+      const id_axis = this.parentNode.id;
       if (self.inversedAxis.has(label)) {
         self.inversedAxis.delete(label);
         self.g.select(`g#${id_axis}`)
@@ -352,7 +352,7 @@ export default class RadarChart3 {
     });
     svg_bar.selectAll('.img_reverse')
       .attrs(function () {
-        const el = this.parentElement.querySelector('tspan');
+        const el = this.parentNode.querySelector('tspan');
         const x = +el.getAttribute('x') - 20;
         const y = +el.getAttribute('y') + 15;
         return { x, y };
@@ -361,7 +361,7 @@ export default class RadarChart3 {
 
     svg_bar.selectAll('.img_reverse2')
       .attrs(function (_, i) {
-        const el = this.parentElement.querySelector('tspan');
+        const el = this.parentNode.querySelector('tspan');
         const x = +el.getAttribute('x');
         const y = +el.getAttribute('y') + 15;
         const transform = `rotate(${(360 / nb_var) * i}, ${x + 25 / 2}, ${y + 10 / 2})`;
@@ -373,7 +373,7 @@ export default class RadarChart3 {
 
     svg_bar.selectAll('.rectlabel')
       .attrs(function () {
-        const el = this.parentElement.querySelector('tspan');
+        const el = this.parentNode.querySelector('tspan');
         const bbox = el.getBoundingClientRect();
         const x = +el.getAttribute('x') - bbox.width / 2 - 20;
         const y = +el.getAttribute('y') - 15;
@@ -689,7 +689,7 @@ export default class RadarChart3 {
           .selectAll('image')
           .style('display', null)
           .attr('y', function () {
-            return +this.parentElement.querySelector('tspan').getAttribute('y') + 15;
+            return +this.parentNode.querySelector('tspan').getAttribute('y') + 15;
           });
         tm = setTimeout(() => {
           d3.select(this)

@@ -396,7 +396,7 @@ export default class ScatterPlot2 {
       .call(this.yAxis);
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentNode), null);
 
     this.prepareTitleAxis();
 

@@ -403,7 +403,7 @@ export default class BarChart1 {
       });
 
     // Prepare the tooltip displayed on mouseover:
-    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentElement), null);
+    this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentNode), null);
 
     // // Deactivate the brush rect selection on the map + on the chart
     // // when he user press the Ctrl key:
