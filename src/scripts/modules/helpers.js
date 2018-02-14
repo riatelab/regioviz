@@ -5,8 +5,8 @@ import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise,
-no-extend-native, prefer-rest-params, no-prototype-builtins,
-no-restricted-syntax, lines-around-directive, no-unused-vars */
+no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
+no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return */
 (function () {
   /*
   Polyfill for 'Element.remove'
@@ -184,12 +184,31 @@ no-restricted-syntax, lines-around-directive, no-unused-vars */
     const a = new MouseEvent('test');
     return false; // No need to polyfill
   } catch (e) {
-    const MouseEvent = function (eventType, params) {
-      params = params || { bubbles: false, cancelable: false };
+    const MouseEvent = function (eventType, _params) {
+      const params = Object.assign({
+        bubbles: false,
+        cancelable: false,
+        view: window,
+        detail: 0,
+        screenX: 0,
+        screenY: 0,
+        clientX: 0,
+        clientY: 0,
+        ctrlKey: false,
+        altKey: false,
+        shiftKey: false,
+        metaKey: false,
+        button: 0,
+        relatedTarget: null,
+      }, _params);
+      // params = params || { bubbles: false, cancelable: false };
       const mouseEvent = document.createEvent('MouseEvent');
+      console.log(params.clientX, params.clientY);
       mouseEvent.initMouseEvent(
-        eventType, params.bubbles, params.cancelable, window,
-        0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        eventType, params.bubbles, params.cancelable, params.view,
+        params.detail, params.screenX, params.screenY, params.clientX, params.clientY,
+        params.ctrlKey, params.altKey, params.shiftKey, params.metaKey,
+        params.button, params.relatedTarget);
       return mouseEvent;
     };
     MouseEvent.prototype = Event.prototype;
@@ -197,8 +216,8 @@ no-restricted-syntax, lines-around-directive, no-unused-vars */
   }
 })();
 /* eslint-enable wrap-iife, object-shorthand, no-bitwise,
-no-extend-native, prefer-rest-params, no-prototype-builtins,
-no-restricted-syntax, lines-around-directive, no-unused-vars  */
+no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
+no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return  */
 
 // eslint-disable-next-line no-restricted-properties
 const math_pow = Math.pow;
@@ -483,12 +502,9 @@ const getMean2 = (data, var_name, info_var) => {
   let s2 = 0;
   let left = 0;
   const formula = jsep(o_info.formula);
-  console.log(formula);
   if (!formula.left.left && !formula.right.right) {
     id1 = o_info[formula.left.name];
     id2 = o_info[formula.right.name];
-    console.log('formula : ', o_info.formula);
-    console.log('id1 : ', id1, ' id2 :', id2);
     const serie1 = data.map(d => +d[id1]);
     const serie2 = data.map(d => +d[id2]);
     const fun = operators.get(formula.operator);
@@ -502,8 +518,6 @@ const getMean2 = (data, var_name, info_var) => {
   } else if (formula.left.left && !formula.right.left) {
     id1 = o_info[formula.left.left.name];
     id2 = o_info[formula.left.right.name];
-    console.log('formula : ', o_info.formula);
-    console.log('id1 :', id1, 'id2 :', id2);
     const serie1 = data.map(d => +d[id1]);
     const serie2 = data.map(d => +d[id2]);
     let fun = operators.get(formula.left.operator);
@@ -520,9 +534,6 @@ const getMean2 = (data, var_name, info_var) => {
       return fun(left, formula.right.value);
     }
   }
-  console.log('Error');
-  console.log(' ');
-  console.log(o_info.formula);
   return NaN;
 };
 
@@ -762,7 +773,7 @@ export function exportPNG(elem, filename) {
   img.onload = function () {
     ctx.drawImage(img, 0, 0);
     const dataurl = targetCanvas.toDataURL('image/png');
-    console.log(dataurl);
+    // console.log(dataurl);
     fetch(dataurl)
       .then(res => res.blob())
       .then((blob) => {
@@ -893,6 +904,17 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
   new ContextMenu().showMenu(d3.event, document.body, items_menu);
 }
 
+const getScrollValue = () => {
+  const scrollX = (window.pageXOffset !== undefined)
+    ? window.pageXOffset
+    : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+
+  const scrollY = (window.pageYOffset !== undefined)
+    ? window.pageYOffset
+    : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+  return { scrollX, scrollY };
+};
+
 const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 
 /**
@@ -956,4 +978,5 @@ export {
   clickDlPdf,
   isContextMenuDisplayed,
   _isNaN,
+  getScrollValue,
 };

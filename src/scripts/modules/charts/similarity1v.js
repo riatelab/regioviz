@@ -1,6 +1,8 @@
 import {
   comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean2, getStdDev, _isNaN,
-  formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect, svgPathToCoords } from './../helpers';
+  formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect,
+  svgPathToCoords, getScrollValue,
+} from './../helpers';
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
@@ -26,6 +28,16 @@ const updateDimensions = () => {
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
   d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
+  svg_bar.append('defs')
+    .append('svg:clipPath')
+    .attr('id', 'clip')
+    .append('svg:rect')
+    .attrs({
+      width: fixed_dimension.chart.width + 10,
+      height: fixed_dimension.chart.height + 4,
+      x: -20,
+      y: -2,
+    });
   svg_container = svg_bar.append('g').attr('class', 'container');
 };
 
@@ -207,6 +219,7 @@ export default class Similarity1plus {
     this.draw_group.select('#axis-title-global-dist').remove();
     this.draw_group.selectAll('.overlayrect').remove();
     if (self.type === 'detailled') {
+      this.draw_group.attr('clip-path', 'url(#clip)');
       const highlight_selection = self.highlight_selection;
       const nb_variables = self.ratios.length;
       const offset = height / nb_variables + 1;
@@ -281,7 +294,6 @@ export default class Similarity1plus {
 
           g.append('image')
             .attrs({
-              // x: txt.node().getBoundingClientRect().width + 22.5,
               x: -19,
               y: -6,
               width: 12,
@@ -292,10 +304,12 @@ export default class Similarity1plus {
             })
             .style('cursor', 'pointer')
             .on('mousedown', function () {
-              this.classList.add('arrow-shadow');
+              d3.select(this).attr('class', 'arrow-shadow');
+              // this.classList.add('arrow-shadow');
             })
             .on('mouseup mouseout', function () {
-              this.classList.remove('arrow-shadow');
+              d3.select(this).attr('class', '');
+              // this.classList.remove('arrow-shadow');
             })
             .on('click', function () {
               const that_ratio = this.parentNode.id.slice(2);
@@ -309,7 +323,6 @@ export default class Similarity1plus {
 
           g.append('image')
             .attrs({
-              // x: txt.node().getBoundingClientRect().width + 22.5,
               x: -19,
               y: 13,
               width: 12,
@@ -320,10 +333,12 @@ export default class Similarity1plus {
             })
             .style('cursor', 'pointer')
             .on('mousedown', function () {
-              this.classList.add('arrow-shadow');
+              d3.select(this).attr('class', 'arrow-shadow');
+              // this.classList.add('arrow-shadow');
             })
             .on('mouseup mouseout', function () {
-              this.classList.remove('arrow-shadow');
+              d3.select(this).attr('class', '');
+              // this.classList.remove('arrow-shadow');
             })
             .on('click', function () {
               const that_ratio = this.parentNode.id.slice(2);
@@ -565,6 +580,7 @@ export default class Similarity1plus {
       }
       setTimeout(() => { this.makeTooltips(); }, 200);
     } else if (self.type === 'global') {
+      this.draw_group.attr('clip-path', null);
       data.sort((a, b) => a.dist - b.dist);
       const values = data.map(ft => ft.dist);
       const _values = values.slice().splice(2);
@@ -828,6 +844,7 @@ export default class Similarity1plus {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
         const content = [];
+        const { scrollX, scrollY } = getScrollValue();
         let _h = 75;
         const ratio_n = this.parentNode.parentNode.id.replace('l_', '');
         const unit_ratio = variables_info.find(ft => ft.id === ratio_n).unit;
@@ -873,8 +890,8 @@ export default class Similarity1plus {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - window.scrollX - 5}px`,
-            top: `${d3.event.pageY - window.scrollY - _h}px`,
+            left: `${d3.event.pageX - scrollX - 5}px`,
+            top: `${d3.event.pageY - scrollY - _h}px`,
           });
       })
       .on('click', function (d) {
@@ -886,12 +903,15 @@ export default class Similarity1plus {
           .each(function (ft) {
             if (ft.id === d.id) {
               const cloned = this.cloneNode();
-              cloned.style.fill = 'red';
-              cloned.style.stroke = 'orange';
-              cloned.style.strokeWidth = '1.25px';
-              cloned.classList.add('cloned');
               self.map_elem.layers.select('#temp').node().appendChild(cloned);
-              setTimeout(() => { cloned.remove(); }, 10000);
+              const _cloned = d3.select(cloned)
+                .attr('class', 'cloned')
+                .styles({
+                  fill: 'red',
+                  stroke: 'orange',
+                  'stroke-width': '1.25px',
+                });
+              setTimeout(() => { _cloned.remove(); }, 7500);
             }
           });
       });
@@ -923,6 +943,7 @@ export default class Similarity1plus {
       .on('mousemove.tooltip', function (d) {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
+        const { scrollX, scrollY } = getScrollValue();
         self.draw_group.selectAll('circle')
           .styles({ stroke: 'darkgray', 'stroke-width': '0.45' });
         const circle = this.previousSibling;
@@ -949,8 +970,8 @@ export default class Similarity1plus {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - window.scrollX - 5}px`,
-            top: `${d3.event.pageY - window.scrollY - 75}px`,
+            left: `${d3.event.pageX - scrollX - 5}px`,
+            top: `${d3.event.pageY - scrollY - 75}px`,
           });
       })
       .on('click', function (d) {
@@ -1093,7 +1114,7 @@ export default class Similarity1plus {
       });
     setTimeout(() => {
       l.remove();
-    }, 5000);
+    }, 7500);
   }
 
   updateChangeRegion() {

@@ -1,4 +1,8 @@
-import { Rect, comp2, svgPathToCoords, computePercentileRank, getMean2, formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed, math_min, math_max, getElementsFromPoint } from './../helpers';
+import {
+  Rect, comp2, svgPathToCoords, computePercentileRank, getMean2, getScrollValue,
+  formatNumber, svgContextMenu, PropSizer, isContextMenuDisplayed, math_min, math_max,
+  getElementsFromPoint,
+} from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
@@ -235,6 +239,7 @@ export default class ScatterPlot2 {
       .on('mousemove mousedown', () => {
         clearTimeout(t);
         if (isContextMenuDisplayed()) return;
+        const { scrollX, scrollY } = getScrollValue();
         if (self.type === 'value') {
           const content = ['Moyenne de l\'espace d\'étude'];
           let _h = 65;
@@ -257,8 +262,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.pageX - window.scrollX - 5}px`,
-              top: `${d3.event.pageY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - scrollX - 5}px`,
+              top: `${d3.event.pageY - scrollY - _h}px`,
             });
         } else if (self.type === 'rank') {
           const content = ['Médiane de l\'espace d\'étude'];
@@ -282,8 +287,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.pageX - window.scrollX - 5}px`,
-              top: `${d3.event.pageY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - scrollX - 5}px`,
+              top: `${d3.event.pageY - scrollY - _h}px`,
             });
         }
       });
@@ -332,6 +337,7 @@ export default class ScatterPlot2 {
       .on('mousemove mousedown', () => {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
+        const { scrollX, scrollY } = getScrollValue();
         if (self.type === 'value') {
           const content = ['Moyenne de l\'espace d\'étude'];
           let _h = 65;
@@ -354,8 +360,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.pageX - window.scrollX - 5}px`,
-              top: `${d3.event.pageY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - scrollX - 5}px`,
+              top: `${d3.event.pageY - scrollY - _h}px`,
             });
         } else if (self.type === 'rank') {
           const content = ['Médiane de l\'espace d\'étude'];
@@ -379,8 +385,8 @@ export default class ScatterPlot2 {
           self.tooltip
             .styles({
               display: null,
-              left: `${d3.event.pageX - window.scrollX - 5}px`,
-              top: `${d3.event.pageY - window.scrollY - _h}px`,
+              left: `${d3.event.pageX - scrollX - 5}px`,
+              top: `${d3.event.pageY - scrollY - _h}px`,
             });
         }
       });
@@ -1035,6 +1041,7 @@ export default class ScatterPlot2 {
       .on('mousemove.tooltip', (d) => {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
+        const { scrollX, scrollY } = getScrollValue();
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));
@@ -1060,8 +1067,8 @@ export default class ScatterPlot2 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - window.scrollX - 5}px`,
-            top: `${d3.event.pageY - window.scrollY - yoffset}px` });
+            left: `${d3.event.pageX - scrollX - 5}px`,
+            top: `${d3.event.pageY - scrollY - yoffset}px` });
       })
       .on('mouseout.tooltip', () => {
         clearTimeout(t);

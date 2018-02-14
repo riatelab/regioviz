@@ -1,7 +1,8 @@
 import alertify from 'alertifyjs';
 import {
-  math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank,
-  getMean2, formatNumber, svgContextMenu, isContextMenuDisplayed, getElementsFromPoint } from './../helpers';
+  math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank, getMean2,
+  formatNumber, svgContextMenu, isContextMenuDisplayed, getElementsFromPoint, getScrollValue,
+} from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -746,7 +747,7 @@ export default class RadarChart3 {
         const id_feature = d.id;
         const direction = self.inversedAxis.has(code_variable)
           ? 'inférieure' : 'supérieure';
-
+        const { scrollX, scrollY } = getScrollValue();
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([app.feature_names[id_feature], ' (', id_feature, ')'].join(''));
@@ -760,8 +761,8 @@ export default class RadarChart3 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - window.scrollX - 5}px`,
-            top: `${d3.event.pageY - window.scrollY - self.tooltip.node().getBoundingClientRect().height - 5}px`,
+            left: `${d3.event.pageX - scrollX - 5}px`,
+            top: `${d3.event.pageY - scrollY - self.tooltip.node().getBoundingClientRect().height - 5}px`,
           });
       });
   }

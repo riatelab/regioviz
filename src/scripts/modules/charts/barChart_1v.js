@@ -1,4 +1,8 @@
-import { comp, math_round, math_abs, math_max, Rect, getMean, getMean2, svgPathToCoords, getElementsFromPoint, formatNumber, svgContextMenu, isContextMenuDisplayed } from './../helpers';
+import {
+  comp, math_round, math_abs, math_max, Rect, getScrollValue,
+  getMean2, svgPathToCoords, getElementsFromPoint, formatNumber,
+  svgContextMenu, isContextMenuDisplayed,
+} from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
@@ -309,6 +313,7 @@ export default class BarChart1 {
             'km)');
           _h += 20;
         }
+        // const { scrollX, scrollY } = getScrollValue();
         self.tooltip.select('.title')
           .attr('class', 'title red')
           .html(content.join(''));
@@ -317,8 +322,8 @@ export default class BarChart1 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.clientX - window.scrollX - 5}px`,
-            top: `${d3.event.clientY - window.scrollY - _h}px`,
+            left: `${d3.event.clientX - 5}px`,
+            top: `${d3.event.clientY - _h}px`,
           });
       });
 
@@ -645,6 +650,10 @@ export default class BarChart1 {
       .on('mousemove mousedown', (d) => {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
+        const { scrollX, scrollY } = getScrollValue();
+        console.log('scroll: ', scrollX, ' ', scrollY);
+        console.log('d3.event: ', d3.event.pageX, ' ', d3.event.pageY);
+        console.log(window.event);
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));
@@ -656,8 +665,8 @@ export default class BarChart1 {
         self.tooltip
           .styles({
             display: null,
-            left: `${d3.event.pageX - window.scrollX - 5}px`,
-            top: `${d3.event.pageY - window.scrollY - 85}px`,
+            left: `${d3.event.pageX - scrollX - 5}px`,
+            top: `${d3.event.pageY - scrollY - 85}px`,
           });
       });
 
@@ -668,7 +677,7 @@ export default class BarChart1 {
         const elem = getElementsFromPoint(d3.event.clientX, d3.event.clientY)
           .find(e => e.className.baseVal === 'bar' || e.className.baseVal === 'transp_mean_line');
         if (elem) {
-          const new_click_event = new MouseEvent('mousemove', {
+          const new_event = new MouseEvent('mousemove', {
             pageX: d3.event.pageX,
             pageY: d3.event.pageY,
             clientX: d3.event.clientX,
@@ -677,7 +686,7 @@ export default class BarChart1 {
             cancelable: true,
             view: window,
           });
-          elem.dispatchEvent(new_click_event);
+          elem.dispatchEvent(new_event);
         } else {
           clearTimeout(t);
           t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);

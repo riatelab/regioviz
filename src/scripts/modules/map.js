@@ -196,13 +196,20 @@ function getLegendElems(type) {
 class MapSelect {
   constructor(nuts, other_layers, user_styles, filter = 'N1') {
     styles = Object.assign({}, user_styles);
-    // bbox_svg = svg_map.node().getBoundingClientRect();
-    // width_map = +bbox_svg.width || (500 * app.ratioToWide);
     const width_value = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
     d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value}px`);
-    // svg_map.attr('height', `${height_map}px`)
-    //   .attr('width', `${width_map}px`);
-    // app.mapDrawRatio = app.ratioToWide;
+
+    svg_map.append('defs')
+      .append('svg:clipPath')
+      .attr('id', 'clip_map')
+      .append('svg:rect')
+      .attrs({
+        width: width_map,
+        height: height_map,
+        x: 0,
+        y: 0,
+      });
+
     projection = d3.geoIdentity()
       .fitExtent([[0, 0], [fixed_dimension.map.width, fixed_dimension.map.height]], other_layers.get('frame'))
       .reflectY(true);
@@ -210,8 +217,11 @@ class MapSelect {
     path = d3.geoPath().projection(projection);
 
     const layers = svg_map.append('g')
-      .attr('id', 'layers')
-      .attr('transform', 'scale(1)');
+      .attrs({
+        id: 'layers',
+        transform: 'scale(1)',
+        'clip-path': 'url(#clip_map)',
+      });
     this.nuts = nuts;
     this.zoom_map = d3.zoom()
       .scaleExtent([1, 5])

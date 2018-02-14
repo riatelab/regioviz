@@ -463,12 +463,12 @@ span.link:hover {
 .map_button {
   margin: -0.2em 0.3em 0 0.3em;
   float: left;
-  filter: opacity(25%);
+  opacity: 0.25;
   cursor: pointer;
 }
 
 .map_button.active {
-  filter: none;
+  opacity: 1;
 }
 
 .map_button.disabled {
