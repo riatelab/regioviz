@@ -160,7 +160,7 @@ export default class Similarity1plus {
       this.last_selection = null;
     } else {
       this.map_elem.removeRectBrush();
-      this.map_elem.layers.selectAll('.cloned').remove();
+      this.removeMapClonedFeatures();
       if (!e.selection || e.selection.length < 2) { return; }
       const selection = [e.selection[0] - 1, e.selection[1] + 1.5];
       this.highlighted = [];
@@ -207,6 +207,7 @@ export default class Similarity1plus {
       this.highlight_selection = [];
     }
     this.removeLines();
+    this.removeMapClonedFeatures();
     this.update();
     this.updateMapRegio();
   }
@@ -253,7 +254,6 @@ export default class Similarity1plus {
 
           g.append('text')
             .attrs({
-              // x: 0,
               x: 20,
               y: -7.5,
               class: `title_axis ${selector_ratio_name} noselect`,
@@ -305,11 +305,9 @@ export default class Similarity1plus {
             .style('cursor', 'pointer')
             .on('mousedown', function () {
               d3.select(this).attr('class', 'arrow-shadow');
-              // this.classList.add('arrow-shadow');
             })
             .on('mouseup mouseout', function () {
               d3.select(this).attr('class', '');
-              // this.classList.remove('arrow-shadow');
             })
             .on('click', function () {
               const that_ratio = this.parentNode.id.slice(2);
@@ -318,6 +316,7 @@ export default class Similarity1plus {
               self.ratios.splice(current_position, 1);
               self.ratios.splice(current_position - 1, 0, that_ratio);
               self.removeLines();
+              self.removeMapClonedFeatures();
               self.update();
             });
 
@@ -334,11 +333,9 @@ export default class Similarity1plus {
             .style('cursor', 'pointer')
             .on('mousedown', function () {
               d3.select(this).attr('class', 'arrow-shadow');
-              // this.classList.add('arrow-shadow');
             })
             .on('mouseup mouseout', function () {
               d3.select(this).attr('class', '');
-              // this.classList.remove('arrow-shadow');
             })
             .on('click', function () {
               const that_ratio = this.parentNode.id.slice(2);
@@ -347,6 +344,7 @@ export default class Similarity1plus {
               self.ratios.splice(current_position, 1);
               self.ratios.splice(current_position + 1, 0, that_ratio);
               self.removeLines();
+              self.removeMapClonedFeatures();
               self.update();
             });
 
@@ -678,7 +676,6 @@ export default class Similarity1plus {
           .data(voro, d => d.data.id);
 
         cells.select('.circle')
-          // .data(voro, d => d.data.id)
           .transition()
           .duration(125)
           .attrs(d => ({
@@ -696,7 +693,6 @@ export default class Similarity1plus {
         cells.select('.polygon')
           .transition()
           .duration(125)
-          // .data(voro, d => d.data.id)
           .attr('d', d => `M${d.join('L')}Z`)
           .style('fill', 'none');
 
@@ -806,6 +802,7 @@ export default class Similarity1plus {
       }
       this.highlight_selection.sort((a, b) => a.dist - b.dist);
       this.removeLines();
+      this.removeMapClonedFeatures();
       this.update();
       if (to_display) setTimeout(() => { this.displayLine(id); }, 150);
     } else if (this.type === 'global') {
@@ -994,8 +991,6 @@ export default class Similarity1plus {
             .each(function (ft) {
               if (ft.id === id) {
                 circle.style.fill = 'purple';
-                // circle.style.stroke = 'black';
-                // circle.style.strokeWidth = '2';
                 this.setAttribute('fill', 'purple');
               }
             });
@@ -1119,6 +1114,7 @@ export default class Similarity1plus {
 
   updateChangeRegion() {
     this.removeLines();
+    this.removeMapClonedFeatures();
     if (app.current_config.filter_key !== undefined) {
       this.changeStudyZone();
     } else {
@@ -1133,6 +1129,7 @@ export default class Similarity1plus {
 
   changeStudyZone() {
     this.removeLines();
+    this.removeMapClonedFeatures();
     this.map_elem.updateLegend();
     this.ratios = app.current_config.ratio;
     this.nums = app.current_config.num;
@@ -1184,8 +1181,10 @@ export default class Similarity1plus {
     this.data.forEach((el, i) => { el.globalrank = i; });
   }
 
+  // eslint-disable-next-line no-unused-vars
   addVariable(code_variable) {
     this.removeLines();
+    this.removeMapClonedFeatures();
     this.ratios = app.current_config.ratio.slice();
     this.nums = app.current_config.num.slice();
     this.data = app.current_data.filter(
@@ -1206,6 +1205,7 @@ export default class Similarity1plus {
 
   removeVariable(code_variable) {
     this.removeLines();
+    this.removeMapClonedFeatures();
     this.ratios = app.current_config.ratio.slice();
     this.nums = app.current_config.num.slice();
     this.data = app.current_data.filter(
@@ -1261,6 +1261,7 @@ export default class Similarity1plus {
         }
         self.handle_brush_map = self._handle_brush_map;
         self.removeLines();
+        self.removeMapClonedFeatures();
         self.type = 'global';
         this.classList.add('active');
         menu.select('#ind_dist_detailled').attr('class', 'choice_ind noselect');
@@ -1293,6 +1294,10 @@ export default class Similarity1plus {
 
   removeLines() {
     this.draw_group.selectAll('.regio_line').remove();
+  }
+
+  removeMapClonedFeatures() {
+    this.map_elem.layers.selectAll('.cloned').remove();
   }
 
   getElemBelow(e) {
@@ -1359,7 +1364,7 @@ export default class Similarity1plus {
   }
 
   remove() {
-    this.map_elem.layers.selectAll('.cloned').remove();
+    this.removeMapClonedFeatures();
     this.map_elem.unbindBrushClick();
     this.map_elem = null;
     this.table_stats.remove();

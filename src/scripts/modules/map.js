@@ -186,7 +186,6 @@ function getLegendElems(type) {
     [
       { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
       { color: color_countries, text: 'Autres régions de l\'espace d\'étude (sélectionnables)' },
-      // { color: color_countries, text: 'Autres régions de l\'espace d\'étude, sélectionnables pour la comparaison' },
     ],
     '50', '22.5',
   ];
@@ -463,7 +462,7 @@ class MapSelect {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  isMap(){
+  isMap() {
     return true;
   }
 

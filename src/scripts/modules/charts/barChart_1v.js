@@ -87,8 +87,8 @@ export default class BarChart1 {
         return;
       }
       const s = d3.event.selection || this.x2.range();
-      context_left_handle.attr('x', s[0] - 12);
-      context_right_handle.attr('x', s[1] - 7);
+      this.context_left_handle.attr('x', s[0] - 12);
+      this.context_right_handle.attr('x', s[1] - 7);
       current_range = [math_round(s[0] / (width / nbFt)), math_round(s[1] / (width / nbFt))];
       this.x.domain(this.data.slice(current_range[0], current_range[1]).map(ft => ft.id));
       svg_container.select('.zoom').call(this.zoom.transform, d3.zoomIdentity
@@ -333,7 +333,7 @@ export default class BarChart1 {
       .attr('class', 'brush_bottom')
       .call(brush_bottom);
 
-    const context_left_handle = g_brush_bottom.insert('image', '.handle')
+    this.context_left_handle = g_brush_bottom.insert('image', '.handle')
       .attrs({
         width: 20,
         height: height2,
@@ -345,7 +345,7 @@ export default class BarChart1 {
         'pointer-events': 'none',
       });
 
-    const context_right_handle = g_brush_bottom.insert('image', '.handle')
+    this.context_right_handle = g_brush_bottom.insert('image', '.handle')
       .attrs({
         width: 20,
         height: height2,
@@ -651,9 +651,6 @@ export default class BarChart1 {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
         const { scrollX, scrollY } = getScrollValue();
-        console.log('scroll: ', scrollX, ' ', scrollY);
-        console.log('d3.event: ', d3.event.pageX, ' ', d3.event.pageY);
-        console.log(window.event);
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));

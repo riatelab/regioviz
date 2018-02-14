@@ -38,4 +38,4 @@ see the .eslintrc.json file for details).
 Styles rules in CSS files can be written without vendor prefixes (they are prefixed at build time with *'autoprefixer'* PostCSS plugin).
 
 ##### Browser compatibility
-Code is transpiled to ES5 thanks to *babel* and the intended compatibility is Firefox 21 / Chrome 23 / IE9.
+Code is transpiled to ES5 thanks to *babel* and the intended compatibility is Firefox 21 / Chrome 23 / IE11.

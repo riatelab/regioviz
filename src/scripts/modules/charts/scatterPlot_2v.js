@@ -110,14 +110,8 @@ export default class ScatterPlot2 {
     this.unit2 = variables_info.find(ft => ft.id === this.variable2).unit;
     this.pretty_name1 = app.current_config.ratio_pretty_name[0];
     this.pretty_name2 = app.current_config.ratio_pretty_name[1];
+
     this.data = ref_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
-      // .map((d) => {
-      //   const res = { id: d.id, name: d.name };
-      //   res[this.variable1] = d[this.variable1];
-      //   res[this.variable2] = d[this.variable2];
-      //   res[pop_field] = d[pop_field];
-      //   return res;
-      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     const tmp_my_region = this.data.splice(
       this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
@@ -1148,7 +1142,6 @@ export default class ScatterPlot2 {
       this.map_elem.removeRectBrush();
       this.map_elem.updateLegend();
       this.map_elem.resetColors(this.current_ids);
-      // this.zoomed(d3.zoomIdentity);
       this.update();
     }
   }
@@ -1157,13 +1150,6 @@ export default class ScatterPlot2 {
     // Fetch the new data subset for this study zone and theses variables:
     const pop_field = app.current_config.pop_field;
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
-      // .map((d) => {
-      //   const res = { id: d.id, name: d.name };
-      //   res[this.variable1] = d[this.variable1];
-      //   res[this.variable2] = d[this.variable2];
-      //   res[pop_field] = d[pop_field];
-      //   return res;
-      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Put "my region" at the end of the serie so it will be displayed on
     // the top of the chart:
@@ -1186,7 +1172,6 @@ export default class ScatterPlot2 {
     this.ref_value2 = tmp_my_region[this.variable2];
 
     this.map_elem.removeRectBrush();
-    // this.zoomed(d3.zoomIdentity);
     this.updateItemsCtxMenu();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1215,13 +1200,6 @@ export default class ScatterPlot2 {
     // Filter the data to only keep data in which we are interested:
     const pop_field = app.current_config.pop_field;
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
-      // .map((d) => {
-      //   const res = { id: d.id, name: d.name };
-      //   res[this.variable1] = d[this.variable1];
-      //   res[this.variable2] = d[this.variable2];
-      //   res[pop_field] = d[pop_field];
-      //   return res;
-      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
@@ -1234,7 +1212,6 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value1 = tmp_my_region[this.variable1];
-    // this.zoomed(d3.zoomIdentity);
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1262,13 +1239,6 @@ export default class ScatterPlot2 {
     // Filter the data to only keep data in which we are interested:
     const pop_field = app.current_config.pop_field;
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
-      // .map((d) => {
-      //   const res = { id: d.id, name: d.name };
-      //   res[this.variable1] = d[this.variable1];
-      //   res[this.variable2] = d[this.variable2];
-      //   res[pop_field] = d[pop_field];
-      //   return res;
-      // });
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
@@ -1281,7 +1251,6 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value2 = tmp_my_region[this.variable2];
-    // this.zoomed(d3.zoomIdentity);
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1341,6 +1310,7 @@ export default class ScatterPlot2 {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getElemBelow(e) {
     const elems = getElementsFromPoint(e.clientX, e.clientY);
     const elem = elems.find(el => el.className.baseVal === 'dot');

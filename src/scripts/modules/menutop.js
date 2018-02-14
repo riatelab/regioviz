@@ -1,5 +1,5 @@
 import tingle from 'tingle.js';
-import { makeModalReport, generateHtmlRapport } from './report';
+import { makeModalReport } from './report';
 import { app } from './../main';
 import { clickDlPdf } from './helpers';
 /**

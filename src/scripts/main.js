@@ -633,7 +633,6 @@ function loadData() {
       if (error) throw error;
       document.body.classList.remove('loading');
       removeAll(document.querySelectorAll('.spinner, .top-spinner'));
-      // app.ratioToWide = getRatioToWide();
       const [
         full_dataset, nuts, borders, countries, countries_remote,
         coasts, coasts_remote, cyprus_non_espon_space,
@@ -666,12 +665,17 @@ function loadData() {
       filterLevelVar(app);
       const other_layers = new Map();
       [
-        ['borders', borders], ['boxes', boxes],
-        ['countries', countries], ['countries_remote', countries_remote],
-        ['coasts', coasts], ['coasts_remote', coasts_remote],
+        ['borders', borders],
+        ['boxes', boxes],
+        ['countries', countries],
+        ['countries_remote', countries_remote],
+        ['coasts', coasts],
+        ['coasts_remote', coasts_remote],
         ['cyprus_non_espon_space', cyprus_non_espon_space],
         ['countries_remote_boundaries', countries_remote_boundaries],
-        ['frame', frame], ['line', line], ['boxes2', boxes],
+        ['frame', frame],
+        ['line', line],
+        ['boxes2', boxes],
       ].forEach((el) => {
         other_layers.set(el[0], el[1]);
       });
@@ -684,12 +688,13 @@ function loadData() {
       app.chart = chart;
       app.map = map_elem;
       Tooltipsify('[title-tooltip]');
+      updateMyCategorySection();
+      changeRegion(app, start_region, map_elem);
       // Fetch the layer in geographic coordinates now in case the user wants to download it later:
       d3.request('data/CGET_nuts_all.geojson', (err, result) => {
         app.geo_layer = result.response;
       });
-      updateMyCategorySection();
-      changeRegion(app, start_region, map_elem);
+      // Load/configure mathjax to render some math formulas in help dialogs:
       MathJax.Hub.Config({
         tex2jax: {
           inlineMath: [['$', '$'], ['\\(', '\\)']],

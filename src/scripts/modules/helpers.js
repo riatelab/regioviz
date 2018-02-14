@@ -4,7 +4,7 @@ import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } fr
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
 
-/* eslint-disable wrap-iife, object-shorthand, no-bitwise,
+/* eslint-disable wrap-iife, object-shorthand, no-bitwise, strict,
 no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
 no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return */
 (function () {
@@ -203,7 +203,6 @@ no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return 
       }, _params);
       // params = params || { bubbles: false, cancelable: false };
       const mouseEvent = document.createEvent('MouseEvent');
-      console.log(params.clientX, params.clientY);
       mouseEvent.initMouseEvent(
         eventType, params.bubbles, params.cancelable, params.view,
         params.detail, params.screenX, params.screenY, params.clientX, params.clientY,
@@ -215,7 +214,7 @@ no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return 
     window.MouseEvent = MouseEvent;
   }
 })();
-/* eslint-enable wrap-iife, object-shorthand, no-bitwise,
+/* eslint-enable wrap-iife, object-shorthand, no-bitwise, strict,
 no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
 no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return  */
 
@@ -490,6 +489,18 @@ const getMean = (serie) => {
   return sum / nb_values;
 };
 
+/**
+* Compute the real value of a ratio within a study area.
+* The value is computed according to a formula retrived for the metadata file.
+* (contrary to the getMean function which returns the mean value of the
+*  regions within the study area)
+*
+* @param {Array} data - The dataset extract corresponding to the features currently in use.
+* @param {String} var_name - The name of the variable to be used.
+* @param {Array} info_var - The Array of Object containing the informations about each variable.
+* @return {Number} - The computed value.
+*
+*/
 const getMean2 = (data, var_name, info_var) => {
   const o_info = info_var.find(ft => ft.id === var_name);
   const nb_values = data.length;
@@ -512,7 +523,6 @@ const getMean2 = (data, var_name, info_var) => {
       s1 += serie1[i];
       s2 += serie2[i];
     }
-    // console.log('mult1 : ', mult1, ' mult2 : ', mult2);
 
     return fun(s1, s2);
   } else if (formula.left.left && !formula.right.left) {
@@ -652,22 +662,6 @@ function prepareGeomLayerId(layer, id_field) {
 function getRandom(arr, false_length) {
   return arr[Math.round(Math.random() * (false_length || arr.length))];
 }
-
-// const getRatioToWide = () => {
-//   if (window.matchMedia('(min-width: 1561px)').matches) {
-//     return 1550 / 1350;
-//   } else if (window.matchMedia('(min-width: 1361px) and (max-width: 1560px)').matches) {
-//     return 1350 / 1350;
-//   } else if (window.matchMedia('(min-width: 1161px) and (max-width: 1360px)').matches) {
-//     return 1150 / 1350;
-//   } else if (window.matchMedia('(min-width: 960px) and (max-width: 1160px)').matches) {
-//     return 960 / 1350;
-//   } else if (window.matchMedia('(max-width: 959px)').matches) {
-//     return 540 / 1350;
-//   }
-//   return 1350 / 1350;
-// };
-
 
 function addThousandsSeparator(value) {
   const reg = /(\d+)(\d{3})/;
@@ -929,7 +923,6 @@ const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 */
 function clickDlPdf(event) {
   const path = this.href;
-  // console.log(event);
   this.href = '#';
   window.open(path);
   event.preventDefault();
@@ -969,7 +962,6 @@ export {
   prepareGeomLayerId,
   getRandom,
   getElementsFromPoint,
-  // getRatioToWide,
   formatNumber,
   getStyle,
   getStyleProperty,
@@ -978,5 +970,6 @@ export {
   clickDlPdf,
   isContextMenuDisplayed,
   _isNaN,
+  isNumber,
   getScrollValue,
 };

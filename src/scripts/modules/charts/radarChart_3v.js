@@ -251,7 +251,7 @@ export default class RadarChart3 {
     const self = this;
     const nb_var = app.current_config.ratio.length;
 
-    const colorLabel = function colorLabel(label) {
+    const colorLabel = function colorLabel() {
       const el = this.parentNode.querySelector('text');
       el.style.fill = 'darkblue';
       el.style.fontWeight = '800';
@@ -1057,6 +1057,7 @@ export default class RadarChart3 {
     this.updateLegend();
   }
 
+  // eslint-disable-next-line no-unused-vars
   addVariable(code_variable) {
     const other_features = this.displayed_ids.filter(d => d !== this.id_my_region);
     this.g.remove();
@@ -1081,6 +1082,7 @@ export default class RadarChart3 {
     Tooltipsify('[title-tooltip]');
   }
 
+  // eslint-disable-next-line no-unused-vars
   removeVariable(code_variable) {
     const other_features = this.displayed_ids.filter(d => d !== this.id_my_region);
     this.g.remove();

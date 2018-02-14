@@ -23,10 +23,8 @@ export const formatnb_thousands_sep = ' ';
 */
 // The maximum number of variables that can be selected simultaneously:
 export const MAX_VARIABLES = 7;
-// xxx:
-export const RATIO_WH_MAP = 0.879;
 
-//
+// Fixed viewBox dimensions for svg elements:
 export const fixed_dimension = {
   map: { width: 470, height: 534 },
   chart: { width: 600, height: 569 },
