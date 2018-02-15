@@ -1,5 +1,5 @@
 import { color_highlight } from './options';
-import { variables_info, study_zones, territorial_mesh } from './../main';
+import { variables_info, study_zones, territorial_mesh, updateMenuStudyZones, updateMenuTerritLevel } from './../main';
 import { _isNaN } from './helpers';
 
 /* eslint-disable no-param-reassign */
@@ -167,8 +167,30 @@ export function applyFilter(app, filter_type) {
 *
 */
 export function changeRegion(app, id_region, map_elem) {
+  const current_level = app.current_config.current_level;
+  const o_region = app.full_dataset.find(d => d.id === id_region);
+  const available_level = [];
   app.current_config.my_region = id_region;
   app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
+  if (o_region.N1 === '1') available_level.push('N1');
+  if (o_region.N12_POL === '1') available_level.push('N12_POL');
+  if (o_region.N2 === '1') available_level.push('N2');
+  if (available_level.indexOf(current_level) < 0) {
+    const level_value = available_level[0];
+    d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
+    d3.selectAll('span.territ_level').attr('class', 'territ_level square');
+    d3.select(`span.territ_level[value='${level_value}']`).attr('class', 'territ_level square checked');
+    app.current_config.current_level = level_value;
+    updateMenuStudyZones();
+    filterLevelVar(app);
+    map_elem.updateLevelRegion(level_value);
+    map_elem.unbindBrushClick();
+    map_elem.bindBrushClick(app.chart);
+    app.chart.changeStudyZone();
+  }
+  d3.select('#curr_regio_level')
+    .html(available_level.map(i => (i === 'N12_POL' ? 'MIND' : i)).join(' '));
+  updateMenuTerritLevel();
   map_elem.computeDistMat();
   app.current_config.min_km_closest_unit = Math.round(
     map_elem.dist_to_my_region[2].dist / 1000) + 1;

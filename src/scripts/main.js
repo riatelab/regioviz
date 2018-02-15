@@ -145,7 +145,7 @@ function setDefaultConfigMenu(code = 'FRE', variable = 'REVMEN', level = 'N1') {
 }
 
 
-function updateMenuStudyZones() {
+export function updateMenuStudyZones() {
   Array.prototype.forEach.call(
     document.querySelectorAll('#menu_studyzone > p'),
     (elem) => {
@@ -160,6 +160,12 @@ function updateMenuStudyZones() {
     });
 }
 
+export function updateMenuTerritLevel() {
+  const o_region = app.full_dataset.find(d => d.id === app.current_config.my_region);
+  d3.select(document.querySelector('.territ_level[value="N1"]').parentNode).classed('disabled', o_region.N1 === '0');
+  d3.select(document.querySelector('.territ_level[value="N12_POL"]').parentNode).classed('disabled', o_region.N12_POL === '0');
+  d3.select(document.querySelector('.territ_level[value="N2"]').parentNode).classed('disabled', o_region.N2 === '0');
+}
 
 export function resetColors() {
   app.colors = {};
@@ -358,7 +364,7 @@ function bindUI_chart(chart, map_elem) {
 
   d3.selectAll('span.territ_level')
     .on('click', function () {
-      if (!this.classList.contains('checked')) {
+      if (!this.classList.contains('checked') && !this.parentNode.classList.contains('disabled')) {
         // Reset the study zone :
         d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
@@ -642,18 +648,24 @@ function loadData() {
       alertify.set('notifier', 'position', 'bottom-left');
       prepareVariablesInfo(metadata_indicateurs);
       // TODO : Reorder it in the dataset :
-      let features_menu = full_dataset.filter(ft => ft.REGIOVIZ === '1');
-      features_menu = features_menu.slice(0, 1).concat(
-        features_menu.slice(6)).concat(features_menu.slice(1, 6));
+      const features_menu = full_dataset.filter(
+        ft => ft.REGIOVIZ === '1' && (
+          ft.N1 === '1' || ft.N2 === '1'));
+      // features_menu = features_menu.slice(0, 1).concat(
+      //   features_menu.slice(6)).concat(features_menu.slice(1, 6));
       // eslint-disable-next-line no-param-reassign
       features_menu.forEach((ft) => { ft.name = ft.name.replace(' — ', ' - '); });
-      const start_region = getRandom(features_menu.map(d => d.id), 12);
+      features_menu.sort((a, b) => a.name.localeCompare(b.name));
+      // TODO: Don't hardcode this:
+      const start_region = 'FRH'; // getRandom(features_menu.map(d => d.id), 12);
       const start_variable = getRandom(
         ['REVMEN', 'CHOM1574', 'CHOM1524']);
       prepare_dataset(full_dataset, app);
       setDefaultConfig(start_region, start_variable, 'N1');
       prepareGeomLayerId(nuts, app.current_config.id_field_geom);
       createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
+      // TODO: Don't hardcode this:
+      d3.select('#curr_regio_level').html('N1 MIND N2');
       bindCreditsSource();
       updateMenuStudyZones();
       bindHelpMenu();
@@ -688,8 +700,6 @@ function loadData() {
       app.chart = chart;
       app.map = map_elem;
       Tooltipsify('[title-tooltip]');
-      updateMyCategorySection();
-      changeRegion(app, start_region, map_elem);
       // Fetch the layer in geographic coordinates now in case the user wants to download it later:
       d3.request('data/CGET_nuts_all.geojson', (err, result) => {
         app.geo_layer = result.response;

@@ -3,10 +3,6 @@ import { app } from './../main';
 
 
 const createMenu = function createMenu(names, variables, study_zones, territorial_mesh) {
-  // First section, regions names:
-  // const title_section1 = document.createElement('p');
-  // title_section1.className = 'title_menu';
-  // title_section1.innerHTML = 'Ma région';
   const title_section1 = document.createElement('div');
   title_section1.style.backgroundColor = '#4f81bd';
   title_section1.style.color = 'white';
@@ -16,7 +12,8 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
 <p>Ma région : </p>
 <input type = "text" id = "search"/>
 <input id="autocomplete" type="text" disabled="disabled" />
-<span class='down_arrow'> &#x25BE;</span>`;
+<span class='down_arrow'> &#x25BE;</span>
+<p id="curr_regio_level"></p>`;
 
   const section1 = document.createElement('div');
   section1.id = 'list_regio';
@@ -27,10 +24,25 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   for (let i = 0, len_i = names.length; i < len_i; i++) {
     // const id = names[i].id;
     // const name = names[i].name;
-    const { id, name } = names[i];
+    const { id, name, N1, N12_POL, N2 } = names[i];
     const entry = document.createElement('p');
-    entry.innerHTML = `<span value="${id}" class='target_region square'></span><span class="label_chk">${name}</span>`;
+    entry.innerHTML = `<span value="${id}" class='target_region square'></span><span style="margin-right:5px;" class="label_chk">${name}</span>`;
+    if (N1 === '1') {
+      entry.innerHTML += '<span class="minibutton" style="display: none;">N1</span>';
+    }
+    if (N12_POL === '1') {
+      entry.innerHTML += '<span class="minibutton" style="display: none;">MIND</span>';
+    }
+    if (N2 === '1') {
+      entry.innerHTML += '<span class="minibutton" style="display: none;">N2</span>';
+    }
     section1.appendChild(entry);
+    entry.onmouseover = function () {
+      d3.select(this).selectAll('span.minibutton').style('display', null);
+    };
+    entry.onmouseout = function () {
+      d3.select(this).selectAll('span.minibutton').style('display', 'none');
+    };
   }
 
   // Second section, groups of variables:
