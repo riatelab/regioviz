@@ -1,8 +1,8 @@
 import jsep from 'jsep';
-import tingle from 'tingle.js';
 import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
+import { isIE } from './../main';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise, strict,
 no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
@@ -733,7 +733,6 @@ export function exportSVG(elem, filename) {
     a.setAttribute('download', filename);
     a.setAttribute('href', href);
     a.style.display = 'none';
-    a.innerHTML = 'CLICK ME';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -750,16 +749,15 @@ export function exportSVG(elem, filename) {
 *
 */
 export function exportPNG(elem, filename) {
-  const REG_SPACES = /[\s\r\t\n]+/gm;
-  function compressSpaces(str) {
-    return str.replace(REG_SPACES, ' ').trim();
-  }
-  const _h = elem.viewBox.baseVal.height;
-  const _w = elem.viewBox.baseVal.width;
+  const bbox = elem.getBBox();
+  const _h = bbox.height;
+  const _w = bbox.width;
   const targetCanvas = d3.select('body')
     .append('canvas')
-    .attrs({ id: 'canvas_export', height: _h, width: _w })
+    .attr('id', 'canvas_export')
     .node();
+  targetCanvas.width = _w;
+  targetCanvas.height = _h;
   const bg_rect = document.createElementNS(d3.namespaces.svg, 'rect');
   bg_rect.setAttribute('id', 'background');
   bg_rect.setAttribute('height', '100%');
@@ -776,11 +774,14 @@ export function exportPNG(elem, filename) {
   bg_rect.remove();
   const svg_src = (new XMLSerializer()).serializeToString(targetSvg);
   const img = new Image();
+  const svgBlob = new Blob([svg_src], { type: 'image/svg+xml;charset=utf-8' });
+  const url = (window.URL || window.webkitURL || window).createObjectURL(svgBlob);
   img.onload = function () {
     const ctx = targetCanvas.getContext('2d');
+    ctx.clearRect(0, 0, _w, _h);
     ctx.drawImage(img, 0, 0);
-    if (window.navigator.msSaveOrOpenBlob) {
-      const d = targetCanvas.toDataURL();
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      const d = targetCanvas.msToBlob();
       window.navigator.msSaveOrOpenBlob(new Blob([d], { type: 'image/png' }), filename);
     } else {
       const dataurl = targetCanvas.toDataURL('image/png');
@@ -799,7 +800,7 @@ export function exportPNG(elem, filename) {
         });
     }
   };
-  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(compressSpaces(svg_src))}`;
+  img.src = url;
 }
 
 /**
@@ -819,6 +820,7 @@ const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 */
 function svgContextMenu(current_chart, svg_elem, map_elem) {
   let items_menu;
+  // Remove existing context menu if any:
   if (isContextMenuDisplayed()) {
     removeAll(document.querySelectorAll('.context-menu'));
   }
@@ -853,6 +855,8 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
         action: () => { makeModalReport(); },
       },
     ];
+    // If the click was on a chart element,
+    // add an extra option in the menu allowing to zoom the map on this feature:
     if (elem_id) {
       items_menu.push({
         name: 'Zoomer la carte sur la région sélectionnée',
@@ -860,7 +864,13 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
       });
     }
   }
+  // Disable PNG export for Internet Explorer (< Edge):
+  if (isIE && window.navigator && window.navigator.appVersion.indexOf('Edge') < 0) {
+    items_menu.splice(0, 1);
+  }
+  // Hide tooltips before displaying the context menu:
   current_chart.tooltip.style('display', 'none');
+  // Create and display the context menu:
   new ContextMenu().showMenu(d3.event, document.body, items_menu);
 }
 
