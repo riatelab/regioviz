@@ -268,6 +268,7 @@ export function makeHeaderChart() {
         closeMethods: ['overlay', 'button', 'escape'],
         closeLabel: 'Close',
         onOpen() {
+          document.querySelector('div.tingle-modal').querySelector('.buttonDownload').onclick = clickDlPdf;
           document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
           setTimeout(() => {
             const formula = document.querySelector('.tingle-modal-box__content').querySelector('#formula');

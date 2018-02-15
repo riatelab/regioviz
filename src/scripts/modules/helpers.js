@@ -709,18 +709,15 @@ const removeAll = (elems) => {
   array_slice.call(elems).forEach((el) => { el.remove(); });
 };
 
-function dataURIToBlob(dataURI) {
-  const _dataURI = dataURI.replace(/^data:/, '');
-  const type = _dataURI.match(/image\/[^;]+/);
-  const base64 = _dataURI.replace(/^[^,]+,/, '');
-  const arrayBuffer = new ArrayBuffer(base64.length);
-  const typedArray = new Uint8Array(arrayBuffer);
-  for (let i = 0; i < base64.length; i++) {
-    typedArray[i] = base64.charCodeAt(i);
-  }
-  return new Blob([arrayBuffer], { type });
-}
 
+/**
+*
+* Export a SVG chart or map to a downloadable SVG file.
+*
+* @param {Node} elem - The svg element to be exported.
+* @param {String} filename - The filename to be used for this export.
+*
+*/
 export function exportSVG(elem, filename) {
   const targetSvg = elem.cloneNode(true);
   const serializer = new XMLSerializer();
@@ -728,18 +725,35 @@ export function exportSVG(elem, filename) {
   let source = serializer.serializeToString(targetSvg);
   source = ['<?xml version="1.0" encoding="utf-8" standalone="no"?>\r\n', source].join('');
 
-  const href = URL.createObjectURL(new Blob([source], { type: 'image/svg+xml' }));
-  const a = document.createElement('a');
-  a.setAttribute('download', filename);
-  a.setAttribute('href', href);
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(href);
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(new Blob([source], { type: 'image/svg+xml' }), filename);
+  } else {
+    const href = URL.createObjectURL(new Blob([source], { type: 'image/svg+xml' }));
+    const a = document.createElement('a');
+    a.setAttribute('download', filename);
+    a.setAttribute('href', href);
+    a.style.display = 'none';
+    a.innerHTML = 'CLICK ME';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(href);
+  }
 }
 
+/**
+*
+* Export a SVG chart or map to a downloadable PNG file.
+*
+* @param {Node} elem - The svg element to be converted to png and exported.
+* @param {String} filename - The filename to be used for this export.
+*
+*/
 export function exportPNG(elem, filename) {
+  const REG_SPACES = /[\s\r\t\n]+/gm;
+  function compressSpaces(str) {
+    return str.replace(REG_SPACES, ' ').trim();
+  }
   const _h = elem.viewBox.baseVal.height;
   const _w = elem.viewBox.baseVal.width;
   const targetCanvas = d3.select('body')
@@ -761,90 +775,39 @@ export function exportPNG(elem, filename) {
   targetSvg.setAttribute('height', _h);
   bg_rect.remove();
   const svg_src = (new XMLSerializer()).serializeToString(targetSvg);
-  const ctx = targetCanvas.getContext('2d');
   const img = new Image();
-  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg_src)}`;
   img.onload = function () {
+    const ctx = targetCanvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    const dataurl = targetCanvas.toDataURL('image/png');
-    // console.log(dataurl);
-    fetch(dataurl)
-      .then(res => res.blob())
-      .then((blob) => {
-        const blobUrl = URL.createObjectURL(blob);
-        const dlAnchorElem = document.createElement('a');
-        dlAnchorElem.setAttribute('href', blobUrl);
-        dlAnchorElem.setAttribute('download', filename);
-        if (window.isIE) {
-          // eslint-disable-next-line new-cap
-          const modal = new tingle.modal({
-            stickyFooter: false,
-            closeMethods: ['overlay', 'button', 'escape'],
-            closeLabel: 'Close',
-            onOpen() {
-              dlAnchorElem.innerHTML = filename;
-              const content = document.getElementsByClassName('link_download')[0];
-              content.appendChild(dlAnchorElem);
-            },
-            onClose() {
-              modal.destroy();
-            },
-          });
-          modal.setContent('<div class="link_download"><p>Lien de téléchargement</p></div>');
-          modal.open();
-        } else {
+    if (window.navigator.msSaveOrOpenBlob) {
+      const d = targetCanvas.toDataURL();
+      window.navigator.msSaveOrOpenBlob(new Blob([d], { type: 'image/png' }), filename);
+    } else {
+      const dataurl = targetCanvas.toDataURL('image/png');
+      fetch(dataurl)
+        .then(res => res.blob())
+        .then((blob) => {
+          const blobUrl = URL.createObjectURL(blob);
+          const dlAnchorElem = document.createElement('a');
+          dlAnchorElem.setAttribute('href', blobUrl);
+          dlAnchorElem.setAttribute('download', filename);
           dlAnchorElem.style.display = 'none';
           document.body.appendChild(dlAnchorElem);
           dlAnchorElem.click();
           dlAnchorElem.remove();
           URL.revokeObjectURL(blobUrl);
-        }
-      });
-
-    // console.log(dataurl);
-    // const blob = dataURIToBlob(dataurl);
-    // console.log(blob);
-    // const href = URL.createObjectURL(blob);
-    // const a = document.createElement('a');
-    // a.setAttribute('download', filename);
-    // a.setAttribute('href', href);
-    // a.style.display = 'none';
-    // document.body.appendChild(a);
-    // a.click();
-    // targetCanvas.remove();
-    // a.remove();
-    // URL.revokeObjectURL(href);
-    // canvasToBlob(targetCanvas, (blob) => {
-    //   const href = URL.createObjectURL(blob);
-    //   console.log(href);
-    //   const a = document.createElement('a');
-    //   a.setAttribute('download', filename);
-    //   a.setAttribute('href', href);
-    //   a.style.display = 'none';
-    //   document.body.appendChild(a);
-    //   a.click();
-    //   targetCanvas.remove();
-    //   console.log(a);
-    //   setTimeout(() => {
-    //     a.remove();
-    //     URL.revokeObjectURL(href);
-    //   }, 125);
-    // }, 'image/png');
-    // targetCanvas.toBlob((blob) => {
-    //   const href = URL.createObjectURL(new Blob([blob], { type: 'image/png' }));
-    //   const a = document.createElement('a');
-    //   a.setAttribute('download', filename);
-    //   a.setAttribute('href', href);
-    //   a.style.display = 'none';
-    //   document.body.append(a);
-    //   a.click();
-    //   targetCanvas.remove();
-    //   a.remove();
-    //   URL.revokeObjectURL(href);
-    // }, 'image/png');
+        });
+    }
   };
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(compressSpaces(svg_src))}`;
 }
 
+/**
+* Returns whether an existing context menu is already displayed on the document.
+*
+* @return {Boolean} - Is there an existing context menu displayed ?
+*/
+const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 
 /**
 * Display a custom context menu when the user triggers a right click on the map
@@ -856,6 +819,9 @@ export function exportPNG(elem, filename) {
 */
 function svgContextMenu(current_chart, svg_elem, map_elem) {
   let items_menu;
+  if (isContextMenuDisplayed()) {
+    removeAll(document.querySelectorAll('.context-menu'));
+  }
   if (current_chart.isMap) {
     items_menu = [
       {
@@ -898,6 +864,12 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
   new ContextMenu().showMenu(d3.event, document.body, items_menu);
 }
 
+/**
+* Cross-browser way to get the scroll values.
+*
+* @return {Object} - Object containing scrollX and scrollY values.
+*
+*/
 const getScrollValue = () => {
   const scrollX = (window.pageXOffset !== undefined)
     ? window.pageXOffset
@@ -908,8 +880,6 @@ const getScrollValue = () => {
     : (document.documentElement || document.body.parentNode || document.body).scrollTop;
   return { scrollX, scrollY };
 };
-
-const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 
 /**
 * Catch the event when the user click on the download anchor of a pdf document and
