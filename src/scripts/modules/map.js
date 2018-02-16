@@ -468,9 +468,23 @@ class MapSelect {
   }
 
   zoomOnFeature(ft_id) {
+    const self = this;
     this.target_layer.selectAll('path')
-      .each((d) => {
+      .each(function (d) {
         if (d.id === ft_id) {
+          const cloned = this.cloneNode();
+          self.layers.select('#temp').node().appendChild(cloned);
+          const _cloned = d3.select(cloned);
+          const ref_fill_value = _cloned.attr('fill');
+          _cloned
+            .attrs({
+              class: 'cloned',
+              fill: d3.color(ref_fill_value).brighter(0.75) })
+            .styles({
+              stroke: 'orange',
+              'stroke-width': '1.25px',
+            });
+
           const bounds = path.bounds(d);
           const dx = bounds[1][0] - bounds[0][0];
           const dy = bounds[1][1] - bounds[0][1];
@@ -481,9 +495,18 @@ class MapSelect {
           const translate = [width_map / 2 - scale * x, height_map / 2 - scale * y];
           const layers = svg_map.select('#layers');
           const transf = `translate(${translate})scale(${scale})`;
-          const t = d3
-            .transition()
-            .duration(125);
+          const t = d3.transition()
+            .duration(125)
+            .on('end', () => {
+              const t2 = d3.transition()
+                .duration(3000)
+                .on('end', () => {
+                  _cloned.remove();
+                });
+              _cloned.transition(t2)
+                .attr('fill', ref_fill_value)
+                .styles({ stroke: 'white', 'stroke-width': 0 });
+            });
 
           layers.selectAll('g')
             .transition(t)
