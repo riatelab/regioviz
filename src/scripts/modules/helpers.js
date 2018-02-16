@@ -838,6 +838,10 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
         name: 'Export d\'un rapport complet',
         action: () => { makeModalReport(); },
       },
+      {
+        name: 'Rétablir le zoom de la carte',
+        action: () => { current_chart.resetZoom(); },
+      },
     ];
   } else {
     const elem_id = current_chart.getElemBelow(d3.event);

@@ -7,7 +7,7 @@ import '../styles/alertify.min.css';
 import '../styles/semantic.min.css';
 import { createMenu, handleInputRegioName } from './modules/menuleft';
 import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
-import { MapSelect, makeSourceSection, svg_map, zoomClick } from './modules/map';
+import { MapSelect, svg_map, zoomClick } from './modules/map';
 import { color_highlight, MAX_VARIABLES, fixed_dimension } from './modules/options';
 import BarChart1 from './modules/charts/barChart_1v';
 import ScatterPlot2 from './modules/charts/scatterPlot_2v';
@@ -46,7 +46,7 @@ export const app = {
   // to not contain feature with empty ratio values within the ratios in use).
   current_ids: [],
   // The current version number (not used for now, except for displaying it):
-  version: '0.0.0',
+  version: '0.1.0',
 };
 
 function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NUTS1') {
@@ -537,6 +537,7 @@ function bindHelpMenu() {
     btn_i.onclick = function () {
       const filter_id = this.parentElement.getAttribute('filter-value');
       const o = study_zones.find(d => d.id === filter_id);
+      const hasUrl = (o.url && o.url.indexOf && o.url.indexOf('pdf') > -1);
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
         stickyFooter: false,
@@ -552,12 +553,12 @@ function bindHelpMenu() {
       let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
 <p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
 
-      if (['SPAT', 'DEFAULT'].indexOf(filter_id) < 0) {
+      if (hasUrl) {
         content += `<p><a class="buttonDownload" href="data/${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
       }
       modal.setContent(content);
       modal.open();
-      if (['SPAT', 'DEFAULT'].indexOf(filter_id) < 0) {
+      if (hasUrl) {
         document.querySelector('a.buttonDownload').onclick = clickDlPdf;
       }
     };
@@ -569,7 +570,7 @@ function bindHelpMenu() {
     btn_i.onclick = function () {
       const territ_level_id = this.previousSibling.previousSibling.getAttribute('value');
       const o = territorial_mesh.find(d => d.id === territ_level_id);
-
+      console.log(o.url);
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
         stickyFooter: false,
@@ -610,11 +611,13 @@ function bindCreditsSource() {
     });
     modal.setContent(
       `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Regioviz</b> - À propos</p>
-      <br><br><br>
+      <br><br>
+      <p style="text-align: justify;">Source des données : Eurostat (téléchargement : octobre 2017)</p>
+      <p style="text-align: justify;">Limite administrative : UMS RIATE, CC-BY-SA'</p>
+      <br>
       <p style="text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></p>
-      <p style="text-align: justify;">Version <b>${app.version}</b></p>
-      <p style="text-align: justify;">Développement : ...</p>
-      <p style="text-align: justify;">Financement : ...</p>`);
+      <p style="text-align: justify;">Version : <b>${app.version}</b></p>
+      <p style="text-align: justify;">Développement : <a href="http://riate.cnrs.fr">UMS 2414 RIATE</a> (CNRS - CGET - Université Paris Diderot)</p>`);
     modal.open();
   };
 }
@@ -665,7 +668,7 @@ function loadData() {
       prepareGeomLayerId(nuts, app.current_config.id_field_geom);
       createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
       // TODO: Don't hardcode this:
-      d3.select('#curr_regio_level').html('N1 MIND N2');
+      d3.select('#curr_regio_level').html('N1 N2');
       bindCreditsSource();
       updateMenuStudyZones();
       bindHelpMenu();
@@ -693,7 +696,6 @@ function loadData() {
       });
       const map_elem = new MapSelect(nuts, other_layers, styles_map);
       const chart = new BarChart1(app.current_data);
-      makeSourceSection();
       bindUI_chart(chart, map_elem);
       map_elem.bindBrushClick(chart);
       chart.bindMap(map_elem);

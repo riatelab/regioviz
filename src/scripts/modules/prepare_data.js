@@ -188,8 +188,11 @@ export function changeRegion(app, id_region, map_elem) {
     map_elem.bindBrushClick(app.chart);
     app.chart.changeStudyZone();
   }
-  d3.select('#curr_regio_level')
-    .html(available_level.map(i => (i === 'N12_POL' ? 'MIND' : i)).join(' '));
+  if (available_level.indexOf('N12_POL') > -1) {
+    available_level.splice(available_level.indexOf('N12_POL'), 1);
+  }
+  // TODO: Wrap this in a function/put this somewhere else:
+  d3.select('#curr_regio_level').html(available_level.join(' '));
   updateMenuTerritLevel();
   map_elem.computeDistMat();
   app.current_config.min_km_closest_unit = Math.round(

@@ -349,6 +349,7 @@ class MapSelect {
   }
 
   resetZoom() {
+    svg_map.node().__zoom = d3.zoomIdentity;
     svg_map.transition()
       .duration(250)
       .call(this.zoom_map.transform, d3.zoomIdentity);
@@ -512,22 +513,22 @@ class MapSelect {
   }
 }
 
-function makeSourceSection() {
-  const src_group = svg_map.append('g').attr('id', 'source');
-  src_group.append('text')
-    .attrs({
-      x: 3,
-      y: height_map - 5,
-      'text-anchor': 'left',
-      'font-family': '"Signika",sans-serif',
-      'font-size': '11px',
-    })
-    .text('Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA');
-}
+// function makeSourceSection() {
+//   const src_group = svg_map.append('g').attr('id', 'source');
+//   src_group.append('text')
+//     .attrs({
+//       x: 3,
+//       y: height_map - 5,
+//       'text-anchor': 'left',
+//       'font-family': '"Signika",sans-serif',
+//       'font-size': '11px',
+//     })
+//     .text('Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA');
+// }
 
 export {
   MapSelect,
-  makeSourceSection,
+  // makeSourceSection,
   makeMapLegend,
   svg_map,
   zoomClick,

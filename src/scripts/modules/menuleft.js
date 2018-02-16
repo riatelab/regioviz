@@ -24,14 +24,11 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   for (let i = 0, len_i = names.length; i < len_i; i++) {
     // const id = names[i].id;
     // const name = names[i].name;
-    const { id, name, N1, N12_POL, N2 } = names[i];
+    const { id, name, N1, N2 } = names[i];
     const entry = document.createElement('p');
     entry.innerHTML = `<span value="${id}" class='target_region square'></span><span style="margin-right:5px;" class="label_chk">${name}</span>`;
     if (N1 === '1') {
       entry.innerHTML += '<span class="minibutton" style="display: none;">N1</span>';
-    }
-    if (N12_POL === '1') {
-      entry.innerHTML += '<span class="minibutton" style="display: none;">MIND</span>';
     }
     if (N2 === '1') {
       entry.innerHTML += '<span class="minibutton" style="display: none;">N2</span>';
@@ -107,7 +104,7 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   // Fourth section:
   const title_section4 = document.createElement('p');
   title_section4.className = 'title_menu';
-  title_section4.innerHTML = 'Maillage territorial d\'analyse';
+  title_section4.innerHTML = 'Maillage territorial';
   const section4 = document.createElement('div');
   section4.id = 'menu_territ_level';
   section4.className = 'box';
@@ -147,10 +144,10 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   blabla.id = 'link_credits_source';
   blabla.className = 'link';
   blabla.style.margin = '0em 0.5em';
-  blabla.style.fontSize = '0.5em';
+  blabla.style.fontSize = '0.65em';
   blabla.style.float = 'right';
   blabla.style.cursor = 'pointer';
-  blabla.innerHTML = 'Crédits & informations supplémentaire';
+  blabla.innerHTML = 'Crédits & informations supplémentaires';
 
   section5.appendChild(img2);
   section5.appendChild(logo_regioviz);
