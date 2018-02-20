@@ -38,7 +38,10 @@ function fitLayer() {
 }
 
 function map_zoomed() {
-  const transform = d3.event ? d3.event.transform : svg_map.node().__zoom;
+  const transform = d3.event
+    ? d3.event.transform
+    : !!svg_map.node().__zoom
+      ? d3.zoomTransform(svg_map.node()) : d3.zoomIdentity;
   if (transform.k < 1) transform.k = 1;
   if (transform.k === 1) {
     transform.x = 0;
@@ -48,7 +51,7 @@ function map_zoomed() {
   const t = layers
     .selectAll('g')
     .transition()
-    .duration(225);
+    .duration(125);
 
   layers.selectAll('g')
     .transition(t)
@@ -71,7 +74,7 @@ function map_zoomed() {
 function interpolateZoom(translate, scale) {
   const node_svg_map = svg_map.node();
   const transform = d3.zoomTransform(node_svg_map);
-  return d3.transition().duration(225).tween('zoom', () => {
+  return d3.transition().duration(125).tween('zoom', () => {
     const iTranslate = d3.interpolate([transform.x, transform.y], translate);
     const iScale = d3.interpolate(transform.k, scale);
     return (t_value) => {
@@ -229,12 +232,16 @@ class MapSelect {
 
     svg_map.call(this.zoom_map);
 
-    const fn_attrs_layers = d => ({
+    const fn_attrs_target_layer = d => ({
       class: 'tg_ft',
       title: `${d.properties[app.current_config.name_field]} (${d.id})`,
       fill: (d.id !== app.current_config.my_region ? color_countries : color_highlight),
       d: path,
     });
+
+    const fn_attrs_layers = d => (d.properties.name
+      ? { d: path, class: 'tg_ft', title: d.properties.name }
+      : { d: path });
 
     const layer_list = Object.keys(styles);
     for (let i = 0, n_layer = layer_list.length; i < n_layer; i++) {
@@ -247,7 +254,7 @@ class MapSelect {
           .data(filterLevelGeom(this.nuts.features, filter), d => d.id)
           .enter()
           .append('path')
-          .attrs(fn_attrs_layers);
+          .attrs(fn_attrs_target_layer);
       } else {
         layers.append('g')
           .attrs(style_layer)
@@ -255,7 +262,7 @@ class MapSelect {
           .data(other_layers.get(name_lyr).features)
           .enter()
           .append('path')
-          .attr('d', path);
+          .attrs(fn_attrs_layers);
       }
     }
     layers.append('g')
@@ -308,7 +315,7 @@ class MapSelect {
 
   bindTooltips() {
     const self = this;
-    this.target_layer.selectAll('path')
+    this.layers.selectAll('path[title]')
       // .on('mouseover', () => {
       //   // clearTimeout(t);
       //   this.tooltip.style('display', null);
@@ -348,11 +355,15 @@ class MapSelect {
       });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   resetZoom() {
+    d3.zoomIdentity.x = 0;
+    d3.zoomIdentity.y = 0;
+    d3.zoomIdentity.k = 1;
     svg_map.node().__zoom = d3.zoomIdentity;
-    svg_map.transition()
-      .duration(250)
-      .call(this.zoom_map.transform, d3.zoomIdentity);
+    // svg_map.node().__zoom.x = 0;
+    // svg_map.node().__zoom.y = 0;
+    svg_map.call(this.zoom_map.transform, d3.zoomIdentity);
   }
 
   // eslint-disable-next-line class-methods-use-this

@@ -867,6 +867,13 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
         action: () => { map_elem.zoomOnFeature(elem_id); },
       });
     }
+    // If the current chart is zoomable, allow to reset the zoom:
+    if (current_chart.zoom && current_chart.zoomed) {
+      items_menu.push({
+        name: 'Rétablir le zoom du graphique',
+        action: () => { current_chart.resetZoom(); },
+      });
+    }
   }
   // Disable PNG export for Internet Explorer (< Edge):
   if (isIE && window.navigator && window.navigator.appVersion.indexOf('Edge') < 0) {

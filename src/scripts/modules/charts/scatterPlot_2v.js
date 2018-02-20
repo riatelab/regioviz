@@ -174,13 +174,15 @@ export default class ScatterPlot2 {
       .attrs({
         id: 'scatterplot',
         'clip-path': 'url(#clip)',
+      }).on('dblclick', () => {
+        this.resetZoom();
       });
 
     this.scatter.append('g')
       .attr('class', 'brush')
       .call(this.brush)
-      .call(this.zoom)
-      .on('dblclick', () => { this.zoomed(d3.zoomIdentity); });
+      .call(this.zoom);
+
 
     this.makeGrid();
 
@@ -573,6 +575,14 @@ export default class ScatterPlot2 {
     this.makeTableStat();
   }
 
+  resetZoom() {
+    d3.zoomIdentity.x = 0;
+    d3.zoomIdentity.y = 0;
+    d3.zoomIdentity.k = 1;
+    this.scatter.select('.brush').node().__zoom = d3.zoomIdentity;
+    this.zoomed(d3.zoomIdentity);
+  }
+
   /**
    * Create the underlying grey grid
    */
@@ -719,6 +729,9 @@ export default class ScatterPlot2 {
       : () => 5;
     const _trans = dots.transition().duration(100);
     const transform = d3.zoomIdentity;
+    transform.k = 1;
+    transform.x = 0;
+    transform.y = 0;
     // if (this.k !== 1) {
     transform.x = math_min(0, math_max(transform.x, width - width * transform.k));
     // eslint-disable-next-line no-param-reassign

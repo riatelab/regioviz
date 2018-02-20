@@ -474,7 +474,7 @@ export function bindTopButtons(chart, map_elem) {
       chart.remove();
       chart = null; // eslint-disable-line no-param-reassign
       unbindUI();
-      map_elem.resetZoom();
+      // map_elem.resetZoom();
       app.colors = {};
       const value = this.getAttribute('value');
       if (value === 'BarChart1') {
