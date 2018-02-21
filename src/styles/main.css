@@ -445,6 +445,10 @@ span.minibutton {
 .completude_section > p.active {
   display: inherit;
 }
+
+.completude_section {
+  padding-bottom: 0.4em;
+}
 /* End of styles for completness section */
 .cont_btn {
   margin: 0.4em 4em;

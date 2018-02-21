@@ -199,8 +199,11 @@ export function makeHeaderChart() {
         columns.join(','), '\r\n'];
       app.chart.current_ids.forEach((idx) => {
         const l1 = app.current_data.find(d => d.id === idx);
-        const l2 = app.chart.data.find(d => d.id === idx);
-        table_content.push(columns.map(c => l1[c] || l2[c]).join(','));
+        const l2 = app.chart.ref_data
+          ? app.chart.ref_data.find(d => d.id === idx)
+          : app.chart.data.find(d => d.id === idx);
+        table_content.push(
+          columns.map(c => (c === 'name' ? `"${l1[c] || l2[c]}"` : (l1[c] || l2[c]))).join(','));
         table_content.push('\r\n');
       });
       table_content = table_content.join('');
