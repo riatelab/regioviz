@@ -1099,17 +1099,21 @@ export default class BarChart1 {
   // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
-<h3>Position – 1 Indicateur</h3>
+<h3>Position - 1 Indicateur</h3>
 <b>Aide générale</b>
 
-Ce graphique représente l’indicateur sélectionné ordonné de la valeur minimale à la valeur maximale (barres bleues) pour l’espace d’étude et le maillage territorial d’analyse sélectionné. La valeur de l’unité territoriale sélectionnée apparaît en surbrillance (jaune). La ligne représentée par un tireté rouge représente la moyenne de l’espace d’étude (non pondérée).
+Ce graphique en bâtons (<i>bar-plot</i>) permet de comparer la situation de la région sélectionnée sur <b>un indicateur</b>, pour un espace d’étude et un maillage territorial d’analyse donné.
 
-Sur ce graphique, il est possible d’inverser l’ordre de classement de l’indicateur (appuyer sur le « + »).
+L’utilisateur est invité à renseigner l’indicateur qu’il souhaite voir apparaître sur le graphique.
+Par défaut, les rangs sont calculés de façon décroissante (premier rang : valeur maximale ; dernier rang : valeur minimale). Il est possible d’inverser cet ordre de classement.
 
-La carte et le graphique sont interactifs dans la mesure où l’utilisateur peut choisir de sélectionner des unités territoriales (clic gauche appuyé de la souris) et visualiser leur positionnement simultanément sur la carte (localisation géographique) ou sur le diagramme de distribution (positionnement statistique). Il peut aussi en un clic choisir de visualiser les unités territoriales ayant des valeurs inférieures/supérieures à la moyenne de l’espace d’étude ou inférieures/supérieures à la valeur de l’unité territoriale de référence (« ma région »).`;
+Ce graphique rend également possible le positionnement des régions au regard de la moyenne.
+
+<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_1ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   getTemplateHelp() {
+    const my_region_pretty_name = app.current_config.my_region_pretty_name;
     const [, my_rank] = this.data.map((d, i) => [d.id, i])
       .find(d => d[0] === app.current_config.my_region);
     const values = this.data.map(d => d[this.ratio_to_use]).sort((a, b) => a - b);
@@ -1124,13 +1128,17 @@ La carte et le graphique sont interactifs dans la mesure où l’utilisateur peu
         sup += 1;
       }
     });
+    let compl = calcCompletudeSubset(app, [this.ratio_to_use], 'array');
+    compl = compl[0] === compl[1] ? 'la totalité des' : `${compl[0]} des ${compl[1]}`;
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_key instanceof Array
         ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
         : study_zones.find(d => d.id === app.current_config.filter_key).name;
+    const name_territorial_mesh = territorial_mesh
+      .find(d => d.id === app.current_config.current_level).name;
     const help1 = [`<b>Indicateur 1</b> : ${info_var.name} (<i>${info_var.id}</i>)<br>
-<b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
+<b>Maillage territorial d'analyse</b> : ${name_territorial_mesh}<br>`];
     if (app.current_config.my_category) {
       help1.push(
         `<b>Espace d'étude</b> : Régions de même ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
@@ -1142,10 +1150,14 @@ La carte et le graphique sont interactifs dans la mesure où l’utilisateur peu
         `<b>Espace d'étude</b> : UE28`);
     }
     const help2 = `
-L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> a une valeur de <b>${formatNumber(this.ref_value, 1)} ${info_var.unit}</b> pour l’indicateur <i>${this.ratio_to_use}</i>.
-Elle se situe  au rang <b>${my_rank}</b> de la distribution pour l’espace d’étude <b>${name_study_zone}</b>.
-Pour cet indicateur, <b>${sup}</b> unités territoriales ont une valeur supérieures et <b>${inf}</b> unités territoriales ont une valeur inférieure.
-Par ailleurs mon unité territoriale se situe <b>${formatNumber(Math.abs(this.ref_value > this.mean_value ? this.ref_value / this.mean_value : this.mean_value / this.ref_value), 1)}%</b> ${this.ref_value > this.mean_value ? 'au dessus' : 'en-dessous'} de la moyenne de l’espace d’étude (${formatNumber(this.mean_value, 1)} ${info_var.unit}).`;
+Ce graphique en bâtons (<i>bar-plot</i>) permet de visualiser la situation de l'unité territoriale <b>${my_region_pretty_name}</b> sur l'indicateur ${info_var.name} <i>(${this.ratio_to_use})</i> par rapport à l'espace d'étude <b>${name_study_zone}</b> et au maillage <b>${name_territorial_mesh}</b>.
+Les données sont disponibles pour <b>${compl} unités territoriales</b> de l'espace d'étude.
+<br><br>
+L’unité territoriale <b>${my_region_pretty_name}</b> a une valeur de <b>${formatNumber(this.ref_value, 1)} ${info_var.unit}</b> pour l’indicateur <i>${this.ratio_to_use}</i> (rang ${my_rank} de la distribution).
+<b>${sup}</b> unités territoriales ont donc une valeur supérieure et <b>${inf}</b> unités territoriales ont une valeur inférieure au sein de l'espace d'étude <b>${name_study_zone}</b>.
+<br><br>
+La moyenne de l'espace d'étude <b>${name_study_zone}</b> s'élève à <b>${formatNumber(this.mean_value, 1)} ${info_var.unit}</b>. L'unité territoriale ${my_region_pretty_name} se situe donc <b>${formatNumber(Math.abs(this.ref_value > this.mean_value ? this.ref_value / this.mean_value : this.mean_value / this.ref_value), 1)}%</b> ${this.ref_value > this.mean_value ? 'au dessus' : 'en-dessous'} de la moyenne de l’espace d’étude (${formatNumber(this.mean_value, 1)} ${info_var.unit}).
+`;
     const source = `<b>Indicateur 1</b> : ${info_var.source} (Date de téléchargement de la donnée : ${info_var.last_update})`;
     return { section_selection: help1.join(''), section_help: help2, section_source: source };
   }

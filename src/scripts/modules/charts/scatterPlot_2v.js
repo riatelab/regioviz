@@ -1509,16 +1509,20 @@ export default class ScatterPlot2 {
   // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
-<h3>Position  - 2 indicateurs</h3>
+<h3>Position - 2 indicateurs</h3>
 <b>Aide générale</b>
-Ce graphique bidimensionnel représente la position de l’unité territoriale de référence sur deux indicateurs pour un espace d’étude et un maillage territorial d’analyse donné. La valeur de l’unité territoriale de référence apparaît en surbrillance (jaune). Les lignes représentées par un tireté rouge représentent la moyenne de l’espace d’étude pour chacun des indicateurs sélectionnés (non pondérée).
 
-Sur le graphique et la carte, les unités territoriales qui disposent de valeurs supérieures à la unité territoriale de référence pour les deux indicateurs sont représentées en vert. Les unités territoriales caractérisées par des valeurs inférieures à l’unité territoriale de référence pour les deux indicateurs sont représentées en rouge. Celles qui sont supérieures pour l’indicateur représenté sur l’axe des abscisses et inférieur sur l’axe des ordonnées sont représentées en orange ; et violet à l’inverse. Sur ce graphique, il est possible d’inverser l’ordre de classement de l’indicateur (appuyer sur le « + ») : les valeurs minimales seront alors considérées comme maximale sur l’axe.
+Ce graphique bidimensionnel (<i>scatter-plot</i>) permet de comparer la situation da la région sélectionnée sur <b>deux indicateurs</b>, pour un espace d’étude et un maillage territorial d’analyse donné.
 
-Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur (pourcentage par exemple). En sélectionnant l’option «valeurs de rang », l’indicateur est normalisé de 0 (valeur minimale) à 100 (valeur maximale). L’utilisation possible de ce type de transformation est la suivante : une unité territoriale disposant d’un indice de 67 sur un indicateur signifie que 33 % des unités territoriales de l’espace d’étude sont caractérisées par des valeurs supérieures à l’unité territoriale de référence pour les indicateurs sélectionnés. Et réciproquement. Les valeurs de rang permettent notamment de rendre comparables des unités de mesure et des paramètres de dispersion de deux indicateurs. Il ne faut néanmoins pas omettre que cette transformation nuit à la restitution de la dispersion statistique effective des indicateurs.`;
+L’utilisateur est invité à renseigner l’indicateur qu’il souhaite voir apparaître en abscisse et en ordonnées du graphique.
+
+Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou au regard de la médiane (rangs normalisés).
+
+<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_2ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   getTemplateHelp() {
+    const my_region_pretty_name = app.current_config.my_region_pretty_name;
     // const [my_region, my_rank] = this.data.map((d, i) => [d.id, i])
     //   .find(d => d[0] === app.current_config.my_region);
     const nb_ft = this.data.length;
@@ -1542,6 +1546,9 @@ Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur
         contrad += 1;
       }
     });
+    let compl = calcCompletudeSubset(app, [this.variable1, this.variable2], 'array');
+    compl = compl[0] === compl[1] ? 'la totalité des' : `${compl[0]} des ${compl[1]}`;
+    const name_territorial_mesh = territorial_mesh.find(d => d.id === app.current_config.current_level).name;
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_key instanceof Array
@@ -1550,7 +1557,7 @@ Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur
     const help1 = [`
   <b>Indicateur 1</b> : ${info_var1.name} (<i>${info_var1.id}</i>)<br>
   <b>Indicateur 2</b> : ${info_var2.name} (<i>${info_var2.id}</i>)<br>
-  <b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`];
+  <b>Maillage territorial d'analyse</b> : ${name_territorial_mesh}<br>`];
     if (app.current_config.my_category) {
       help1.push(
         `<b>Espace d'étude</b> : Régions de même ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
@@ -1562,12 +1569,18 @@ Par défaut, ce graphique est exprimé dans les valeurs brutes de l’indicateur
         `<b>Espace d'étude</b> : UE28`);
     }
 
-    const help2 = `L'unité territoriale ${app.current_config.my_region_pretty_name} a une valeur de ${formatNumber(this.ref_value1, 1)} ${info_var1.unit} pour l’indicateur <b>${this.variable1}</b> représenté sur l’axe des abscisses
-et une valeur de ${formatNumber(this.ref_value2, 1)} ${info_var2.unit} pour l’indicateur <b>${this.variable2}</b> représenté sur l’axe des ordonnées.
-Cela place cette unité territoriale de référence au rang ${my_rank1} de la distribution pour l’espace d’étude <b>${name_study_zone}</b> pour l’indicateur <b>${this.pretty_name1}</b> ; et au ${my_rank2} rang pour l’indicateur <b>${this.pretty_name2}</b>.
-Pour cet espace d’étude, ${formatNumber(sup_both * 100 / nb_ft, 1)}% des unités territoriales sont définies par une situation plus favorable sur les deux indicateurs pour la unité territoriale sélectionnée, représentées en vert sur le graphique et sur la carte.
-${formatNumber(inf_both * 100 / nb_ft, 1)}% des unités territoriales sont caractérisées par une situation plus défavorables pour les deux indicateurs, représentées en rouge sur la carte.
-Enfin, l’unité territoriale ${app.current_config.my_region_pretty_name} se situe dans une situation contradictoire avec ${contrad * 100 / nb_ft}% des unité territoriales, représentées en violet et orange sur la carte (situation favorable/défavorable pour un des deux indicateurs).`;
+    const help2 = `
+Ce graphique cartésien (<i>scatter-plot</i>) permet de visualiser la sitation de l'unité territoriale <b>${my_region_pretty_name}</b> sélectionnée sur deux indicateurs : <b>${info_var1.name}</b> <i>(${this.variable1})</i> et <b>${info_var2.name}</b> <i>(${this.variable2})</i>, par rapport à l'espace d'étude <b>${name_study_zone}</b> et au maillage <b>${name_territorial_mesh}</b>.
+Les données sont disponibles pour <b>${compl} unités territoriales</b> de l'espace d'étude, soit ${formatNumber(calcPopCompletudeSubset(app, [this.variable1, this.variable2]), 0)}% de la population de l'espace d'étude.
+<br><br>
+Sur cette sélection, l'unité territoriale ${my_region_pretty_name} a une valeur de <b>${formatNumber(this.ref_value1, 1)} ${info_var1.unit}</b> pour l'indicateur <i>${this.variable1}</i> (<b>rang ${my_rank1}</b> de ma distribution)
+et une valeur de <b>${formatNumber(this.ref_value2, 1)} ${info_var2.unit}</b> pour l'indicateur <i>${this.variable2}</i> (<b>rang ${my_rank2}</b>).
+<br><br>
+Pour cet espace d’étude, <b>${sup_both}</b> unités territoriales sont caractérisées par des valeurs supérieures à l’unité territoriale ${my_region_pretty_name} sur ces deux indicateurs (en vert) ; et <b>${inf_both}</b> par des valeurs inférieures (en rouge).
+${contrad} unités territoriales se trouvent dans une situation intermédiaire par rapport à l’unité territoriale ${my_region_pretty_name}(en violet et orange : valeurs supérieures pour l’un des deux indicateurs).
+<br><br>
+L’unité territoriale ${my_region_pretty_name} se situe dans le <b>cadran ${''}</b>, cela signifie qu’elle est caractérisée par des valeurs supérieures à la ${this.type === 'value' ? 'moyenne' : 'médiane'} pour l’indicateur <i>${this.variable1}</i> ${formatNumber(this.mean_variable1, 1)} et l’indicateur <i>${this.variable2}</i> (${formatNumber(this.mean_variable2, 1)}).
+`;
 
     const source = `<b>Indicateur 1</b> : ${info_var1.source} (Date de téléchargement de la donnée : ${info_var1.last_update})<br>
 <b>Indicateur 2</b> : ${info_var2.source} (Date de téléchargement de la donnée : ${info_var2.last_update})`;

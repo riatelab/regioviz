@@ -1182,7 +1182,7 @@ export default class RadarChart3 {
   // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
-<h3>Position  - 3 indicateurs</h3>
+<h3>Position - 3 indicateurs</h3>
 <b>Aide générale</b>
 
 Ce graphique en radar permet de comparer la situation d’une région sélectionnée en fonction d’un jeu de <b>3 indicateurs et plus</b>. Afin de rendre comparables les indicateurs exprimés dans des ordres de grandeur et des unités de mesure hétérogènes, ceux-ci sont préalablement normalisés au regard du rang des régions sur chacun des indicateurs sélectionnés. Ainsi, pour un indicateur donné, une valeur d’indice sera comprise entre 0 et 100. Par exemple, une valeur de 60 signifiera que 60 % des régions sont caractérisées par des valeurs inférieures sur cet indicateur et 40 % par des valeurs supérieures.
@@ -1199,7 +1199,6 @@ N : Nombre total de régions de l’espace d’étude
 Cette méthode permet de rendre comparables les positions relatives des régions sur différents indicateurs en termes de rangs, mais elle ne restitue pas d’information sur l’ampleur des écarts entre ces régions.
 A partir de ces indices, on peut construire un graphique en radar qui correspond à un graphique multidimensionnel de rangs relatifs.
 
-
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_3ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
@@ -1208,7 +1207,9 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
     this.variables.forEach((v, i) => {
       info_var[i + 1] = variables_info.find(ft => ft.id === v);
     });
-
+    const my_region_pretty_name = app.current_config.my_region_pretty_name;
+    const name_territorial_mesh = territorial_mesh
+      .find(d => d.id === app.current_config.current_level).name;
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_key instanceof Array
@@ -1230,27 +1231,43 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
         `<b>Espace d'étude</b> : UE28`);
     }
     const my_region = this.data[0];
+    let compl = calcCompletudeSubset(app, this.variables, 'array');
+    compl = compl[0] === compl[1] ? 'la totalité des' : `${compl[0]} des ${compl[1]}`;
     // const o_my_region = app.full_dataset.find(d => d.id === my_region.id);
     const sup_median = my_region.axes.filter(d => d.value > 50);
     const inf_median = my_region.axes.filter(d => d.value <= 50);
 
-    const help2 = [`<b>${this.variables.length} indicateurs</b> sont simultanément représentés sur ce graphique.<br><br>`];
+    const help2 = [`Ce graphique en radar permet de visualiser la situation de l'unité territoriale <b>${my_region_pretty_name}</b> en fonction d'un jeu de <b>${this.variables.length} indicateurs</b> :<br>`];
+    this.variables.forEach((v, i) => {
+      help2.push(` - ${v} : ${info_var[i + 1].name}<br>`);
+    });
+    help2.push(`
+      Les données sont disponibles pour ${compl} unités territoriales de l’espace d’étude ${name_study_zone},
+      au niveau ${name_territorial_mesh}, soit ${formatNumber(calcPopCompletudeSubset(app, this.variables), 0)}% de la population de l’espace d’étude.<br>
+      <br>`);
+    help2.push(`
+      Afin de rendre comparables les indicateurs exprimés dans des ordres de grandeur et des unités de mesure hétérogènes,
+      ceux-ci sont préalablement normalisés au regard du rang des unités territoriales sur chacun des indicateurs sélectionnés.
+      Ainsi, pour un indicateur donné, une valeur d’indice (rang) sera comprise entre 0 et 100.
+      Par exemple, une valeur de 60 signifiera que 60 % des unités territoriales sont caractérisées par des valeurs inférieures sur cet indicateur et 40 % par des valeurs supérieures.
+      <br><br>`);
     if (sup_median.length > 0) {
       help2.push(
-        `Pour l’espace d’étude <b>${name_study_zone}</b>, l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> (<b>${app.current_config.my_region}</b>) se positionne <b>au-dessus de la valeur médiane (50)</b> pour les indicateurs suivants (position plus favorable) :<br>`);
+        `Pour l’espace d’étude <b>${name_study_zone}</b> et au maillage ${name_territorial_mesh},
+        l’unité territoriale <b>${my_region_pretty_name}</b> se positionne <b>au-dessus de la valeur médiane (50)</b> pour les indicateurs suivants (position jugée favorable) :<br>`);
       sup_median.forEach((v) => {
-        help2.push(` - ${v.axis}, indice ${formatNumber(v.value, 1)}, valeur ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit};<br>`);
+        help2.push(` - ${v.axis}, ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit} (rang ${formatNumber(v.value, 1)}/100)<br>`);
       });
     } else {
       help2.push('Cette unité territoriale n\'est positionnée <b>au-dessus de la valeur médiane</b> pour aucun de ces indicateurs.<br>');
     }
     if (inf_median.length > 0) {
-      help2.push('Cette unité territoriale se positionne <b>sous la valeur médiane</b> pour les indicateurs suivants :<br>');
+      help2.push('<br>Cette unité territoriale se positionne <b>sous la valeur médiane</b> pour les indicateurs suivants :<br>');
       inf_median.forEach((v) => {
-        help2.push(` - ${v.axis}, indice ${formatNumber(v.value, 1)}, valeur ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit};<br>`);
+        help2.push(` - ${v.axis}, ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit} (rang ${formatNumber(v.value, 1)}/100)<br>`);
       });
     } else {
-      help2.push('Cette unité territoriale n\'est positionnée <b>sous la valeur médiane</b> pour aucun de ces indicateurs.<br>');
+      help2.push('<br>Cette unité territoriale n\'est positionnée <b>sous la valeur médiane</b> pour aucun de ces indicateurs.<br>');
     }
 
     if (this.data.length > 1) {
@@ -1265,19 +1282,19 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
           if (_inf_my_reg.length > 0) {
             // _inf_my_reg.sort((a, b) => b.value - a.value);
             help2.push(
-              `En comparaison à l’unité territoriale <b>${o_region.name}</b> (${o_region.id} - ${o_region.UNIT_SUP}), l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des indices normalisés plus importants pour les indicateurs suivants :<br>`);
+              `En comparaison à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}), l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs plus importantes pour les indicateurs suivants :<br>`);
             _inf_my_reg.forEach((v) => {
-              help2.push(` - ${v.axis} (${formatNumber(v.value, 1)});<br>`);
+              help2.push(` - ${v.axis} (écart de rang : ${formatNumber(my_region.axes[v].value - v.value, 1)})<br>`);
             });
           } else {
             help2.push(
-              `L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence d'indices normalisés plus importants par rapport à l’unité territoriale <b>${o_region.name}</b> (${o_region.id} - ${o_region.UNIT_SUP}).<br>`);
+              `L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de valeurs plus importantes par rapport à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}).<br>`);
           }
           if (_sup_my_reg.length > 0) {
             // _sup_my_reg.sort((a, b) => b.dist - a.dist);
-            help2.push(`Inversement, l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des scores moins importants pour ces indicateurs :<br>`);
+            help2.push(`Inversement, l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs moins importantes pour ces indicateurs :<br>`);
             _sup_my_reg.forEach((v) => {
-              help2.push(` - ${v.axis} (${formatNumber(v.value, 1)});<br>`);
+              help2.push(` - ${v.axis} (écart de rang : ${formatNumber(region.axes.find(vv => vv.axis === v.axis).value - v.value, 1)})<br>`);
             });
           } else {
             help2.push(`L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de scores moins importants pour l'ensembme des idnicateurs.<br>`);
