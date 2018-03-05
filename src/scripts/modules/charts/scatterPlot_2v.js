@@ -1568,6 +1568,10 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);
     }
+    const cadran = [
+      this.ref_value2 >= this.mean_variable2 ? 'supérieur' : 'inférieur',
+      this.ref_value1 >= this.mean_variable1 ? 'droit' : 'gauche'
+    ].join(' ');
 
     const help2 = `
 Ce graphique cartésien (<i>scatter-plot</i>) permet de visualiser la sitation de l'unité territoriale <b>${my_region_pretty_name}</b> sélectionnée sur deux indicateurs : <b>${info_var1.name}</b> <i>(${this.variable1})</i> et <b>${info_var2.name}</b> <i>(${this.variable2})</i>, par rapport à l'espace d'étude <b>${name_study_zone}</b> et au maillage <b>${name_territorial_mesh}</b>.
@@ -1579,7 +1583,7 @@ et une valeur de <b>${formatNumber(this.ref_value2, 1)} ${info_var2.unit}</b> po
 Pour cet espace d’étude, <b>${sup_both}</b> unités territoriales sont caractérisées par des valeurs supérieures à l’unité territoriale ${my_region_pretty_name} sur ces deux indicateurs (en vert) ; et <b>${inf_both}</b> par des valeurs inférieures (en rouge).
 ${contrad} unités territoriales se trouvent dans une situation intermédiaire par rapport à l’unité territoriale ${my_region_pretty_name}(en violet et orange : valeurs supérieures pour l’un des deux indicateurs).
 <br><br>
-L’unité territoriale ${my_region_pretty_name} se situe dans le <b>cadran ${''}</b>, cela signifie qu’elle est caractérisée par des valeurs supérieures à la ${this.type === 'value' ? 'moyenne' : 'médiane'} pour l’indicateur <i>${this.variable1}</i> ${formatNumber(this.mean_variable1, 1)} et l’indicateur <i>${this.variable2}</i> (${formatNumber(this.mean_variable2, 1)}).
+L’unité territoriale ${my_region_pretty_name} se situe dans le <b>cadran ${cadran}</b>, cela signifie qu’elle est caractérisée par des valeurs supérieures à la ${this.type === 'value' ? 'moyenne' : 'médiane'} pour l’indicateur <i>${this.variable1}</i> ${formatNumber(this.mean_variable1, 1)} et l’indicateur <i>${this.variable2}</i> (${formatNumber(this.mean_variable2, 1)}).
 `;
 
     const source = `<b>Indicateur 1</b> : ${info_var1.source} (Date de téléchargement de la donnée : ${info_var1.last_update})<br>
