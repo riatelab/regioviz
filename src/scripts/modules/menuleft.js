@@ -128,6 +128,10 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   img2.style.margin = '0.9em 0.5em';
   // img2.style.width = '7.5em';
   img2.style.float = 'left';
+  const link2 = document.createElement('a');
+  link2.href = 'http://www.cget.gouv.fr/';
+  link2.target = '_blank';
+  link2.appendChild(img2);
   const logo_regioviz = document.createElement('img');
   logo_regioviz.className = 'img_scale_logo';
   logo_regioviz.src = 'img/logo_regioviz.png';
@@ -140,6 +144,10 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   img1.style.margin = '0.9em 0.5em';
   // img1.style.width = '7.5em';
   img1.style.float = 'right';
+  const link1 = document.createElement('a');
+  link1.href = 'http://riate.cnrs.fr';
+  link1.target = '_blank';
+  link1.appendChild(img1);
   const blabla = document.createElement('span');
   blabla.id = 'link_credits_source';
   blabla.className = 'link';
@@ -149,9 +157,9 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   blabla.style.cursor = 'pointer';
   blabla.innerHTML = 'Crédits & informations supplémentaires';
 
-  section5.appendChild(img2);
+  section5.appendChild(link2);
   section5.appendChild(logo_regioviz);
-  section5.appendChild(img1);
+  section5.appendChild(link1);
   section5.appendChild(blabla);
 
   // The actual menu containing these 5 sections:

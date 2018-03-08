@@ -293,6 +293,10 @@ div.tingle-modal-box__content {
   margin-bottom: 0.8em;
 }
 
+.box > p:last-of-type {
+  padding-bottom: 0.3em !important;
+}
+
 span.down_arrow {
   float: right;
   padding-right: 1px;

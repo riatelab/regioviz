@@ -612,7 +612,7 @@ function bindCreditsSource() {
     modal.setContent(`
 <p style="color: #4f81bd;font-size: 1.2rem;margin-bottom:2em;"><b>Regioviz</b> - À propos</p>
 <p style="text-align: justify;">Version : <b>${app.version}</b></p>
-<p style="text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></b></p>
+<p style="text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></b> (licence CeCILL 2.1)</p>
 <p style="text-align: justify;">Développement : <b><a href="http://riate.cnrs.fr">UMS 2414 RIATE</a> (CNRS - CGET - Université Paris Diderot)</b></p>
 <hr></hr>
 <p style="text-align: justify;">Source des données : <b>Eurostat (téléchargement : octobre 2017)</b></p>

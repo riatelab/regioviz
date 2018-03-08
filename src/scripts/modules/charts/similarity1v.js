@@ -1051,28 +1051,28 @@ export default class Similarity1plus {
         if (cy > maxy) maxy = cy;
         if (cy < miny) miny = cy;
       });
-    miny -= 45;
-    maxy += 45;
+    miny -= 20;
+    maxy += 20;
     if (miny > 0) {
       this.draw_group.append('rect')
         .attrs({
           class: 'overlayrect',
-          x: 0,
-          y: 0,
-          width: width,
-          height: miny,
-          fill: 'white',
+          x: -60,
+          y: -30,
+          width: width + 120,
+          height: miny + 30,
+          fill: 'transparent',
         });
     }
     if ((height - maxy) > 0) {
       this.draw_group.append('rect')
         .attrs({
           class: 'overlayrect',
-          x: 0,
+          x: -60,
           y: maxy,
-          width: width,
-          height: height - maxy,
-          fill: 'white',
+          width: width + 120,
+          height: height - maxy + 50,
+          fill: 'transparent',
         });
     }
     this.draw_group.selectAll('.overlayrect')

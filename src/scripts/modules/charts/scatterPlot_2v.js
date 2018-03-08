@@ -493,7 +493,7 @@ export default class ScatterPlot2 {
     const menu_selection = d3.select('#bar_section')
       .append('div')
       .attr('id', 'menu_selection')
-      .styles({ position: 'relative', 'text-align': 'center' });
+      .styles({ padding: '0 10px 10px 10px', 'text-align': 'center', color: '#4f81bd' });
 
     const chart_type = menu_selection.append('p');
 
