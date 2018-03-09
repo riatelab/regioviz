@@ -52,7 +52,7 @@ export default class contextMenu {
 
     this.initMenu(parent);
     if (!position) {
-      this.DOMobj.style.top = `${event.clientY + document.body.scrollTop}px`;
+      this.DOMobj.style.top = `${event.clientY + window.scrollY}px`;
       this.DOMobj.style.left = `${event.clientX}px`;
     } else {
       this.DOMobj.style.top = `${position[1]}px`;
