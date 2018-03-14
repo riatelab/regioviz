@@ -730,6 +730,7 @@ export default class Similarity1plus {
         self.appendOverlayRect();
       }, 200);
     }
+    this.data.sort((a, b) => a.dist - b.dist);
   }
   /* eslint-enable no-loop-func */
 
@@ -846,7 +847,8 @@ export default class Similarity1plus {
         const ratio_n = this.parentNode.parentNode.id.replace('l_', '');
         const unit_ratio = variables_info.find(ft => ft.id === ratio_n).unit;
         const globalrank = +this.getAttribute('globalrank');
-        const indic_rank = self.current_ids.length - +d[`rank_${ratio_n}`];
+        let indic_rank = self.current_ids.length - +d[`rank_${ratio_n}`];
+        indic_rank = indic_rank === 0 ? 1 : indic_rank;
         content.push(`${ratio_n} : ${formatNumber(d[ratio_n], 1)} ${unit_ratio}`);
         if (self.proportionnal_symbols) {
           _h += 25;
@@ -1483,20 +1485,23 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
     } else {
       const n_regio = +d3.select('#menu_selection').select('.nb_select').property('value');
       help2.push(`
-Ces graphiques de distribution permettent d'évaluer visuellement le degré de ressemblance existant entre l'unité territoriale ${my_region_pretty_name} et les autres unités territoriales pour chacun des indicateurs suivants :<br>`);
+Ces graphiques de distribution permettent d'évaluer visuellement le degré de ressemblance existant entre l'unité territoriale <b>${my_region_pretty_name}</b> et les autres unités territoriales pour chacun des indicateurs suivants :<br>`);
       this.ratios.forEach((v, i) => {
         help2.push(` - ${v} : ${info_var[i + 1].name}<br>`);
       });
       help2.push(`Les données sont disponibles pour <b>${compl} unités territoriales</b> de l'espace d'étude ${name_study_zone}, au niveau ${name_territorial_mesh}, soit ${formatNumber(calcPopCompletudeSubset(app, this.ratios), 0)}% de la population de l'espace d'étude.<br><br>`);
       help2.push(`
-En particulier, ce graphique souligne la distance qui sépare la ${n_regio === 1 ? [n_regio, 'ère'].join('') : [n_regio, 'ème'].join('')} entité territoriale la plus ressemblante globalement de l'unité territoriale ${my_region_pretty_name}.
+En particulier, ce graphique souligne la distance qui sépare la ${n_regio === 1 ? [n_regio, 'ère'].join('') : [n_regio, 'ème'].join('')} entité territoriale la plus ressemblante globalement de l'unité territoriale <b>${my_region_pretty_name}</b>.
 Il s'agit de la ${this.data[n_regio].name} (${app.full_dataset.find(d => d.id === this.data[n_regio].id).UNIT_SUP}). Voici ce qui en résulte indicateur par indicateur : <br>`);
       this.ratios.forEach((v) => {
-        help2.push(` - ${v} : ${this.data[n_regio][`rank_${v}`]} unité territoriale la plus proche.<br>`);
+        let rank = this.current_ids.length - 1 - +this.data[n_regio][`rank_${v}`];
+        rank = rank === 0 ? 1 : rank;
+        rank = rank === 1 ? '1ère' : `${rank}ème`;
+        help2.push(` - ${v} : ${rank} unité territoriale la plus proche.<br>`);
       });
       const dmin = this.ratios.map(v => [v, this.data[n_regio][`dist_${v}`]]);
       dmin.sort((a, b) => b[1] - a[1]);
-      help2.push(`<br>La ressemblance entre les unités territoriales ${my_region_pretty_name} et ${this.data[n_regio].name} est donc d'abord due à la proximité des valeurs de ${dmin[0][0]}`);
+      help2.push(`<br>La ressemblance entre les unités territoriales <b>${my_region_pretty_name}</b> et <b>${this.data[n_regio].name}</b> est donc d'abord due à la proximité des valeurs de ${dmin[0][0]}`);
     }
     const source = this.ratios
       .map((v, i) => `<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].source} (Date de téléchargement de la donnée : ${info_var[i + 1].last_update})`)

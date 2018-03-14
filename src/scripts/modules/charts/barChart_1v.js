@@ -1141,7 +1141,7 @@ Ce graphique rend également possible le positionnement des régions au regard d
 <b>Maillage territorial d'analyse</b> : ${name_territorial_mesh}<br>`];
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : Régions de même ${app.current_config.filter_key}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_key) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
@@ -1151,7 +1151,7 @@ Ce graphique rend également possible le positionnement des régions au regard d
     }
     const help2 = `
 Ce graphique en bâtons (<i>bar-plot</i>) permet de visualiser la situation de l'unité territoriale <b>${my_region_pretty_name}</b> sur l'indicateur ${info_var.name} <i>(${this.ratio_to_use})</i> par rapport à l'espace d'étude <b>${name_study_zone}</b> et au maillage <b>${name_territorial_mesh}</b>.
-Les données sont disponibles pour <b>${compl} unités territoriales</b> de l'espace d'étude.
+Les données sont disponibles pour <b>${compl} unités territoriales</b> de l'espace d'étude, soit ${formatNumber(calcPopCompletudeSubset(app, [this.ratio_to_use]), 0)}% de la population de l'espace d'étude.
 <br><br>
 L’unité territoriale <b>${my_region_pretty_name}</b> a une valeur de <b>${formatNumber(this.ref_value, 1)} ${info_var.unit}</b> pour l’indicateur <i>${this.ratio_to_use}</i> (rang ${my_rank} de la distribution).
 <b>${sup}</b> unités territoriales ont donc une valeur supérieure et <b>${inf}</b> unités territoriales ont une valeur inférieure au sein de l'espace d'étude <b>${name_study_zone}</b>.

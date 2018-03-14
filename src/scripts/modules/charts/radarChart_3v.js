@@ -1262,7 +1262,7 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
       help2.push('Cette unité territoriale n\'est positionnée <b>au-dessus de la valeur médiane</b> pour aucun de ces indicateurs.<br>');
     }
     if (inf_median.length > 0) {
-      help2.push('<br>Cette unité territoriale se positionne <b>sous la valeur médiane</b> pour les indicateurs suivants :<br>');
+      help2.push('<br>Cette unité territoriale se positionne <b>sous la valeur médiane</b> pour les indicateurs suivants (position jugée défavorable) :<br>');
       inf_median.forEach((v) => {
         help2.push(` - ${v.axis}, ${formatNumber(v.raw_value, 1)} ${v.raw_value_unit} (rang ${formatNumber(v.value, 1)}/100)<br>`);
       });
@@ -1277,6 +1277,7 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
           const id_region = region.name;
           const o_region = app.full_dataset.find(d => d.id === id_region);
           help2.push('<br>');
+          console.log(region, my_region);
           const _inf_my_reg = region.axes.filter((d, j) => d.value <= my_region.axes[j].value);
           const _sup_my_reg = region.axes.filter((d, j) => d.value > my_region.axes[j].value);
           if (_inf_my_reg.length > 0) {
@@ -1284,7 +1285,8 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
             help2.push(
               `En comparaison à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}), l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs plus importantes pour les indicateurs suivants :<br>`);
             _inf_my_reg.forEach((v) => {
-              help2.push(` - ${v.axis} (écart de rang : ${formatNumber(my_region.axes[v].value - v.value, 1)})<br>`);
+              // const my_region_axis = my_region.axes.find(vv => vv.axis === v.axis).
+              help2.push(` - ${v.axis} (écart de rang : ${formatNumber(my_region.axes.find(vv => vv.axis === v.axis).value - v.value, 1)})<br>`);
             });
           } else {
             help2.push(
@@ -1294,7 +1296,7 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
             // _sup_my_reg.sort((a, b) => b.dist - a.dist);
             help2.push(`Inversement, l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs moins importantes pour ces indicateurs :<br>`);
             _sup_my_reg.forEach((v) => {
-              help2.push(` - ${v.axis} (écart de rang : ${formatNumber(region.axes.find(vv => vv.axis === v.axis).value - v.value, 1)})<br>`);
+              help2.push(` - ${v.axis} (écart de rang : ${formatNumber(my_region.axes.find(vv => vv.axis === v.axis).value - v.value, 1)})<br>`);
             });
           } else {
             help2.push(`L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de scores moins importants pour l'ensembme des idnicateurs.<br>`);
