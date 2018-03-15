@@ -1473,13 +1473,13 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
         Compte tenu de cette sélection, les cinq unités territoriales les plus ressemblantes sont les suivantes :<br>`);
       this.data.slice(1, 6).forEach((d, i) => {
         if (i === 0) help2.push(`${d.id} - ${d.name} (avec un indice de similarité de ${formatNumber(d.dist, 1)})<br>`);
-        else help2.push(`${d.id} - ${d.name} (${formatNumber(d.dist, 1)})<br>`);
+        else help2.push(`${d.id} - ${d.name} (${formatNumber(d.dist, 2)})<br>`);
       });
       help2.push('<br>Les cinqs unités territoriales les moins ressemblantes sont les suivantes :<br>');
       const temp = this.data.slice(this.data.length - 5, this.data.length);
       temp.reverse();
       temp.forEach((d) => {
-        help2.push(`${d.id} - ${d.name} (${formatNumber(d.dist, 1)})<br>`);
+        help2.push(`${d.id} - ${d.name} (${formatNumber(d.dist, 2)})<br>`);
       });
       help2.push('<br>Cette mesure de ressemblance étant synthétique, il est opportun de se rendre sur l\'option des ressemblances détaillées par indicateur pour en savoir plus sur la nature de ces ressemblances.');
     } else {

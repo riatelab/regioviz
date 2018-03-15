@@ -1283,14 +1283,17 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
           if (_inf_my_reg.length > 0) {
             // _inf_my_reg.sort((a, b) => b.value - a.value);
             help2.push(
-              `En comparaison à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}), l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs plus importantes pour les indicateurs suivants :<br>`);
+              `En comparaison à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}), l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs plus favorable pour les indicateurs suivants :<br>`);
             _inf_my_reg.forEach((v) => {
               // const my_region_axis = my_region.axes.find(vv => vv.axis === v.axis).
               help2.push(` - ${v.axis} (écart de rang : ${formatNumber(my_region.axes.find(vv => vv.axis === v.axis).value - v.value, 1)})<br>`);
             });
           } else {
-            help2.push(
-              `L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de valeurs plus importantes par rapport à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}).<br>`);
+            help2.push(`
+              Par rapport à l'unité territoriale ${o_region.name}, l'unité territoriale ${app.current_config.my_region_pretty_name} se situe dans une position favorable pour l'ensemble des indicateurs.
+              `);
+            // help2.push(
+            //   `L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de valeurs plus faorables par rapport à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}).<br>`);
           }
           if (_sup_my_reg.length > 0) {
             // _sup_my_reg.sort((a, b) => b.dist - a.dist);
@@ -1299,7 +1302,10 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
               help2.push(` - ${v.axis} (écart de rang : ${formatNumber(my_region.axes.find(vv => vv.axis === v.axis).value - v.value, 1)})<br>`);
             });
           } else {
-            help2.push(`L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de scores moins importants pour l'ensembme des idnicateurs.<br>`);
+            help2.push(`
+              Par rapport à l'unité territoriale ${o_region.name}, l'unité territoriale ${app.current_config.my_region_pretty_name} se situe dans une position défavorable pour l'ensemble des indicateurs.
+              `);
+            // help2.push(`L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de scores moins importants pour l'ensembme des idnicateurs.<br>`);
           }
         }
       });
