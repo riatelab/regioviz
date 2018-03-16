@@ -329,11 +329,12 @@ export default class Similarity1plus {
               d3.select(this).attr('class', '');
             })
             .on('click', function () {
+              if (self.sorted_axis) return;
               const that_ratio = this.parentNode.id.slice(2);
-              const current_position = ratios.indexOf(that_ratio);
+              const current_position = self.ratios.indexOf(that_ratio);
               if (current_position === 0) { return; }
-              ratios.splice(current_position, 1);
-              ratios.splice(current_position - 1, 0, that_ratio);
+              self.ratios.splice(current_position, 1);
+              self.ratios.splice(current_position - 1, 0, that_ratio);
               self.removeLines();
               self.removeMapClonedFeatures();
               self.update();
@@ -357,11 +358,12 @@ export default class Similarity1plus {
               d3.select(this).attr('class', '');
             })
             .on('click', function () {
+              if (self.sorted_axis) return;
               const that_ratio = this.parentNode.id.slice(2);
-              const current_position = ratios.indexOf(that_ratio);
-              if (current_position === ratios.length) { return; }
-              ratios.splice(current_position, 1);
-              ratios.splice(current_position + 1, 0, that_ratio);
+              const current_position = self.ratios.indexOf(that_ratio);
+              if (current_position === self.ratios.length) { return; }
+              self.ratios.splice(current_position, 1);
+              self.ratios.splice(current_position + 1, 0, that_ratio);
               self.removeLines();
               self.removeMapClonedFeatures();
               self.update();
@@ -761,7 +763,7 @@ export default class Similarity1plus {
 
   updateMapRegio(ix_last_selec) {
     if (!this.map_elem) return;
-    const target_id = ix_last_selec ? this.data[ix_last_selec].id : null;
+    const target_id = ix_last_selec && this.data[ix_last_selec] ? this.data[ix_last_selec].id : null;
     this.map_elem.target_layer.selectAll('path')
       .attr('fill', (d) => {
         const _id = d.id;
@@ -1162,7 +1164,14 @@ export default class Similarity1plus {
     this.data = app.current_data.filter(
       ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
     this.prepareData();
-    const temp = this.highlight_selection.length;
+    let temp;
+    if (this.data.length > +d3.select('#menu_selection').select('.nb_select').property('value')
+          || this.data.length > this.highlight_selection.length) {
+      d3.select('#menu_selection').select('.nb_select').property('value', this.data.length);
+      temp = 1;
+    } else {
+      temp = this.highlight.length;
+    }
     this.highlight_selection = [];
     this.updateTableStat();
     this.updateCompletude();
@@ -1461,7 +1470,7 @@ Les graphiques de ressemblance permettent de visualiser pour un indicateur et pl
 
 L'interface Regioviz propose deux niveaux pour la visualisation de ces ressemblances : la <b>ressemblance globale</b> et la <b>ressemblance détaillée</b> indicateur par indicateur.
 
-L'option de distance globale propose une visualisation synthétique de l'éloignement statistique existant entre « ma région » et les autres régions de l'espace d'étude sur les n indicateurs sélectionnés. Ce module est composé d'un graphique de <i>Beeswarm</i> qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre ma région et les autres régions de l'espace d'étude. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (régions les plus ressemblantes) apparaissent dans des tonalités rouges, les 25 % les plus importantes (régions les moins ressemblantes) sont représentées par des tonalités bleues.
+L'option de distance globale propose une visualisation synthétique de l'éloignement statistique existant entre « ma région » et les autres régions de l'espace d'étude sur les n indicateurs sélectionnés. Ce module est composé d’un graphique en essaim (beeswarm) qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre ma région et les autres régions de l'espace d'étude. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (régions les plus ressemblantes) apparaissent dans des tonalités rouges, les 25 % les plus importantes (régions les moins ressemblantes) sont représentées par des tonalités bleues.
 
 Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d'évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l'application décompose cette ressemblance pour l'unité territoriale qui ressemble le plus à « ma région » de référence d'après la mesure globale de ressemblance. Libre ensuite à l'utilisateur de choisir plus ou moins d'unités territoriales de comparaison (les n unités les plus ressemblantes) en fonction de ses objectifs d'analyse.
 
