@@ -1,4 +1,4 @@
-# WIP
+# Regioviz
 
 **[fr]**
 **Regioviz** est un outil développé par **[l’UMS RIATE](http://riate.cnrs.fr)** dans le cadre d’un projet coordonné par le CGET visant à situer et comparer les nouvelles régions françaises dans un contexte européen. Cet outil d'exploration statistique a l'ambition d'être compréhensible et utilisable par des non-experts en manipulation et visualisation de données.  
@@ -8,4 +8,4 @@
 
 
 
-[Accéder à l'application ...](https://riatelab.github.io/regioviz/demo/)
+[Accéder à l'application ...](https://riatelab.github.io/regioviz/)
