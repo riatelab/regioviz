@@ -71,7 +71,7 @@ export default class Similarity1plus {
 
     // Brush behavior (only used for beeswarm):
     this.brush = d3.brushX()
-      .extent([[0, 0], [width, height]])
+      .extent([[0, 0], [width, height - 50]])
       .on('brush end', () => this.brushed());
 
     // To decide wether to inverse the positive/negative color for an axis
@@ -626,7 +626,7 @@ export default class Similarity1plus {
       const voro = d3.voronoi()
         .extent([
           [-margin.left, -margin.top * 2],
-          [width + margin.right, height + margin.top * 2]])
+          [width + margin.right, height + margin.top * 2 - 50]])
         .x(d => d.x)
         .y(d => d.y)
         .polygons(data);
@@ -652,7 +652,7 @@ export default class Similarity1plus {
             class: 'global_dist',
           });
 
-        g.append('g')
+        this.draw_group.append('g')
           .attrs({
             class: 'axis-top-v axis--x',
             transform: `translate(0,${height})`,
@@ -1099,7 +1099,7 @@ export default class Similarity1plus {
           x: -60,
           y: maxy,
           width: width + 120,
-          height: height - maxy + 50,
+          height: height - maxy,
           fill: 'white',
         });
     }
