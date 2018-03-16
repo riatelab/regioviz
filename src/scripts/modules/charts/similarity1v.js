@@ -1087,7 +1087,7 @@ export default class Similarity1plus {
           y: -30,
           width: width + 120,
           height: miny + 30,
-          fill: 'transparent',
+          fill: 'white',
         });
     }
     if ((height - maxy) > 0) {
@@ -1098,7 +1098,7 @@ export default class Similarity1plus {
           y: maxy,
           width: width + 120,
           height: height - maxy + 50,
-          fill: 'transparent',
+          fill: 'white',
         });
     }
     this.draw_group.selectAll('.overlayrect')
