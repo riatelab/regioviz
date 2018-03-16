@@ -114,12 +114,22 @@ export default class Similarity1plus {
 
     const section = menu_selection.append('div')
       .append('section')
-      .attr('class', 'slider-checkbox');
+      .attr('class', 'slider-checkbox scprop');
     section.append('input')
       .attrs({ type: 'checkbox', id: 'check_prop' });
     section.append('label')
       .attrs({ class: 'label not_selected noselect', for: 'check_prop' })
       .text('Cercles proportionnels à la population');
+
+    const section2 = menu_selection.append('div')
+      .append('section')
+      .attr('class', 'slider-checkbox scsorted')
+      .style('display', 'none');
+    section2.append('input')
+      .attrs({ type: 'checkbox', id: 'check_sorted_axis' });
+    section2.append('label')
+      .attrs({ class: 'label not_selected noselect', for: 'check_sorted_axis' })
+      .text('Classement par degré de ressemblance');
 
     this.bindMenu();
     this.makeTableStat();
@@ -220,14 +230,23 @@ export default class Similarity1plus {
     this.draw_group.select('#axis-title-global-dist').remove();
     this.draw_group.selectAll('.overlayrect').remove();
     if (self.type === 'detailled') {
+      let ratios;
+      if (self.sorted_axis) {
+        const highlighted_region = +d3.select('#menu_selection').select('.nb_select').property('value');
+        ratios = self.ratios.slice();
+        ratios.sort((a, b) => data[highlighted_region][`rank_${b}`] - data[highlighted_region][`rank_${a}`]);
+      } else {
+        ratios = self.ratios;
+      }
+
       this.draw_group.attr('clip-path', 'url(#clip)');
       const highlight_selection = self.highlight_selection;
-      const nb_variables = self.ratios.length;
+      const nb_variables = ratios.length;
       const offset = height / nb_variables + 1;
       let height_to_use = offset / 2;
       const trans = d3.transition().duration(125);
       for (let i = 0; i < nb_variables; i++) {
-        const ratio_name = self.ratios[i];
+        const ratio_name = ratios[i];
         const selector_ratio_name = `l_${ratio_name}`;
         const ratio_pretty_name = app.current_config.ratio_pretty_name[i];
         // const num_name = self.nums[i];
@@ -311,10 +330,10 @@ export default class Similarity1plus {
             })
             .on('click', function () {
               const that_ratio = this.parentNode.id.slice(2);
-              const current_position = self.ratios.indexOf(that_ratio);
+              const current_position = ratios.indexOf(that_ratio);
               if (current_position === 0) { return; }
-              self.ratios.splice(current_position, 1);
-              self.ratios.splice(current_position - 1, 0, that_ratio);
+              ratios.splice(current_position, 1);
+              ratios.splice(current_position - 1, 0, that_ratio);
               self.removeLines();
               self.removeMapClonedFeatures();
               self.update();
@@ -339,10 +358,10 @@ export default class Similarity1plus {
             })
             .on('click', function () {
               const that_ratio = this.parentNode.id.slice(2);
-              const current_position = self.ratios.indexOf(that_ratio);
-              if (current_position === self.ratios.length) { return; }
-              self.ratios.splice(current_position, 1);
-              self.ratios.splice(current_position + 1, 0, that_ratio);
+              const current_position = ratios.indexOf(that_ratio);
+              if (current_position === ratios.length) { return; }
+              ratios.splice(current_position, 1);
+              ratios.splice(current_position + 1, 0, that_ratio);
               self.removeLines();
               self.removeMapClonedFeatures();
               self.update();
@@ -372,9 +391,9 @@ export default class Similarity1plus {
         let _min;
         let _max;
         this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
-        this.data.forEach((ft, _ix) => {
-          ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
-        });
+        // this.data.forEach((ft, _ix) => {
+        //   ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
+        // });
         this.data.splice(this.data.indexOf(this.my_region), 1);
         this.data.push(this.my_region);
         if (highlight_selection.length > 0) {
@@ -1172,6 +1191,12 @@ export default class Similarity1plus {
           ft[`dist_${v}`] = math_abs(+ft[`cr_${v}`] - +this.my_region[`cr_${v}`]);
         });
       });
+    this.ratios.forEach((ratio_name) => {
+      this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
+      this.data.forEach((ft, _ix) => {
+        ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
+      });
+    });
     this.current_ids = this.data.map(d => d.id);
     this.data.forEach((ft) => {
       // eslint-disable-next-line no-param-reassign, no-restricted-properties
@@ -1247,11 +1272,23 @@ export default class Similarity1plus {
     menu.select('#check_prop')
       .on('change', function () {
         if (this.checked) {
-          menu.select('.slider-checkbox > .label').attr('class', 'label noselect');
+          menu.select('.scprop > .label').attr('class', 'label noselect');
           self.proportionnal_symbols = true;
         } else {
-          menu.select('.slider-checkbox > .label').attr('class', 'label noselect not_selected');
+          menu.select('.scprop > .label').attr('class', 'label noselect not_selected');
           self.proportionnal_symbols = false;
+        }
+        self.update();
+      });
+
+    menu.select('#check_sorted_axis')
+      .on('change', function () {
+        if (this.checked) {
+          menu.select('.scsorted > .label').attr('class', 'label noselect');
+          self.sorted_axis = true;
+        } else {
+          menu.select('.scsorted > .label').attr('class', 'label noselect not_selected');
+          self.sorted_axis = false;
         }
         self.update();
       });
@@ -1268,6 +1305,7 @@ export default class Similarity1plus {
         this.classList.add('active');
         menu.select('#ind_dist_detailled').attr('class', 'choice_ind noselect');
         menu.select('.selection_display').style('display', 'none');
+        menu.select('.scsorted').style('display', 'none');
         self.draw_group.selectAll('g').remove();
         self.map_elem.unbindBrushClick();
         self.map_elem.bindBrushClick(self);
@@ -1286,6 +1324,7 @@ export default class Similarity1plus {
         this.classList.add('active');
         menu.select('#ind_dist_global').attr('class', 'choice_ind noselect');
         menu.select('.selection_display').style('display', null);
+        menu.select('.scsorted').style('display', null);
         self.draw_group.selectAll('g').remove();
         self.map_elem.unbindBrushClick();
         self.map_elem.bindBrushClick(self);
