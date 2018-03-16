@@ -219,7 +219,7 @@ export default class Similarity1plus {
     this.removeLines();
     this.removeMapClonedFeatures();
     this.update();
-    this.updateMapRegio();
+    this.updateMapRegio(nb);
   }
 
   /* eslint-disable no-loop-func */
@@ -759,8 +759,9 @@ export default class Similarity1plus {
       calcPopCompletudeSubset(app, this.ratios));
   }
 
-  updateMapRegio() {
+  updateMapRegio(ix_last_selec) {
     if (!this.map_elem) return;
+    const target_id = ix_last_selec ? this.data[ix_last_selec].id : null;
     this.map_elem.target_layer.selectAll('path')
       .attr('fill', (d) => {
         const _id = d.id;
@@ -773,6 +774,10 @@ export default class Similarity1plus {
         }
         return color_disabled;
       });
+    if (this.type === 'detailled' && target_id) {
+      this.map_elem.target_layer.selectAll('path')
+        .attr('fill-opacity', d => (app.colors[d.id] && !(d.id === target_id || d.id === app.current_config.my_region)) ? 0.6 : 1);
+    }
   }
 
   makeClassifColors(_values) {
@@ -1143,7 +1148,7 @@ export default class Similarity1plus {
       this.prepareData();
       this.updateCompletude();
       this.updateTableStat();
-      this.updateMapRegio();
+      // this.updateMapRegio();
       this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
     }
   }
@@ -1162,7 +1167,7 @@ export default class Similarity1plus {
     this.updateTableStat();
     this.updateCompletude();
     this.applySelection(temp);
-    this.updateMapRegio();
+    // this.updateMapRegio();
   }
 
   prepareData() {
@@ -1222,12 +1227,11 @@ export default class Similarity1plus {
     //   return this.data.find(el => el.id === d.id);
     // }).filter(d => !!d);
     // this.update();
-
+    const ix_last_selec = +d3.select('#menu_selection').select('.nb_select').property('value');
     // To use a new selection according to 'nb_select' value:
-    this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
+    this.applySelection(ix_last_selec);
     this.updateCompletude();
     this.updateTableStat();
-    this.updateMapRegio();
   }
 
   removeVariable(code_variable) {
@@ -1241,12 +1245,13 @@ export default class Similarity1plus {
 
     this.draw_group.select(`g#l_${code_variable}`).remove();
 
+    const ix_last_selec = +d3.select('#menu_selection').select('.nb_select').property('value');
+
     // And use it immediatly:
     this.updateCompletude();
     this.updateTableStat();
-    this.updateMapRegio();
     // To use a new selection according to 'nb_select' value:
-    this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
+    this.applySelection(ix_last_selec);
   }
 
   bindMenu() {
