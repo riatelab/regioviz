@@ -1,0 +1,18 @@
+.footer {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  background-color: #c3c3c3;
+  color: $white;
+}
+
+.copyright {
+  background-color: darken(#c3c3c3, 10%);
+}
+
+.footer img {
+  height: 3rem;
+}
+
+.copyright img {
+  height: 1.5rem;
+}
