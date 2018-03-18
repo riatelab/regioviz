@@ -570,7 +570,6 @@ function bindHelpMenu() {
     btn_i.onclick = function () {
       const territ_level_id = this.previousSibling.previousSibling.getAttribute('value');
       const o = territorial_mesh.find(d => d.id === territ_level_id);
-      console.log(o.url);
       // eslint-disable-next-line new-cap
       const modal = new tingle.modal({
         stickyFooter: false,

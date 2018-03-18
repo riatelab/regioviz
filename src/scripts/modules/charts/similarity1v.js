@@ -652,7 +652,7 @@ export default class Similarity1plus {
             class: 'global_dist',
           });
 
-        this.draw_group.append('g')
+        g.append('g')
           .attrs({
             class: 'axis-top-v axis--x',
             transform: `translate(0,${height})`,
@@ -763,7 +763,9 @@ export default class Similarity1plus {
 
   updateMapRegio(ix_last_selec) {
     if (!this.map_elem) return;
-    const target_id = ix_last_selec && this.data[ix_last_selec] ? this.data[ix_last_selec].id : null;
+    const target_id = ix_last_selec && this.data[ix_last_selec]
+      ? this.data[ix_last_selec].id
+      : null;
     this.map_elem.target_layer.selectAll('path')
       .attr('fill', (d) => {
         const _id = d.id;
@@ -778,7 +780,10 @@ export default class Similarity1plus {
       });
     if (this.type === 'detailled' && target_id) {
       this.map_elem.target_layer.selectAll('path')
-        .attr('fill-opacity', d => (app.colors[d.id] && !(d.id === target_id || d.id === app.current_config.my_region)) ? 0.6 : 1);
+        .attr('fill-opacity', d => (
+          (app.colors[d.id] && !(d.id === target_id || d.id === app.current_config.my_region))
+            ? 0.6
+            : 1));
     }
   }
 

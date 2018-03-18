@@ -1525,7 +1525,6 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
     const my_region_pretty_name = app.current_config.my_region_pretty_name;
     // const [my_region, my_rank] = this.data.map((d, i) => [d.id, i])
     //   .find(d => d[0] === app.current_config.my_region);
-    const nb_ft = this.data.length;
     const v1 = this.variable1;
     const v2 = this.variable2;
     const info_var1 = variables_info.find(ft => ft.id === v1);
@@ -1548,7 +1547,8 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
     });
     let compl = calcCompletudeSubset(app, [this.variable1, this.variable2], 'array');
     compl = compl[0] === compl[1] ? 'la totalité des' : `${compl[0]} des ${compl[1]}`;
-    const name_territorial_mesh = territorial_mesh.find(d => d.id === app.current_config.current_level).name;
+    const name_territorial_mesh = territorial_mesh
+      .find(d => d.id === app.current_config.current_level).name;
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_key instanceof Array
@@ -1572,7 +1572,7 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
       if (inv) return a < b;
       else return a >= b;
     };
-    let obj_my_region = this.data.find(d => d.id === app.current_config.my_region);
+    const obj_my_region = this.data.find(d => d.id === app.current_config.my_region);
     let cadran;
     let t1;
     let t2;
@@ -1588,7 +1588,7 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
       t1 = comp(obj_my_region[this.rank_variable1], 50, this.xInversed);
       cadran = [
         t2 ? 'supérieur' : 'inférieur',
-        t1 ? 'droit' :'gauche',
+        t1 ? 'droit' : 'gauche',
       ].join(' ');
     }
 

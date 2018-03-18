@@ -62,10 +62,6 @@ function map_zoomed() {
         : null;
     });
 
-  // layers.selectAll('g')
-  //   .transition(t)
-  //   .attr('transform', transform);
-
   svg_map.select('.brush_map')
     .transition(t)
     .attr('transform', transform);
@@ -547,22 +543,8 @@ class MapSelect {
   }
 }
 
-// function makeSourceSection() {
-//   const src_group = svg_map.append('g').attr('id', 'source');
-//   src_group.append('text')
-//     .attrs({
-//       x: 3,
-//       y: height_map - 5,
-//       'text-anchor': 'left',
-//       'font-family': '"Signika",sans-serif',
-//       'font-size': '11px',
-//     })
-//     .text('Données : Eurostat (téléchargement : Oct. 2017)- Limite administrative: UMS RIATE, CC-BY-SA');
-// }
-
 export {
   MapSelect,
-  // makeSourceSection,
   makeMapLegend,
   svg_map,
   zoomClick,

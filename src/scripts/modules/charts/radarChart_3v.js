@@ -1277,7 +1277,6 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
           const id_region = region.name;
           const o_region = app.full_dataset.find(d => d.id === id_region);
           help2.push('<br>');
-          console.log(region, my_region);
           const _inf_my_reg = region.axes.filter((d, j) => d.value <= my_region.axes[j].value);
           const _sup_my_reg = region.axes.filter((d, j) => d.value > my_region.axes[j].value);
           if (_inf_my_reg.length > 0) {
