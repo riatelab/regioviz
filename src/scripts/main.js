@@ -587,6 +587,9 @@ function bindHelpMenu() {
       }
       modal.setContent(content);
       modal.open();
+      if (o.id === 'N12_POL') {
+        document.querySelector('a.buttonDownload').onclick = clickDlPdf;
+      }
     };
   });
 }
