@@ -29,50 +29,6 @@ const updateDimensions = () => {
   d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
 };
 
-// const makeTableTooltip = (data_feature) => {
-//   const doc = document;
-//   const nb_features = data_feature.axes.length;
-//   const column_names = ['/', 'Ratio', 'Rang', 'Écart à ma région'];
-//   const nb_columns = column_names.length;
-//   // const container_div = doc.createElement('div');
-//   const myTable = doc.createElement('table');
-//   const headers = doc.createElement('thead');
-//   const table_body = doc.createElement('tbody');
-//   const headers_row = doc.createElement('tr');
-//   myTable.style.position = 'relative';
-//   myTable.style.display = 'inline-block';
-//   myTable.className = 'minitable';
-//   for (let i = 0; i < nb_columns; i++) {
-//     const cell = doc.createElement('th');
-//     cell.innerHTML = column_names[i];
-//     headers_row.appendChild(cell);
-//   }
-//   headers.appendChild(headers_row);
-//   myTable.appendChild(headers);
-//   for (let i = 0; i < nb_features; i++) {
-//     const row = doc.createElement('tr');
-//     for (let j = 0; j < nb_columns; j++) {
-//       const cell = doc.createElement('td');
-//       const col_name = column_names[j];
-//       if (col_name === '/') {
-//         cell.innerHTML = data_feature.axes[i].axis;
-//       } else if (col_name === 'Ratio') {
-//         cell.innerHTML = Math.round(data_feature.axes[i].raw_value * 10) / 10;
-//       } else if (col_name === 'Rang') {
-//         cell.innerHTML = Math.round(data_feature.axes[i].value * 10) / 10;
-//       } else {
-//         cell.innerHTML = '';
-//       }
-//       row.appendChild(cell);
-//     }
-//     table_body.appendChild(row);
-//   }
-//   myTable.appendChild(table_body);
-//   myTable.setAttribute('id', 'table_tooltip');
-//   // container_div.appendChild(myTable);
-//   return myTable;
-// };
-
 /**
 * Move an element from an array to a specific position
 *
@@ -325,9 +281,6 @@ export default class RadarChart3 {
       let y = +text.attr('y');
       let line = [];
       let lineNumber = 0;
-      // if (y > height / 2 - 35) {
-      //   y -= 40;
-      // }
       if (id === 0) y += 12;
       if (id === nb_var / 2) y -= 12;
       let tspan = text.text(null)
@@ -385,10 +338,6 @@ export default class RadarChart3 {
   }
 
   add_element(elem) {
-    // const n_axis = elem.axes.map(i => i.axis);
-    // if (!(JSON.stringify(n_axis.sort()) === JSON.stringify(this.allAxis.sort()))) {
-    //   throw new Error('Expected element with same axes name than existing data.');
-    // }
     const axes_reordered = [];
     elem.axes.forEach((ft) => {
       if (this.inversedAxis.has(ft.axis)) {
@@ -528,11 +477,6 @@ export default class RadarChart3 {
 
     this.makeTooltips();
   }
-
-  // changeOrder() {
-  //   this.data = this.data.slice(1, this.data.length).concat(this.data.slice(0, 1));
-  //   this.update();
-  // }
 
   prepareData(data) {
     // Set the minimum number of variables to keep selected for this kind of chart:
@@ -914,17 +858,7 @@ export default class RadarChart3 {
     const maxValue = this.maxValue;
     const cfg = this.cfg;
     const angleSlice = this.angleSlice;
-    // console.log(this.current_ids);
-    // if (new_data) {
-    //   const new_axis = new_data[0].axes.map(elem => elem.axis);
-    //   if (!(JSON.stringify(new_axis) === JSON.stringify(this.allAxis))) {
-    //     throw new Error('Expected element with same axes name than existing data.');
-    //   }
-    //   this.data = new_data;
-    //   this.allAxis = new_axis;
-    // } else {
     this.allAxis = this.data[0].axes.map(elem => elem.axis);
-    // }
     const update_axis = this.axisGrid.selectAll('.axis')
       .data(this.allAxis);
 
@@ -1119,7 +1053,7 @@ export default class RadarChart3 {
     return features;
   }
 
-  handleClickMap(d, parent) {
+  handleClickMap(d, parent) { // eslint-disable-line no-unused-vars
     const id = d.id;
     if (this.current_ids.indexOf(id) < 0 || id === this.id_my_region) return;
     if (this.displayed_ids.indexOf(id) < 0) {
@@ -1162,11 +1096,6 @@ export default class RadarChart3 {
         }
         return color_disabled;
       });
-    // .attr('fill', d => (d.id === this.id_my_region
-    //   ? color_highlight
-    //   : this.current_ids.indexOf(d.id) > -1
-    //     ? (this.displayed_ids.indexOf(d.id) > -1
-    //       ? app.colors[d.id] : color_countries) : color_disabled));
   }
 
   updateTableStat() {
@@ -1280,7 +1209,6 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
           const _inf_my_reg = region.axes.filter((d, j) => d.value <= my_region.axes[j].value);
           const _sup_my_reg = region.axes.filter((d, j) => d.value > my_region.axes[j].value);
           if (_inf_my_reg.length > 0) {
-            // _inf_my_reg.sort((a, b) => b.value - a.value);
             help2.push(
               `En comparaison à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}), l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs plus favorable pour les indicateurs suivants :<br>`);
             _inf_my_reg.forEach((v) => {
@@ -1291,11 +1219,8 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
             help2.push(`
               Par rapport à l'unité territoriale ${o_region.name}, l'unité territoriale ${app.current_config.my_region_pretty_name} se situe dans une position favorable pour l'ensemble des indicateurs.
               `);
-            // help2.push(
-            //   `L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de valeurs plus faorables par rapport à l’unité territoriale <b>${o_region.name}</b> (${o_region.UNIT_SUP}).<br>`);
           }
           if (_sup_my_reg.length > 0) {
-            // _sup_my_reg.sort((a, b) => b.dist - a.dist);
             help2.push(`Inversement, l’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par des valeurs moins importantes pour ces indicateurs :<br>`);
             _sup_my_reg.forEach((v) => {
               help2.push(` - ${v.axis} (écart de rang : ${formatNumber(my_region.axes.find(vv => vv.axis === v.axis).value - v.value, 1)})<br>`);
@@ -1304,7 +1229,6 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
             help2.push(`
               Par rapport à l'unité territoriale ${o_region.name}, l'unité territoriale ${app.current_config.my_region_pretty_name} se situe dans une position défavorable pour l'ensemble des indicateurs.
               `);
-            // help2.push(`L’unité territoriale <b>${app.current_config.my_region_pretty_name}</b> est caractérisée par l'absence de scores moins importants pour l'ensembme des idnicateurs.<br>`);
           }
         }
       });

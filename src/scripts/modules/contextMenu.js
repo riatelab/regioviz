@@ -61,7 +61,7 @@ export default class contextMenu {
     this.displayed = true;
     setTimeout(() => {
       document.addEventListener('click', () => this.hideMenu());
-    }, 150);
+    }, 225);
   }
 
   removeMenu() {

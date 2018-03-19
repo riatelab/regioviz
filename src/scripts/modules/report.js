@@ -47,6 +47,13 @@ export function generateHtmlRapport(sections, name_my_region) {
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <style>
+@media print{
+  body {
+    font-size: 11px;
+    margin: 5%;
+  }
+  div.f1 { width: 100% !important; }
+}
 @media only screen and (max-width: 959px) {
   body {
     font-size: 11px;

@@ -338,7 +338,6 @@ function bindUI_chart(chart, map_elem) {
         }
         this.classList.add('checked');
         const code_variable = this.getAttribute('value');
-        // const name_variable = variables_info.find(d => d.id === code_variable).name;
         addVariable(app, code_variable);
 
         chart.addVariable(code_variable);
@@ -355,7 +354,6 @@ function bindUI_chart(chart, map_elem) {
         this.classList.remove('checked');
         removeVariable(app, code_variable);
         chart.removeVariable(code_variable);
-        // makeTable(app.current_data, app.current_config);
       }
       // Update the top menu to display available charts according to the current
       // number of available variables:
@@ -649,24 +647,22 @@ function loadData() {
       ] = results;
       alertify.set('notifier', 'position', 'bottom-left');
       prepareVariablesInfo(metadata_indicateurs);
-      // TODO : Reorder it in the dataset :
       const features_menu = full_dataset.filter(
         ft => ft.REGIOVIZ === '1' && (
           ft.N1 === '1' || ft.N2 === '1'));
-      // features_menu = features_menu.slice(0, 1).concat(
-      //   features_menu.slice(6)).concat(features_menu.slice(1, 6));
       // eslint-disable-next-line no-param-reassign
       features_menu.forEach((ft) => { ft.name = ft.name.replace(' — ', ' - '); });
       features_menu.sort((a, b) => a.name.localeCompare(b.name));
-      // TODO: Don't hardcode this:
-      const start_region = 'FRH'; // getRandom(features_menu.map(d => d.id), 12);
+      const start_region = getRandom(full_dataset
+        .filter(d => d.REGIOVIZ === '1' && d.level === '1').map(d => d.id));
       const start_variable = getRandom(
         ['REVMEN', 'CHOM1574', 'CHOM1524']);
       prepare_dataset(full_dataset, app);
       setDefaultConfig(start_region, start_variable, 'N1');
       prepareGeomLayerId(nuts, app.current_config.id_field_geom);
       createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
-      // TODO: Don't hardcode this:
+      // We filtered the features earlier to only get a region available at both
+      // N1 and N2 levels when the application starts so lets hardcode this :
       d3.select('#curr_regio_level').html('N1 N2');
       bindCreditsSource();
       updateMenuStudyZones();
