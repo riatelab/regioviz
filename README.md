@@ -9,3 +9,7 @@
 
 
 [Accéder à l'application ...](https://riatelab.github.io/regioviz/)
+
+
+For guidance on contributing to development, see CONTRIBUTING.md.
+
