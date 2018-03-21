@@ -10,5 +10,5 @@
 
 [Accéder à l'application ...](https://riatelab.github.io/regioviz/)
 
-[fr] Pour des conseils sur la façon de contribuer au développement, voir CONTRIBUTING.md.
+[fr] Pour des conseils sur la façon de contribuer au développement, voir CONTRIBUTING.md.  
 [en] For guidance on contributing to development, see CONTRIBUTING.md.
