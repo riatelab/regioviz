@@ -47,6 +47,9 @@ export const app = {
   current_ids: [],
   // The current version number (not used for now, except for displaying it):
   version: '0.1.0',
+  // The user is now allowed to create its custom study zones, this is where
+  // we are storing a mapping "name_study_zone" -> [id_x, id_y, id_z, id_a, ...]:
+  custom_studyzones: {},
 };
 
 function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NUTS1') {
@@ -214,7 +217,7 @@ function updateMyCategorySection() {
 * @return {void}
 *
 */
-function bindUI_chart(chart, map_elem) {
+export function bindUI_chart(chart, map_elem) {
   // Variable for slight timeout used for
   // some input fields to avoid refreshing as soon as the value is entered:
   let tm;
@@ -243,6 +246,9 @@ function bindUI_chart(chart, map_elem) {
           const dist = +input_elem.value;
           const ids = map_elem.getUnitsWithin(dist);
           applyFilter(app, ids);
+        } else if (filter_type === 'CUSTOM') {
+          document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
+          applyFilter(app, app.custom_studyzones[this.nextSibling.innerHTML]);
         } else {
           document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
           applyFilter(app, filter_type);
@@ -493,7 +499,7 @@ export function bindTopButtons(chart, map_elem) {
     });
 }
 
-function bindHelpMenu() {
+export function bindHelpMenu() {
   const help_buttons_var = document.querySelector('#menu_variables').querySelectorAll('span.i_info');
   Array.prototype.slice.call(help_buttons_var).forEach((btn_i) => {
     // eslint-disable-next-line no-param-reassign
@@ -534,30 +540,50 @@ function bindHelpMenu() {
     // eslint-disable-next-line no-param-reassign, func-names
     btn_i.onclick = function () {
       const filter_id = this.parentElement.getAttribute('filter-value');
-      const o = study_zones.find(d => d.id === filter_id);
-      const hasUrl = (o.url && o.url.indexOf && o.url.indexOf('pdf') > -1);
-      // eslint-disable-next-line new-cap
-      const modal = new tingle.modal({
-        stickyFooter: false,
-        closeMethods: ['overlay', 'button', 'escape'],
-        closeLabel: 'Close',
-        onOpen() {
-          document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
-        },
-        onClose() {
-          modal.destroy();
-        },
-      });
-      let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
-<p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
-
-      if (hasUrl) {
-        content += `<p><a class="buttonDownload" href="data/${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
-      }
-      modal.setContent(content);
-      modal.open();
-      if (hasUrl) {
-        document.querySelector('a.buttonDownload').onclick = clickDlPdf;
+      if (filter_id === 'CUSTOM') {
+        const name_studyzone = this.previousSibling.innerHTML;
+        const regions = app.custom_studyzones[name_studyzone];
+        const modal = new tingle.modal({
+          stickyFooter: false,
+          closeMethods: ['overlay', 'button', 'escape'],
+          closeLabel: 'Close',
+          onOpen() {
+            document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
+          },
+          onClose() {
+            modal.destroy();
+          },
+        });
+        let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Espace d'étude créé par l'utilisateur :</b></p>
+<p style="color: #4f81bd;font-size: 1.2rem;"><b>${name_studyzone}</b></p>
+<p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>`;
+        modal.setContent(content);
+        modal.open();
+      } else {
+        const o = study_zones.find(d => d.id === filter_id);
+        const hasUrl = (o.url && o.url.indexOf && o.url.indexOf('pdf') > -1);
+        // eslint-disable-next-line new-cap
+        const modal = new tingle.modal({
+          stickyFooter: false,
+          closeMethods: ['overlay', 'button', 'escape'],
+          closeLabel: 'Close',
+          onOpen() {
+            document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
+          },
+          onClose() {
+            modal.destroy();
+          },
+        });
+        let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
+  <p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
+        if (hasUrl) {
+          content += `<p><a class="buttonDownload" href="data/${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
+        }
+        modal.setContent(content);
+        modal.open();
+        if (hasUrl) {
+          document.querySelector('a.buttonDownload').onclick = clickDlPdf;
+        }
       }
     };
   });

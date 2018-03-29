@@ -1,8 +1,10 @@
 import jsep from 'jsep';
+import tingle from 'tingle.js';
 import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
-import { isIE } from './../main';
+import sillyname from 'sillyname';
+import { isIE, app, bindUI_chart, bindHelpMenu } from './../main';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise, strict,
 no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
@@ -818,7 +820,7 @@ const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 *  current chart in use in the application.
 * @return {Void}
 */
-function svgContextMenu(current_chart, svg_elem, map_elem) {
+function svgContextMenu(current_chart, svg_elem, map_elem, colors_selection) {
   let items_menu;
   // Remove existing context menu if any:
   if (isContextMenuDisplayed()) {
@@ -875,6 +877,13 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
       });
     }
   }
+  // Allow to create a study zone from the current selection:
+  if (colors_selection && colors_selection.length > 1) {
+    items_menu.push({
+      name: 'Créer un espace d\'étude à partir de la sélection',
+      action: () => { createStudyZone(colors_selection); },
+    });
+  }
   // Disable PNG export for Internet Explorer (< Edge):
   if (isIE && window.navigator && window.navigator.appVersion.indexOf('Edge') < 0) {
     items_menu.splice(0, 1);
@@ -883,6 +892,54 @@ function svgContextMenu(current_chart, svg_elem, map_elem) {
   current_chart.tooltip.style('display', 'none');
   // Create and display the context menu:
   new ContextMenu().showMenu(d3.event, document.body, items_menu);
+}
+
+function createStudyZone(regions) {
+  const modal = new tingle.modal({
+    stickyFooter: false,
+    closeMethods: ['overlay', 'button', 'escape'],
+    closeLabel: 'Close',
+    onOpen() {
+      document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0,0.4)';
+    },
+    onClose() {
+      modal.destroy();
+    },
+  });
+  const n_custom_studyzone = Object.keys(app.custom_studyzones).length + 1;
+  const content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Création d'un espace d'étude personnalisé</b></p>
+  <p>Régions sélectionnées : </p>
+<p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>
+<div>
+  <p>
+  <span>Nom de l'espace d'étude :</span>
+  <input id="input_name_studyzone" type="text" style="width:280px;" placeholder="Espace d'étude ${n_custom_studyzone}" />
+  </p>
+  <div style="width:75%; display: flex-inline; text-align: center; margin: auto; font-size: 1.2em;">
+    <button class="b_valid button_blue">Valider</button>
+    <button class="b_cancel button_red">Annuler</button>
+  </div>
+</div>`;
+  modal.setContent(content);
+  modal.open();
+  const div_modal = document.querySelector('div.tingle-modal');
+  div_modal.querySelector('.b_valid').onclick = function () {
+    const name_studyzone = div_modal.querySelector('#input_name_studyzone').value || `Espace d\'étude ${n_custom_studyzone}`;
+    app.custom_studyzones[name_studyzone] = regions;
+    const section3 = document.querySelector('#menu_studyzone');
+    const entry = document.createElement('p');
+    entry.setAttribute('filter-value', 'CUSTOM');
+    entry.innerHTML = `<span display_level="${app.current_config.current_level}" class='filter_v square'></span><span class="label_chk">${name_studyzone}</span><span class="i_info">i</span>`;
+    section3.appendChild(entry);
+    unbindUI();
+    bindUI_chart(app.chart, app.map);
+    bindHelpMenu();
+    modal.close();
+    entry.querySelector('.label_chk').click();
+  };
+  div_modal.querySelector('.b_cancel').onclick = function () {
+    modal.close();
+  };
 }
 
 /**

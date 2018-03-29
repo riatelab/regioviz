@@ -389,6 +389,10 @@ span.minibutton {
   z-index: 1001;
   word-spacing: 0.2em;
 }
+
+span.i_regio {
+  cursor: pointer;
+}
 /* End on styles for left menu */
 
 /* Styles for top menu */
@@ -491,6 +495,37 @@ span.minibutton {
     background: linear-gradient(to bottom, #3f6797, #3f6797);
 }
 
+.button_red {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.4em 0.8em;
+    border: 1px solid #973f55;
+    border-radius: 8px;
+    background: #f66565;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f66565), to(#973f55));
+    background: -moz-linear-gradient(top, #f66565, #973f55);
+    background: linear-gradient(to bottom, #f66565, #973f55);
+    font: normal normal normal 0.85em 'Signika', sans-serif;
+    color: #ffffff;
+    text-decoration: none;
+}
+.button_red:hover,
+.button_red:focus {
+    border: 1px solid #bd516c;
+    background: #ff7abd;
+    background: -webkit-gradient(linear, left top, left bottom, from(#ff7abd), to(#b54a65));
+    background: -moz-linear-gradient(top, #ff7abd, #b54a65);
+    background: linear-gradient(to bottom, #ff7abd, #b54a65);
+    color: #ffffff;
+    text-decoration: none;
+}
+.button_red:active, .button_red.pressed {
+    background: #973f55;
+    background: -webkit-gradient(linear, left top, left bottom, from(#973f55), to(#973f55));
+    background: -moz-linear-gradient(top, #973f55, #973f55);
+    background: linear-gradient(to bottom, #973f55, #973f55);
+}
 /*#menu_selection > .button_blue {
   margin: 0.4em 5em;
 }*/
