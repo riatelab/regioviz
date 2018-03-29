@@ -29,7 +29,6 @@ export default class TableResumeStat {
         const cell = doc.createElement('td');
         const col_name = column_names[j];
         if (col_name !== 'Variable') {
-          // cell.innerHTML = Math.round(summary_features[i][col_name] * 10) / 10;
           cell.innerHTML = formatNumber(summary_features[i][col_name], 1);
         } else {
           cell.innerHTML = summary_features[i][col_name];
@@ -60,7 +59,7 @@ export default class TableResumeStat {
       const cell = document.createElement('td');
       const col_name = this.column_names[j];
       if (col_name !== 'Variable') {
-        cell.innerHTML = Math.round(summary[col_name] * 10) / 10;
+        cell.innerHTML = formatNumber(summary[col_name], 1);
       } else {
         cell.innerHTML = summary[col_name];
       }
