@@ -1096,6 +1096,9 @@ h3 {
   color: red;
 }
 
+.tingle-modal {
+  z-index: 2000 !important;
+}
 
 .tingle-modal-box__content {
   font-size: 0.8em;
@@ -1120,3 +1123,15 @@ h3 {
   pointer-events: all;
 }
 /* End of styles for beeswarm chart / similarity with global distance */
+
+/* Styles for guided tour */
+.steptour {
+  font-size: 0.8em;
+  max-width: 450px;
+}
+
+.steptour .titlestep {
+  font-weight: bold;
+  font-size: 1em;
+}
+/* End of styles for guided tour */

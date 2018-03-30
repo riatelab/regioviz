@@ -5,6 +5,7 @@ import '../styles/tingle.min.css';
 import '../styles/tippy.css';
 import '../styles/alertify.min.css';
 import '../styles/semantic.min.css';
+import '../styles/introjs.min.css';
 import { createMenu, handleInputRegioName } from './modules/menuleft';
 import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
 import { MapSelect, svg_map, zoomClick } from './modules/map';
@@ -25,6 +26,7 @@ import {
   resetVariables,
   prepareVariablesInfo,
 } from './modules/prepare_data';
+import { makeTour } from './modules/guide_tour';
 
 // Variables filled after reading the metadata file:
 export const variables_info = [];
@@ -83,6 +85,8 @@ function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NU
     my_region_pretty_name: app.feature_names[code],
     // How many ratio on the current chart:
     nb_var: 1,
+    // Filter/category type:
+    filter_type: null,
   };
   app.colors[app.current_config.my_region] = color_highlight;
 }
@@ -201,8 +205,10 @@ function updateAvailableCharts(nb_var) {
 function updateMyCategorySection() {
   if (app.current_config.my_category) {
     document.querySelector('.filter_info').innerHTML = app.current_config.my_category;
-  } else if (app.current_config.filter_key instanceof Array) {
+  } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
     document.querySelector('.filter_info').innerHTML = `Régions dans un voisinage de ${+d3.select('#dist_filter').property('value')} km`;
+  } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
+    document.querySelector('.filter_info').innerHTML = `Sélection personnalisée de régions`;
   } else {
     document.querySelector('.filter_info').innerHTML = 'Ensemble des régions';
   }
@@ -241,15 +247,18 @@ export function bindUI_chart(chart, map_elem) {
         this.classList.add('checked');
         const filter_type = this.parentElement.getAttribute('filter-value');
         if (filter_type === 'SPAT') {
+          app.current_config.filter_type = 'SPAT';
           const input_elem = document.getElementById('dist_filter');
           input_elem.removeAttribute('disabled');
           const dist = +input_elem.value;
           const ids = map_elem.getUnitsWithin(dist);
           applyFilter(app, ids);
         } else if (filter_type === 'CUSTOM') {
+          app.current_config.filter_type = 'CUSTOM';
           document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
           applyFilter(app, app.custom_studyzones[this.nextSibling.innerHTML]);
         } else {
+          app.current_config.filter_type = 'APP';
           document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
           applyFilter(app, filter_type);
         }
@@ -555,10 +564,29 @@ export function bindHelpMenu() {
           },
         });
         let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Espace d'étude créé par l'utilisateur :</b></p>
-<p style="color: #4f81bd;font-size: 1.2rem;"><b>${name_studyzone}</b></p>
-<p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>`;
+<p style="color: #4f81bd;font-size: 1.2rem;"><b>${name_studyzone} (${regions.length} régions)</b></p>
+<p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>
+<br>
+<br>
+<p style="text-align:center;">
+<button class="b_cancel button_red">Supprimer l'espace d'étude</button>
+</p>`;
         modal.setContent(content);
         modal.open();
+        document.querySelector('div.tingle-modal.tingle-modal--visible').querySelector('.button_red').onclick = function () {
+          delete app.custom_studyzones[name_studyzone];
+          app.custom_studyzones[name_studyzone] = null;
+          Array.prototype.slice.call(document.querySelectorAll('p[filter-value="CUSTOM"]'))
+            .forEach((el) => {
+              if (el.querySelector('.label_chk').innerHTML === name_studyzone) {
+                if (el.querySelector('.filter_v').classList.contains('checked')) {
+                  document.querySelector('p[filter-value="DEFAULT"] > .filter_v').click();
+                }
+                el.remove();
+              }
+            });
+          modal.close();
+        };
       } else {
         const o = study_zones.find(d => d.id === filter_id);
         const hasUrl = (o.url && o.url.indexOf && o.url.indexOf('pdf') > -1);
@@ -737,6 +765,8 @@ function loadData() {
           processEscapes: true,
         },
       });
+      const tour = makeTour();
+      d3.select('#tour_link').on('click', () => { tour.start(); });
     });
 }
 

@@ -3,7 +3,6 @@ import tingle from 'tingle.js';
 import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
-import sillyname from 'sillyname';
 import { isIE, app, bindUI_chart, bindHelpMenu } from './../main';
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise, strict,
@@ -878,7 +877,7 @@ function svgContextMenu(current_chart, svg_elem, map_elem, colors_selection) {
     }
   }
   // Allow to create a study zone from the current selection:
-  if (colors_selection && colors_selection.length > 1) {
+  if (app.current_config.nb_var < 3 && colors_selection && colors_selection.length > 1) {
     items_menu.push({
       name: 'Créer un espace d\'étude à partir de la sélection',
       action: () => { createStudyZone(colors_selection); },

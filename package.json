@@ -39,6 +39,7 @@
     "alertifyjs": "^1.11.0",
     "babel-polyfill": "^6.26.0",
     "debug": "^2.6.6",
+    "intro.js": "^2.8.0-alpha.1",
     "jsep": "^0.3.3",
     "tingle.js": "^0.12.0",
     "tippy.js": "^2.0.4"
