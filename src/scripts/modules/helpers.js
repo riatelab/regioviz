@@ -812,6 +812,69 @@ export function exportPNG(elem, filename) {
 const isContextMenuDisplayed = () => !!document.querySelector('.context-menu');
 
 /**
+* Function to display a modal window allowing the user to choose the name of its
+* new studyzone.
+* If the 'confirm' button is pressed, the studyzone will actualy be created given
+* an array of Id of the regions to be selected. It will also be displayed in
+* the left menu.
+* This new studyzone will be used right now so the chart will (probably) be redrawn.
+*
+* @param {Array} regions - An array of identifiers of the regions to be used in the studyzone.
+* @return {Void}
+*/
+function createStudyZone(regions) {
+  if (regions.indexOf(app.current_config.my_region) < 0) {
+    regions.push(app.current_config.my_region);
+  }
+  // eslint-disable-next-line new-cap
+  const modal = new tingle.modal({
+    stickyFooter: false,
+    closeMethods: ['overlay', 'button', 'escape'],
+    closeLabel: 'Close',
+    onOpen() {
+      document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0,0.4)';
+    },
+    onClose() {
+      modal.destroy();
+    },
+  });
+  const n_custom_studyzone = Object.keys(app.custom_studyzones).length + 1;
+  const content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Création d'un espace d'étude personnalisé</b></p>
+  <p>Régions sélectionnées : </p>
+<p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>
+<div>
+  <p>
+  <span>Nom de l'espace d'étude :</span>
+  <input id="input_name_studyzone" type="text" style="width:280px;" placeholder="Espace d'étude ${n_custom_studyzone}" />
+  </p>
+  <div style="width:75%; display: flex-inline; text-align: center; margin: auto; font-size: 1.2em;">
+    <button class="b_valid button_blue">Valider</button>
+    <button class="b_cancel button_red">Annuler</button>
+  </div>
+</div>`;
+  modal.setContent(content);
+  modal.open();
+  const div_modal = document.querySelector('div.tingle-modal');
+  div_modal.querySelector('.b_valid').onclick = function () {
+    const name_studyzone = div_modal.querySelector('#input_name_studyzone').value || `Espace d'étude ${n_custom_studyzone}`;
+    app.custom_studyzones[name_studyzone] = regions;
+    const section3 = document.querySelector('#menu_studyzone');
+    const entry = document.createElement('p');
+    entry.setAttribute('filter-value', 'CUSTOM');
+    entry.innerHTML = `<span display_level="${app.current_config.current_level}" class='filter_v square'></span><span class="label_chk">${name_studyzone}</span><span class="i_info">i</span>`;
+    section3.appendChild(entry);
+    unbindUI();
+    bindUI_chart(app.chart, app.map);
+    bindHelpMenu();
+    modal.close();
+    entry.querySelector('.label_chk').click();
+  };
+  div_modal.querySelector('.b_cancel').onclick = function () {
+    modal.close();
+  };
+}
+
+/**
 * Display a custom context menu when the user triggers a right click on the map
 * or on a chart.
 *
@@ -891,54 +954,6 @@ function svgContextMenu(current_chart, svg_elem, map_elem, colors_selection) {
   current_chart.tooltip.style('display', 'none');
   // Create and display the context menu:
   new ContextMenu().showMenu(d3.event, document.body, items_menu);
-}
-
-function createStudyZone(regions) {
-  const modal = new tingle.modal({
-    stickyFooter: false,
-    closeMethods: ['overlay', 'button', 'escape'],
-    closeLabel: 'Close',
-    onOpen() {
-      document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0,0.4)';
-    },
-    onClose() {
-      modal.destroy();
-    },
-  });
-  const n_custom_studyzone = Object.keys(app.custom_studyzones).length + 1;
-  const content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Création d'un espace d'étude personnalisé</b></p>
-  <p>Régions sélectionnées : </p>
-<p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>
-<div>
-  <p>
-  <span>Nom de l'espace d'étude :</span>
-  <input id="input_name_studyzone" type="text" style="width:280px;" placeholder="Espace d'étude ${n_custom_studyzone}" />
-  </p>
-  <div style="width:75%; display: flex-inline; text-align: center; margin: auto; font-size: 1.2em;">
-    <button class="b_valid button_blue">Valider</button>
-    <button class="b_cancel button_red">Annuler</button>
-  </div>
-</div>`;
-  modal.setContent(content);
-  modal.open();
-  const div_modal = document.querySelector('div.tingle-modal');
-  div_modal.querySelector('.b_valid').onclick = function () {
-    const name_studyzone = div_modal.querySelector('#input_name_studyzone').value || `Espace d\'étude ${n_custom_studyzone}`;
-    app.custom_studyzones[name_studyzone] = regions;
-    const section3 = document.querySelector('#menu_studyzone');
-    const entry = document.createElement('p');
-    entry.setAttribute('filter-value', 'CUSTOM');
-    entry.innerHTML = `<span display_level="${app.current_config.current_level}" class='filter_v square'></span><span class="label_chk">${name_studyzone}</span><span class="i_info">i</span>`;
-    section3.appendChild(entry);
-    unbindUI();
-    bindUI_chart(app.chart, app.map);
-    bindHelpMenu();
-    modal.close();
-    entry.querySelector('.label_chk').click();
-  };
-  div_modal.querySelector('.b_cancel').onclick = function () {
-    modal.close();
-  };
 }
 
 /**

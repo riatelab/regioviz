@@ -1170,8 +1170,8 @@ export default class Similarity1plus {
       ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
     this.prepareData();
     let temp;
-    if (this.type !== 'global' && (
-          this.data.length > +d3.select('#menu_selection').select('.nb_select').property('value')
+    if (this.type !== 'global'
+          && (this.data.length > +d3.select('#menu_selection').select('.nb_select').property('value')
           || this.data.length > this.highlight_selection.length)) {
       d3.select('#menu_selection').select('.nb_select').property('value', this.data.length - 1);
       temp = 1;

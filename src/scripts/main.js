@@ -563,7 +563,7 @@ export function bindHelpMenu() {
             modal.destroy();
           },
         });
-        let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Espace d'étude créé par l'utilisateur :</b></p>
+        const content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Espace d'étude créé par l'utilisateur :</b></p>
 <p style="color: #4f81bd;font-size: 1.2rem;"><b>${name_studyzone} (${regions.length} régions)</b></p>
 <p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>
 <br>

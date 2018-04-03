@@ -488,6 +488,12 @@ export default class RadarChart3 {
     this.variables.forEach((d, i) => {
       computePercentileRank(this.ref_data, d, this.rank_variables[i]);
     });
+    // try {
+    //   this.data = [prepare_data_radar_default(this.ref_data, this.variables)];
+    // } catch (e) {
+    //   console.log(e, this.ref_data, this.variables);
+    //   this.data = [];
+    // }
     this.data = [prepare_data_radar_default(this.ref_data, this.variables)];
     this.displayed_ids = this.data.map(d => d.name);
     this.current_ids = this.ref_data.map(d => d.id);

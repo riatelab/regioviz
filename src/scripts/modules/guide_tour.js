@@ -70,15 +70,19 @@ export const makeTour = () => {
     tour.refresh();
   };
 
-  tour.onafterchange(function(targetElement) {
-    switch (tour._currentStep){
+  tour.onafterchange(() => {
+    switch (tour._currentStep) {
       case 4:
         document.querySelector('.regio_name').parentElement.addEventListener('click', refreshTour);
+        break;
       case 5:
         document.querySelector('#menu_variables').addEventListener('click', refreshTour);
+        break;
+      default:
+        break;
     }
   });
-  tour.onexit(function() {
+  tour.onexit(() => {
     document.querySelector('.regio_name').parentElement.removeEventListener('click', refreshTour);
     document.querySelector('#menu_variables').removeEventListener('click', refreshTour);
   });
