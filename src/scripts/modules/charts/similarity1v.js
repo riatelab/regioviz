@@ -1170,18 +1170,18 @@ export default class Similarity1plus {
       ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
     this.prepareData();
     let temp;
-    if (this.data.length > +d3.select('#menu_selection').select('.nb_select').property('value')
-          || this.data.length > this.highlight_selection.length) {
-      d3.select('#menu_selection').select('.nb_select').property('value', this.data.length);
+    if (this.type !== 'global' && (
+          this.data.length > +d3.select('#menu_selection').select('.nb_select').property('value')
+          || this.data.length > this.highlight_selection.length)) {
+      d3.select('#menu_selection').select('.nb_select').property('value', this.data.length - 1);
       temp = 1;
     } else {
-      temp = this.highlight.length;
+      temp = this.highlighted.length;
     }
     this.highlight_selection = [];
     this.updateTableStat();
     this.updateCompletude();
     this.applySelection(temp);
-    // this.updateMapRegio();
   }
 
   prepareData() {
@@ -1241,7 +1241,9 @@ export default class Similarity1plus {
     //   return this.data.find(el => el.id === d.id);
     // }).filter(d => !!d);
     // this.update();
-    const ix_last_selec = +d3.select('#menu_selection').select('.nb_select').property('value');
+    const ix_last_selec = this.type !== 'global'
+      ? +d3.select('#menu_selection').select('.nb_select').property('value')
+      : null;
     // To use a new selection according to 'nb_select' value:
     this.applySelection(ix_last_selec);
     this.updateCompletude();
@@ -1259,7 +1261,9 @@ export default class Similarity1plus {
 
     this.draw_group.select(`g#l_${code_variable}`).remove();
 
-    const ix_last_selec = +d3.select('#menu_selection').select('.nb_select').property('value');
+    const ix_last_selec = this.type !== 'global'
+      ? +d3.select('#menu_selection').select('.nb_select').property('value')
+      : null;
 
     // And use it immediatly:
     this.updateCompletude();
