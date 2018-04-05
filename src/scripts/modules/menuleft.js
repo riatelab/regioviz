@@ -156,21 +156,21 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   blabla.style.float = 'right';
   blabla.style.cursor = 'pointer';
   blabla.innerHTML = 'Crédits & informations supplémentaires';
-  const tour_link = document.createElement('span');
-  tour_link.id = 'tour_link';
-  tour_link.className = 'link';
-  tour_link.style.margin = '1.4em 0.5em';
-  tour_link.style.fontSize = '0.65em';
-  tour_link.style.float = 'right';
-  tour_link.style.cursor = 'pointer';
-  tour_link.style.clear = 'both';
-  tour_link.innerHTML = 'Visite guidée de l\'application';
+  // const tour_link = document.createElement('span');
+  // tour_link.id = 'tour_link';
+  // tour_link.className = 'link';
+  // tour_link.style.margin = '1.4em 0.5em';
+  // tour_link.style.fontSize = '0.65em';
+  // tour_link.style.float = 'right';
+  // tour_link.style.cursor = 'pointer';
+  // tour_link.style.clear = 'both';
+  // tour_link.innerHTML = 'Visite guidée de l\'application';
 
   section5.appendChild(link2);
   section5.appendChild(logo_regioviz);
   section5.appendChild(link1);
   section5.appendChild(blabla);
-  section5.appendChild(tour_link);
+  // section5.appendChild(tour_link);
 
   // The actual menu containing these 5 sections:
   const menu = document.getElementById('menu');

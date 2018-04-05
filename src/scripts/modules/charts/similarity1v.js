@@ -21,7 +21,10 @@ let t;
 const updateDimensions = () => {
   svg_bar = d3.select('svg#svg_bar')
     .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
-    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map); })
+    .on('contextmenu', () => {
+      const selec = app.chart.type === 'global' ? app.chart.highlighted : null;
+      svgContextMenu(app.chart, svg_bar, app.map, selec);
+      })
     .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
@@ -43,6 +46,7 @@ const updateDimensions = () => {
 
 export default class Similarity1plus {
   constructor(ref_data) {
+    this._id = Symbol('4');
     updateDimensions();
     this.handle_brush_map = this._handle_brush_map;
     // Set the minimum number of variables to keep selected for this kind of chart:
@@ -1497,20 +1501,26 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
       .find(d => d.id === app.current_config.current_level).name;
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
-      ? 'UE28' : app.current_config.filter_key instanceof Array
+      ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
         ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+        : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
+        ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
         : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [];
     this.ratios.forEach((v, i) => {
       help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (<i>${info_var[i + 1].id}</i>)<br>`);
     });
     help1.push(`<b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`);
+
     if (app.current_config.my_category) {
       help1.push(
         `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
-    } else if (app.current_config.filter_key) {
+    } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+    } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
+      help1.push(
+        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} régions`);
     } else {
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);

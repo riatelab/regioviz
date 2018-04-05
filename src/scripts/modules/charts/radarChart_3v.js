@@ -120,6 +120,7 @@ export default class RadarChart3 {
    * @param {Object} options - Options regarding the style of the radar to be draw.
    */
   constructor(data, options) {
+    this._id = Symbol('3');
     updateDimensions();
     const cfg = {
       w: width - 20, // Width of the circle
@@ -1147,24 +1148,31 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
       .find(d => d.id === app.current_config.current_level).name;
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
-      ? 'UE28' : app.current_config.filter_key instanceof Array
+      ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
         ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+        : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
+        ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
         : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [];
     this.variables.forEach((v, i) => {
       help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (<i>${info_var[i + 1].id}</i>)<br>`);
     });
     help1.push(`<b>Maillage territorial d'analyse</b> : ${territorial_mesh.find(d => d.id === app.current_config.current_level).name}<br>`);
+
     if (app.current_config.my_category) {
       help1.push(
         `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
-    } else if (app.current_config.filter_key) {
+    } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+    } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
+      help1.push(
+        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} régions`);
     } else {
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);
     }
+
     const my_region = this.data[0];
     let compl = calcCompletudeSubset(app, this.variables, 'array');
     compl = compl[0] === compl[1] ? 'la totalité des' : `${compl[0]} des ${compl[1]}`;

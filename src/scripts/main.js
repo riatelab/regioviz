@@ -26,7 +26,7 @@ import {
   resetVariables,
   prepareVariablesInfo,
 } from './modules/prepare_data';
-import { makeTour } from './modules/guide_tour';
+// import { makeTour } from './modules/guide_tour';
 
 // Variables filled after reading the metadata file:
 export const variables_info = [];
@@ -765,8 +765,8 @@ function loadData() {
           processEscapes: true,
         },
       });
-      const tour = makeTour();
-      d3.select('#tour_link').on('click', () => { tour.start(); });
+      // const tour = makeTour();
+      // d3.select('#tour_link').on('click', () => { tour.start(); });
     });
 }
 

@@ -95,6 +95,7 @@ export default class ScatterPlot2 {
       this.updateMapRegio();
       this.map_elem.removeRectBrush();
     };
+    this._id = Symbol('2');
     updateDimensions();
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 2;
@@ -1551,23 +1552,30 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
       .find(d => d.id === app.current_config.current_level).name;
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
-      ? 'UE28' : app.current_config.filter_key instanceof Array
-        ? ['Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km'].join('')
+      ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
+        ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+        : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
+        ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
         : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [`
   <b>Indicateur 1</b> : ${info_var1.name} (<i>${info_var1.id}</i>)<br>
   <b>Indicateur 2</b> : ${info_var2.name} (<i>${info_var2.id}</i>)<br>
   <b>Maillage territorial d'analyse</b> : ${name_territorial_mesh}<br>`];
+
     if (app.current_config.my_category) {
       help1.push(
         `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
-    } else if (app.current_config.filter_key) {
+    } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
       help1.push(
         `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+    } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
+      help1.push(
+        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} régions`);
     } else {
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);
     }
+
     const comp = (a, b, inv) => {
       if (inv) return a < b;
       else return a >= b;

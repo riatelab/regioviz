@@ -7,7 +7,17 @@ import { filterLevelGeom } from './prepare_data';
 import { prepareTooltip } from './tooltip';
 
 
-const svg_map = d3.select('svg#svg_map').on('contextmenu', () => svgContextMenu(app.map, svg_map, undefined, Object.keys(app.colors)));
+const svg_map = d3.select('svg#svg_map')
+  .on('contextmenu', () => {
+    let selec;
+    let _id = app.chart._id.toString();
+    if (_id == 'Symbol(1)' || _id === 'Symbol(2)') {
+      selec = Object.keys(app.colors);
+    } else if (_id === 'Symbol(4)' && app.chart.type === 'global') {
+      selec = app.chart.highlighted;
+    }
+    svgContextMenu(app.map, svg_map, undefined, selec);
+  });
 const width_map = fixed_dimension.map.width;
 const height_map = fixed_dimension.map.height;
 let styles;

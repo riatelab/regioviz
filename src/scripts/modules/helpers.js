@@ -863,8 +863,10 @@ function createStudyZone(regions) {
     entry.setAttribute('filter-value', 'CUSTOM');
     entry.innerHTML = `<span display_level="${app.current_config.current_level}" class='filter_v square'></span><span class="label_chk">${name_studyzone}</span><span class="i_info">i</span>`;
     section3.appendChild(entry);
-    unbindUI();
+    // unbindUI();
     bindUI_chart(app.chart, app.map);
+    // map_elem.bindBrushClick(chart);
+    // chart.bindMap(map_elem);
     bindHelpMenu();
     modal.close();
     entry.querySelector('.label_chk').click();
