@@ -10,8 +10,8 @@ import { prepareTooltip } from './tooltip';
 const svg_map = d3.select('svg#svg_map')
   .on('contextmenu', () => {
     let selec;
-    let _id = app.chart._id.toString();
-    if (_id == 'Symbol(1)' || _id === 'Symbol(2)') {
+    const _id = app.chart._id.toString();
+    if (_id === 'Symbol(1)' || _id === 'Symbol(2)') {
       selec = Object.keys(app.colors);
     } else if (_id === 'Symbol(4)' && app.chart.type === 'global') {
       selec = app.chart.highlighted;

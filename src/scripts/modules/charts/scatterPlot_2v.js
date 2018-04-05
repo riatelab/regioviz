@@ -981,6 +981,7 @@ export default class ScatterPlot2 {
   updateMapRegio() {
     if (!this.map_elem) return;
     this.map_elem.target_layer.selectAll('path')
+      .attr('fill-opacity', 1)
       .attr('fill', d => (this.current_ids.indexOf(d.id) > -1
         ? (app.colors[d.id] || color_countries)
         : color_disabled));

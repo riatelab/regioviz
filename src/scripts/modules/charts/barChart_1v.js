@@ -729,6 +729,7 @@ export default class BarChart1 {
 
   updateMapRegio() {
     this.map_elem.target_layer.selectAll('path')
+      .attr('fill-opacity', 1)
       .attr('fill', d => (this.current_ids.indexOf(d.id) > -1
         ? (app.colors[d.id] || color_countries)
         : color_disabled));

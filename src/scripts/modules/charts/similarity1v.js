@@ -161,6 +161,7 @@ export default class Similarity1plus {
       this.draw_group.selectAll('.circle')
         .style('fill', d => app.colors[d.data.id]);
       this.map_elem.target_layer.selectAll('path')
+        .attr('fill-opacity', 1)
         .attr('fill', (d) => {
           const _id = d.id;
           if (_id === app.current_config.my_region) {
@@ -190,6 +191,7 @@ export default class Similarity1plus {
         });
 
       this.map_elem.target_layer.selectAll('path')
+        .attr('fill-opacity', 1)
         .attr('fill', (d) => {
           const _id = d.id;
           if (_id === app.current_config.my_region) {
@@ -771,6 +773,7 @@ export default class Similarity1plus {
       ? this.data[ix_last_selec].id
       : null;
     this.map_elem.target_layer.selectAll('path')
+      .attr('fill-opacity', 1)
       .attr('fill', (d) => {
         const _id = d.id;
         if (_id === app.current_config.my_region) {

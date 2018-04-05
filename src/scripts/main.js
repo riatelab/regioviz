@@ -239,6 +239,7 @@ export function bindUI_chart(chart, map_elem) {
         list_regio.classList.add('hidden');
       }
     });
+
   // User change the study zone:
   d3.selectAll('span.filter_v')
     .on('click', function () {
@@ -258,7 +259,7 @@ export function bindUI_chart(chart, map_elem) {
           document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
           applyFilter(app, app.custom_studyzones[this.nextSibling.innerHTML]);
         } else {
-          app.current_config.filter_type = 'APP';
+          app.current_config.filter_type = 'DEFAULT';
           document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
           applyFilter(app, filter_type);
         }
@@ -291,7 +292,6 @@ export function bindUI_chart(chart, map_elem) {
 
         const id_region = this.getAttribute('value');
         const old_nb_var = app.current_config.ratio.length;
-        changeRegion(app, id_region, map_elem);
 
         document.getElementById('list_regio').classList.add('hidden');
         document.querySelector('.regio_name > #search').value = app.feature_names[id_region];
@@ -303,9 +303,12 @@ export function bindUI_chart(chart, map_elem) {
         const new_nb_var = updateAvailableRatios(id_region);
         updateAvailableCharts(new_nb_var);
         updateMyCategorySection();
+
+        const a = changeRegion(app, id_region, map_elem);
+
         if (new_nb_var >= app.current_config.nb_var) {
           if (old_nb_var === new_nb_var) {
-            chart.updateChangeRegion();
+            if (a === false) chart.updateChangeRegion();
           } else {
             d3.select('span.type_chart.selected').dispatch('click');
             alertify.warning('Une variable précédemment sélectionnée n\'est pas disponible pour cette région.');

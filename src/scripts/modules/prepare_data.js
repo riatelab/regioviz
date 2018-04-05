@@ -1,6 +1,10 @@
 import { color_highlight } from './options';
-import { variables_info, study_zones, territorial_mesh, updateMenuStudyZones, updateMenuTerritLevel } from './../main';
-import { _isNaN } from './helpers';
+import { variables_info, study_zones, territorial_mesh, updateMenuStudyZones, updateMenuTerritLevel, bindUI_chart } from './../main';
+import { _isNaN, unbindUI } from './helpers';
+import BarChart1 from './charts/barChart_1v';
+import ScatterPlot2 from './charts/scatterPlot_2v';
+import RadarChart3 from './charts/radarChart_3v';
+import Similarity1plus from './charts/similarity1v';
 
 /* eslint-disable no-param-reassign */
 
@@ -175,25 +179,56 @@ export function changeRegion(app, id_region, map_elem) {
   if (o_region.N1 === '1') available_level.push('N1');
   if (o_region.N12_POL === '1') available_level.push('N12_POL');
   if (o_region.N2 === '1') available_level.push('N2');
-  if (available_level.indexOf(current_level) < 0) {
-    const level_value = available_level[0];
-    d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
-    d3.selectAll('span.territ_level').attr('class', 'territ_level square');
-    d3.select(`span.territ_level[value='${level_value}']`).attr('class', 'territ_level square checked');
-    app.current_config.current_level = level_value;
-    updateMenuStudyZones();
-    filterLevelVar(app);
-    map_elem.updateLevelRegion(level_value);
-    map_elem.unbindBrushClick();
-    map_elem.bindBrushClick(app.chart);
-    app.chart.changeStudyZone();
-  }
   if (available_level.indexOf('N12_POL') > -1) {
     available_level.splice(available_level.indexOf('N12_POL'), 1);
   }
   // TODO: Wrap this in a function/put this somewhere else:
   d3.select('#curr_regio_level').html(available_level.join(' '));
   updateMenuTerritLevel();
+  let a = false;
+  if (available_level.indexOf(current_level) < 0) {
+    const level_value = available_level[0];
+    d3.selectAll('p > span.filter_v').classed('checked', false);
+    d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true);
+    d3.selectAll('span.territ_level').attr('class', 'territ_level square');
+    d3.select(`span.territ_level[value='${level_value}']`).attr('class', 'territ_level square checked');
+    app.current_config.filter_type = 'DEFAULT';
+    app.current_config.filter_key = undefined;
+    app.current_config.current_level = level_value;
+    updateMenuStudyZones();
+    filterLevelVar(app);
+    map_elem.updateLevelRegion(level_value);
+    const _id = app.chart._id.toString();
+    app.chart.remove();
+    app.chart = null; // eslint-disable-line no-param-reassign
+    unbindUI();
+    // map_elem.resetZoom();
+    app.colors = {};
+    if (_id === 'Symbol(1)') {
+      app.chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
+    } else if (_id === 'Symbol(2)') {
+      app.chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
+    } else if (_id === 'Symbol(3)') {
+      app.chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
+    } else if (_id === 'Symbol(4)') {
+      app.chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
+    }
+    bindUI_chart(app.chart, app.map);
+    map_elem.bindBrushClick(app.chart);
+    app.chart.bindMap(app.map);
+    a = true;
+  } else {
+    // Reset the color to use on the chart/map:
+    app.colors = {};
+    app.colors[app.current_config.my_region] = color_highlight;
+
+    if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
+      app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
+      filterLevelVar(app);
+    } else if (app.current_config.filter_key) {
+      filterLevelVar(app);
+    }
+  }
   map_elem.computeDistMat();
   app.current_config.min_km_closest_unit = Math.round(
     map_elem.dist_to_my_region[2].dist / 1000) + 1;
@@ -202,15 +237,8 @@ export function changeRegion(app, id_region, map_elem) {
   if (input_dist.value < app.current_config.min_km_closest_unit) {
     input_dist.value = app.current_config.min_km_closest_unit + 100;
   }
-  if (app.current_config.filter_key instanceof Array) {
-    app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
-    filterLevelVar(app);
-  } else if (app.current_config.filter_key) {
-    filterLevelVar(app);
-  }
-  // Reset the color to use on the chart/map:
-  app.colors = {};
-  app.colors[app.current_config.my_region] = color_highlight;
+
+  return a;
 }
 
 /**

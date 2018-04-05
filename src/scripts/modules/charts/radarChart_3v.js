@@ -67,18 +67,26 @@ const swap = function swap(array, ix1, ix2) {
 */
 const prepare_data_radar_default = (data, variables) => {
   // Prepare the data for "My Région":
+
   const v_my_region = data.find(d => d.id === app.current_config.my_region);
   const ojb_my_region = {
     name: app.current_config.my_region,
     axes: [],
   };
-  variables.forEach((v) => {
-    const temp = variables_info.find(d => d.id === v);
-    const _v = `pr_${v}`;
-    ojb_my_region.axes.push({
-      axis: temp.id, value: v_my_region[_v], raw_value: v_my_region[v], raw_value_unit: temp.unit,
+  try  {
+    variables.forEach((v) => {
+      const temp = variables_info.find(d => d.id === v);
+      const _v = `pr_${v}`;
+      ojb_my_region.axes.push({
+        axis: temp.id, value: v_my_region[_v], raw_value: v_my_region[v], raw_value_unit: temp.unit,
+      });
     });
-  });
+
+  } catch (e) {
+    console.log(e);
+    console.log(data);
+    console.log(variables);
+  }
   return ojb_my_region;
 };
 
@@ -1092,6 +1100,7 @@ export default class RadarChart3 {
   updateMapRegio() {
     if (!this.map_elem) return;
     this.map_elem.target_layer.selectAll('path')
+      .attr('fill-opacity', 1)
       .attr('fill', (d) => {
         if (d.id === this.id_my_region) {
           return color_highlight;
