@@ -11,9 +11,9 @@ const svg_map = d3.select('svg#svg_map')
   .on('contextmenu', () => {
     let selec;
     const _id = app.chart._id.toString();
-    if (_id === 'Symbol(1)' || _id === 'Symbol(2)') {
+    if (_id.indexOf('BarChart1') > -1 || _id.indexOf('ScatterPlot2')) {
       selec = Object.keys(app.colors);
-    } else if (_id === 'Symbol(4)' && app.chart.type === 'global') {
+    } else if (_id.indexOf('Similarity1plus') > -1 && app.chart.type === 'global') {
       selec = app.chart.highlighted;
     }
     svgContextMenu(app.map, svg_map, undefined, selec);

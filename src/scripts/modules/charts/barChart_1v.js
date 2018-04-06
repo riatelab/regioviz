@@ -172,7 +172,7 @@ export default class BarChart1 {
         }
       }
     };
-    this._id = Symbol('1');
+    this._id = Symbol('BarChart1');
     updateDimensions();
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 1;
@@ -1072,6 +1072,7 @@ export default class BarChart1 {
     this.map_elem = map_elem;
     this.map_elem.resetColors(this.current_ids);
     this.map_elem.displayLegend(0);
+    this.updateCompletude();
   }
 
   updateTableStats() {
@@ -1137,8 +1138,8 @@ Ce graphique rend également possible le positionnement des régions au regard d
       ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
         ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
-        ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
-        : study_zones.find(d => d.id === app.current_config.filter_key).name;
+          ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
+          : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const name_territorial_mesh = territorial_mesh
       .find(d => d.id === app.current_config.current_level).name;
     const help1 = [`<b>Indicateur 1</b> : ${info_var.name} (<i>${info_var.id}</i>)<br>

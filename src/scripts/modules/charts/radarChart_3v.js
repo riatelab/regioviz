@@ -73,20 +73,13 @@ const prepare_data_radar_default = (data, variables) => {
     name: app.current_config.my_region,
     axes: [],
   };
-  try  {
-    variables.forEach((v) => {
-      const temp = variables_info.find(d => d.id === v);
-      const _v = `pr_${v}`;
-      ojb_my_region.axes.push({
-        axis: temp.id, value: v_my_region[_v], raw_value: v_my_region[v], raw_value_unit: temp.unit,
-      });
+  variables.forEach((v) => {
+    const temp = variables_info.find(d => d.id === v);
+    const _v = `pr_${v}`;
+    ojb_my_region.axes.push({
+      axis: temp.id, value: v_my_region[_v], raw_value: v_my_region[v], raw_value_unit: temp.unit,
     });
-
-  } catch (e) {
-    console.log(e);
-    console.log(data);
-    console.log(variables);
-  }
+  });
   return ojb_my_region;
 };
 
@@ -128,7 +121,7 @@ export default class RadarChart3 {
    * @param {Object} options - Options regarding the style of the radar to be draw.
    */
   constructor(data, options) {
-    this._id = Symbol('3');
+    this._id = Symbol('RadarChart3');
     updateDimensions();
     const cfg = {
       w: width - 20, // Width of the circle
@@ -958,6 +951,7 @@ export default class RadarChart3 {
     this.map_elem.resetColors(this.current_ids);
     this.map_elem.displayLegend(2);
     this.updateMapRegio();
+    this.updateCompletude();
   }
 
   remove() {
@@ -1160,8 +1154,8 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
       ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
         ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
-        ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
-        : study_zones.find(d => d.id === app.current_config.filter_key).name;
+          ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
+          : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [];
     this.variables.forEach((v, i) => {
       help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (<i>${info_var[i + 1].id}</i>)<br>`);

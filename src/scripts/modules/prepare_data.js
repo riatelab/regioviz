@@ -1,10 +1,6 @@
 import { color_highlight } from './options';
-import { variables_info, study_zones, territorial_mesh, updateMenuStudyZones, updateMenuTerritLevel, bindUI_chart } from './../main';
-import { _isNaN, unbindUI } from './helpers';
-import BarChart1 from './charts/barChart_1v';
-import ScatterPlot2 from './charts/scatterPlot_2v';
-import RadarChart3 from './charts/radarChart_3v';
-import Similarity1plus from './charts/similarity1v';
+import { variables_info, study_zones, territorial_mesh, changeChart } from './../main';
+import { _isNaN } from './helpers';
 
 /* eslint-disable no-param-reassign */
 
@@ -177,16 +173,12 @@ export function changeRegion(app, id_region, map_elem) {
   app.current_config.my_region = id_region;
   app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
   if (o_region.N1 === '1') available_level.push('N1');
-  if (o_region.N12_POL === '1') available_level.push('N12_POL');
   if (o_region.N2 === '1') available_level.push('N2');
-  if (available_level.indexOf('N12_POL') > -1) {
-    available_level.splice(available_level.indexOf('N12_POL'), 1);
-  }
   // TODO: Wrap this in a function/put this somewhere else:
   d3.select('#curr_regio_level').html(available_level.join(' '));
-  updateMenuTerritLevel();
-  let a = false;
-  if (available_level.indexOf(current_level) < 0) {
+  // Do we need to switch to a new territorial level ?
+  const redraw = available_level.indexOf(current_level) < 0;
+  if (redraw) {
     const level_value = available_level[0];
     d3.selectAll('p > span.filter_v').classed('checked', false);
     d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true);
@@ -195,50 +187,37 @@ export function changeRegion(app, id_region, map_elem) {
     app.current_config.filter_type = 'DEFAULT';
     app.current_config.filter_key = undefined;
     app.current_config.current_level = level_value;
-    updateMenuStudyZones();
     filterLevelVar(app);
     map_elem.updateLevelRegion(level_value);
     const _id = app.chart._id.toString();
-    app.chart.remove();
-    app.chart = null; // eslint-disable-line no-param-reassign
-    unbindUI();
-    // map_elem.resetZoom();
-    app.colors = {};
-    if (_id === 'Symbol(1)') {
-      app.chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
-    } else if (_id === 'Symbol(2)') {
-      app.chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
-    } else if (_id === 'Symbol(3)') {
-      app.chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
-    } else if (_id === 'Symbol(4)') {
-      app.chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
-    }
-    bindUI_chart(app.chart, app.map);
-    map_elem.bindBrushClick(app.chart);
-    app.chart.bindMap(app.map);
-    a = true;
+    changeChart(_id, app.chart, app.map);
   } else {
+    // Compute the new distance matrix between this feature and each other one:
+    map_elem.computeDistMat();
+    // Set the minimum distance in order to select two regions:
+    app.current_config.min_km_closest_unit = Math.round(
+      map_elem.dist_to_my_region[2].dist / 1000) + 1;
+    const input_dist = document.querySelector('#dist_filter');
+    input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
+    if (input_dist.value < app.current_config.min_km_closest_unit) {
+      input_dist.value = app.current_config.min_km_closest_unit + 100;
+    }
+
+    // Reset the sutdy zone if we are currently using a custom study zone
+    // which dosen't include our new region:
+    if (app.current_config.filter_type === 'CUSTOM'
+        && app.current_config.filter_key.indexOf(id_region)) {
+      d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
+    } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
+      app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
+    }
     // Reset the color to use on the chart/map:
     app.colors = {};
     app.colors[app.current_config.my_region] = color_highlight;
 
-    if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
-      app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
-      filterLevelVar(app);
-    } else if (app.current_config.filter_key) {
-      filterLevelVar(app);
-    }
+    filterLevelVar(app);
   }
-  map_elem.computeDistMat();
-  app.current_config.min_km_closest_unit = Math.round(
-    map_elem.dist_to_my_region[2].dist / 1000) + 1;
-  const input_dist = document.querySelector('#dist_filter');
-  input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
-  if (input_dist.value < app.current_config.min_km_closest_unit) {
-    input_dist.value = app.current_config.min_km_closest_unit + 100;
-  }
-
-  return a;
+  return redraw;
 }
 
 /**

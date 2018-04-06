@@ -95,7 +95,7 @@ export default class ScatterPlot2 {
       this.updateMapRegio();
       this.map_elem.removeRectBrush();
     };
-    this._id = Symbol('2');
+    this._id = Symbol('ScatterPlot2');
     updateDimensions();
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 2;
@@ -1149,6 +1149,8 @@ export default class ScatterPlot2 {
     if (app.current_config.filter_key !== undefined) {
       this.changeStudyZone();
     } else {
+      // Remove the rect brush from the chart if any:
+      svg_container.select('.brush').call(this.brush.move, null);
       const tmp_my_region = this.data.splice(
         this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
       this.data.push(tmp_my_region);
@@ -1162,6 +1164,8 @@ export default class ScatterPlot2 {
   }
 
   changeStudyZone() {
+    // Remove the rect brush from the chart if any:
+    svg_container.select('.brush').call(this.brush.move, null);
     // Fetch the new data subset for this study zone and theses variables:
     const pop_field = app.current_config.pop_field;
     this.data = app.current_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
@@ -1315,6 +1319,11 @@ export default class ScatterPlot2 {
     }
 
     // If the variable to remove was currently used for drawing this chart,
+    // then remove the rect brush from the chart if any:
+    if (code_variable === this.variable1 || code_variable === this.variable2) {
+      svg_container.select('.brush').call(this.brush.move, null);
+    }
+    // If the variable to remove was currently used for drawing this chart:
     // set a new variable for this axis and redraw the chart:
     if (code_variable === this.variable1) {
       const new_var_x = this.itemsX.filter(ft => ft.name !== this.variable2)[0].name;
@@ -1344,6 +1353,7 @@ export default class ScatterPlot2 {
     this.map_elem.displayLegend(1);
     this.updateMapRegio();
     this.update();
+    this.updateCompletude();
   }
 
   bindMenu() {
@@ -1556,8 +1566,8 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
       ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
         ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
-        ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
-        : study_zones.find(d => d.id === app.current_config.filter_key).name;
+          ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
+          : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [`
   <b>Indicateur 1</b> : ${info_var1.name} (<i>${info_var1.id}</i>)<br>
   <b>Indicateur 2</b> : ${info_var2.name} (<i>${info_var2.id}</i>)<br>
@@ -1579,7 +1589,7 @@ Il est possible de situer la région au regard de la moyenne (valeurs brutes) ou
 
     const comp = (a, b, inv) => {
       if (inv) return a < b;
-      else return a >= b;
+      return a >= b;
     };
     const obj_my_region = this.data.find(d => d.id === app.current_config.my_region);
     let cadran;

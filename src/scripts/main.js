@@ -156,13 +156,26 @@ export function updateMenuStudyZones() {
   Array.prototype.forEach.call(
     document.querySelectorAll('#menu_studyzone > p'),
     (elem) => {
-      const val = elem.querySelector('.filter_v.square').getAttribute('display_level');
+      const square_elem = elem.querySelector('.filter_v.square');
+      const label_elem = elem.querySelector('.label_chk');
+      const val = square_elem.getAttribute('display_level');
       if (val === '' || val === app.current_config.current_level) {
         // eslint-disable-next-line no-param-reassign
         elem.style.display = null;
       } else {
         // eslint-disable-next-line no-param-reassign
         elem.style.display = 'none';
+      }
+      if (elem.getAttribute('filter-value') === 'CUSTOM') {
+        const name_studyzone = label_elem.innerHTML;
+        if (app.custom_studyzones[name_studyzone]
+            && app.custom_studyzones[name_studyzone].indexOf(app.current_config.my_region) < 0) {
+          square_elem.classList.add('disabled');
+          label_elem.classList.add('disabled');
+        } else {
+          square_elem.classList.remove('disabled');
+          label_elem.classList.remove('disabled');
+        }
       }
     });
 }
@@ -208,7 +221,7 @@ function updateMyCategorySection() {
   } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
     document.querySelector('.filter_info').innerHTML = `Régions dans un voisinage de ${+d3.select('#dist_filter').property('value')} km`;
   } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
-    document.querySelector('.filter_info').innerHTML = `Sélection personnalisée de régions`;
+    document.querySelector('.filter_info').innerHTML = 'Sélection personnalisée de régions';
   } else {
     document.querySelector('.filter_info').innerHTML = 'Ensemble des régions';
   }
@@ -243,6 +256,7 @@ export function bindUI_chart(chart, map_elem) {
   // User change the study zone:
   d3.selectAll('span.filter_v')
     .on('click', function () {
+      if (this.classList.contains('disabled')) return;
       if (!this.classList.contains('checked')) {
         d3.selectAll('span.filter_v').attr('class', 'filter_v square');
         this.classList.add('checked');
@@ -265,7 +279,6 @@ export function bindUI_chart(chart, map_elem) {
         }
         updateMyCategorySection();
         chart.changeStudyZone();
-        chart.updateCompletude();
       }
     });
 
@@ -279,8 +292,7 @@ export function bindUI_chart(chart, map_elem) {
         const ids = map_elem.getUnitsWithin(+this.value);
         applyFilter(app, ids);
         chart.changeStudyZone();
-        chart.updateCompletude();
-      }, 150);
+      }, 275);
     });
 
   // User change the targeted region:
@@ -293,7 +305,10 @@ export function bindUI_chart(chart, map_elem) {
         const id_region = this.getAttribute('value');
         const old_nb_var = app.current_config.ratio.length;
 
+        // Hide the list of availables regions:
         document.getElementById('list_regio').classList.add('hidden');
+        // Set the name of the region (completed, with correct case, etc.) in
+        // the input field:
         document.querySelector('.regio_name > #search').value = app.feature_names[id_region];
         document.querySelector('.regio_name > #autocomplete').value = app.feature_names[id_region];
         // Update the availables ratio on the left menu
@@ -303,8 +318,9 @@ export function bindUI_chart(chart, map_elem) {
         const new_nb_var = updateAvailableRatios(id_region);
         updateAvailableCharts(new_nb_var);
         updateMyCategorySection();
-
         const a = changeRegion(app, id_region, map_elem);
+        updateMenuTerritLevel();
+        updateMenuStudyZones();
 
         if (new_nb_var >= app.current_config.nb_var) {
           if (old_nb_var === new_nb_var) {
@@ -473,6 +489,37 @@ export function bindUI_chart(chart, map_elem) {
 }
 
 /**
+* Function to actually remove a chart a draw a new one, based on the current
+* (filtered) dataset stored in `app.current_data`.
+*
+* @param {Object} chart -
+* @param {Object} map_elem -
+* @return {void}
+*/
+export function changeChart(type_new_chart, chart, map_elem) {
+  chart.remove();
+  // eslint-disable-next-line no-param-reassign
+  chart = null;
+  unbindUI();
+  app.colors = {};
+  if (type_new_chart.indexOf('BarChart1') > -1) {
+    chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
+  } else if (type_new_chart.indexOf('ScatterPlot2') > -1) {
+    chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
+  } else if (type_new_chart.indexOf('RadarChart3') > -1) {
+    chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
+  } else if (type_new_chart.indexOf('Similarity1plus') > -1) {
+    chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
+  }
+  bindUI_chart(chart, map_elem);
+  map_elem.bindBrushClick(chart);
+  chart.bindMap(map_elem);
+  app.chart = chart;
+  app.map = map_elem;
+  Tooltipsify('[title-tooltip]');
+}
+
+/**
 * Function to handle click on the top menu, in order to choose
 * between available representations.
 *
@@ -480,34 +527,15 @@ export function bindUI_chart(chart, map_elem) {
 * @param {Object} map_elem -
 * @return {void}
 */
-export function bindTopButtons(chart, map_elem) {
+function bindTopButtons(chart, map_elem) {
   d3.selectAll('.type_chart')
     .on('click', function () {
       if (this.classList.contains('disabled')) return;
       // if (this.classList.contains('selected')) return;
       document.querySelector('.type_chart.selected').classList.remove('selected');
       this.classList.add('selected');
-      chart.remove();
-      chart = null; // eslint-disable-line no-param-reassign
-      unbindUI();
-      // map_elem.resetZoom();
-      app.colors = {};
       const value = this.getAttribute('value');
-      if (value === 'BarChart1') {
-        chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
-      } else if (value === 'ScatterPlot2') {
-        chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
-      } else if (value === 'RadarChart3') {
-        chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
-      } else if (value === 'Similarity1plus') {
-        chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
-      }
-      bindUI_chart(chart, map_elem);
-      map_elem.bindBrushClick(chart);
-      chart.bindMap(map_elem);
-      app.chart = chart;
-      app.map = map_elem;
-      Tooltipsify('[title-tooltip]');
+      changeChart(value, chart, map_elem);
     });
 }
 
@@ -555,6 +583,7 @@ export function bindHelpMenu() {
       if (filter_id === 'CUSTOM') {
         const name_studyzone = this.previousSibling.innerHTML;
         const regions = app.custom_studyzones[name_studyzone];
+        // eslint-disable-next-line new-cap
         const modal = new tingle.modal({
           stickyFooter: false,
           closeMethods: ['overlay', 'button', 'escape'],

@@ -314,6 +314,11 @@ span.square {
     cursor: pointer;
 }
 
+span.square.disabled {
+  border: 1px solid lightgray;
+  cursor: not-allowed;
+}
+
 span.small_square {
   height: 5px;
   border: 1px solid #4f81bd;
@@ -325,12 +330,7 @@ span.small_square {
 }
 
 span.small_square.disabled {
-  height: 5px;
   border: 1px solid lightgray;
-  content: " ";
-  padding-left: 8px;
-  margin-right: 4px;
-  font-size: 0.6em;
   cursor: not-allowed;
 }
 
@@ -440,7 +440,7 @@ span.i_regio {
   text-align: center;
   width: 100%;
   margin: auto;
-  height: 1.2em;
+  height: 100%;
 }
 
 .completude_section > p {

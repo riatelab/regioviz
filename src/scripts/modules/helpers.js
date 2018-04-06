@@ -538,12 +538,13 @@ const getMean2 = (data, var_name, info_var) => {
     }
     left = fun(s1, s2);
     fun = operators.get(formula.operator);
+    let right;
     if (formula.right.type === 'Identifier') {
-      const right = formula.right.name === 'id1' ? s1 : s2;
-      return fun(left, right);
+      right = formula.right.name === 'id1' ? s1 : s2;
     } else {
-      return fun(left, formula.right.value);
+      right = formula.right.value;
     }
+    return fun(left, right);
   }
   return NaN;
 };
@@ -863,10 +864,7 @@ function createStudyZone(regions) {
     entry.setAttribute('filter-value', 'CUSTOM');
     entry.innerHTML = `<span display_level="${app.current_config.current_level}" class='filter_v square'></span><span class="label_chk">${name_studyzone}</span><span class="i_info">i</span>`;
     section3.appendChild(entry);
-    // unbindUI();
     bindUI_chart(app.chart, app.map);
-    // map_elem.bindBrushClick(chart);
-    // chart.bindMap(map_elem);
     bindHelpMenu();
     modal.close();
     entry.querySelector('.label_chk').click();

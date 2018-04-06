@@ -24,7 +24,7 @@ const updateDimensions = () => {
     .on('contextmenu', () => {
       const selec = app.chart.type === 'global' ? app.chart.highlighted : null;
       svgContextMenu(app.chart, svg_bar, app.map, selec);
-      })
+    })
     .on('wheel', () => { d3.event.preventDefault(); });
   margin = { top: 20, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
@@ -46,7 +46,7 @@ const updateDimensions = () => {
 
 export default class Similarity1plus {
   constructor(ref_data) {
-    this._id = Symbol('4');
+    this._id = Symbol('Similarity1plus');
     updateDimensions();
     this.handle_brush_map = this._handle_brush_map;
     // Set the minimum number of variables to keep selected for this kind of chart:
@@ -1180,7 +1180,7 @@ export default class Similarity1plus {
     if (this.type !== 'global'
           && (this.data.length > +d3.select('#menu_selection').select('.nb_select').property('value')
           || this.data.length > this.highlight_selection.length)) {
-      d3.select('#menu_selection').select('.nb_select').property('value', this.data.length - 1);
+      d3.select('#menu_selection').select('.nb_select').property('value', 1);
       temp = 1;
     } else {
       temp = this.highlighted.length;
@@ -1232,6 +1232,8 @@ export default class Similarity1plus {
     this.data.sort((a, b) => a.dist - b.dist);
     // eslint-disable-next-line no-param-reassign
     this.data.forEach((el, i) => { el.globalrank = i; });
+
+    d3.select('#menu_selection').select('.nb_select').property('max', this.data.length - 1);
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -1284,14 +1286,14 @@ export default class Similarity1plus {
     const menu = d3.select('#menu_selection');
     let ts;
     const applychange = function () {
-      // self.map_elem.removeRectBrush();
-      const value = +this.value;
+      let value = +this.value;
       if (value < 1) {
-        this.value = 1;
-        return;
+        value = this.value = 1; // eslint-disable-line no-multi-assign
       }
       clearTimeout(ts);
-      ts = setTimeout(() => { self.applySelection(value); clearTimeout(ts); }, 75);
+      ts = setTimeout(() => {
+        self.applySelection(value); clearTimeout(ts);
+      }, 175);
     };
     menu.select('.nb_select')
       .on('change', applychange);
@@ -1448,6 +1450,7 @@ export default class Similarity1plus {
     this.map_elem.resetColors(this.current_ids);
     this.map_elem.displayLegend(4);
     this.applySelection(1);
+    this.updateCompletude();
   }
 
   prepareTableStat() {
@@ -1507,8 +1510,8 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
       ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
         ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
-        ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
-        : study_zones.find(d => d.id === app.current_config.filter_key).name;
+          ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
+          : study_zones.find(d => d.id === app.current_config.filter_key).name;
     const help1 = [];
     this.ratios.forEach((v, i) => {
       help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (<i>${info_var[i + 1].id}</i>)<br>`);
