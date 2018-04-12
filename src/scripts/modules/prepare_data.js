@@ -78,12 +78,12 @@ export function filterLevelVar(app) {
 * Function allowing to filter the entities of the geographical layer
 * according to the territorial division chosen.
 *
-* @param {Array} nuts_features - The array of geojson Feature to be filtered.
+* @param {Array} target_features - The array of geojson Feature to be filtered.
 * @return {Array} - The filtered array.
 *
 */
-export function filterLevelGeom(nuts_features, filter = 'N1') {
-  return nuts_features.filter(d => d.properties[filter] === 1);
+export function filterLevelGeom(target_features, filter = 'N1') {
+  return target_features.filter(d => d.properties[filter] === 1);
 }
 
 /**
@@ -167,57 +167,57 @@ export function applyFilter(app, filter_type) {
 *
 */
 export function changeRegion(app, id_region, map_elem) {
-  const current_level = app.current_config.current_level;
-  const o_region = app.full_dataset.find(d => d.id === id_region);
-  const available_level = [];
+  // const current_level = app.current_config.current_level;
+  // const o_region = app.full_dataset.find(d => d.id === id_region);
+  // const available_level = [];
   app.current_config.my_region = id_region;
   app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
-  if (o_region.N1 === '1') available_level.push('N1');
-  if (o_region.N2 === '1') available_level.push('N2');
-  // TODO: Wrap this in a function/put this somewhere else:
-  d3.select('#curr_regio_level').html(available_level.join(' '));
-  // Do we need to switch to a new territorial level ?
-  const redraw = available_level.indexOf(current_level) < 0;
-  if (redraw) {
-    const level_value = available_level[0];
-    d3.selectAll('p > span.filter_v').classed('checked', false);
-    d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true);
-    d3.selectAll('span.territ_level').attr('class', 'territ_level square');
-    d3.select(`span.territ_level[value='${level_value}']`).attr('class', 'territ_level square checked');
-    app.current_config.filter_type = 'DEFAULT';
-    app.current_config.filter_key = undefined;
-    app.current_config.current_level = level_value;
-    filterLevelVar(app);
-    map_elem.updateLevelRegion(level_value);
-    const _id = app.chart._id.toString();
-    changeChart(_id, app.chart, app.map);
-  } else {
-    // Compute the new distance matrix between this feature and each other one:
-    map_elem.computeDistMat();
-    // Set the minimum distance in order to select two regions:
-    app.current_config.min_km_closest_unit = Math.round(
-      map_elem.dist_to_my_region[2].dist / 1000) + 1;
-    const input_dist = document.querySelector('#dist_filter');
-    input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
-    if (input_dist.value < app.current_config.min_km_closest_unit) {
-      input_dist.value = app.current_config.min_km_closest_unit + 100;
-    }
-
-    // Reset the sutdy zone if we are currently using a custom study zone
-    // which dosen't include our new region:
-    if (app.current_config.filter_type === 'CUSTOM'
-        && app.current_config.filter_key.indexOf(id_region)) {
-      d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
-    } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
-      app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
-    }
-    // Reset the color to use on the chart/map:
-    app.colors = {};
-    app.colors[app.current_config.my_region] = color_highlight;
-
-    filterLevelVar(app);
+  // if (o_region.N1 === '1') available_level.push('N1');
+  // if (o_region.N2 === '1') available_level.push('N2');
+  // // TODO: Wrap this in a function/put this somewhere else:
+  // d3.select('#curr_regio_level').html(available_level.join(' '));
+  // // Do we need to switch to a new territorial level ?
+  // const redraw = available_level.indexOf(current_level) < 0;
+  // if (redraw) {
+  //   const level_value = available_level[0];
+  //   d3.selectAll('p > span.filter_v').classed('checked', false);
+  //   d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true);
+  //   d3.selectAll('span.territ_level').attr('class', 'territ_level square');
+  //   d3.select(`span.territ_level[value='${level_value}']`).attr('class', 'territ_level square checked');
+  //   app.current_config.filter_type = 'DEFAULT';
+  //   app.current_config.filter_key = undefined;
+  //   app.current_config.current_level = level_value;
+  //   filterLevelVar(app);
+  //   map_elem.updateLevelRegion(level_value);
+  //   const _id = app.chart._id.toString();
+  //   changeChart(_id, app.chart, app.map);
+  // } else {
+  // Compute the new distance matrix between this feature and each other one:
+  map_elem.computeDistMat();
+  // Set the minimum distance in order to select two regions:
+  app.current_config.min_km_closest_unit = Math.round(
+    map_elem.dist_to_my_region[2].dist / 1000) + 1;
+  const input_dist = document.querySelector('#dist_filter');
+  input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
+  if (input_dist.value < app.current_config.min_km_closest_unit) {
+    input_dist.value = app.current_config.min_km_closest_unit + 100;
   }
-  return redraw;
+
+  // Reset the sutdy zone if we are currently using a custom study zone
+  // which dosen't include our new region:
+  if (app.current_config.filter_type === 'CUSTOM'
+      && app.current_config.filter_key.indexOf(id_region)) {
+    d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
+  } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
+    app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
+  }
+  // Reset the color to use on the chart/map:
+  app.colors = {};
+  app.colors[app.current_config.my_region] = color_highlight;
+
+  filterLevelVar(app);
+  // }
+
 }
 
 /**
@@ -279,6 +279,7 @@ export function resetVariables(app, codes_ratio) {
   app.current_config.ratio_unit = [];
   for (let i = 0, len = codes_ratio.length; i < len; i++) {
     const code_ratio = codes_ratio[i];
+    if (!code_ratio) continue;
     const variable_info = variables_info.filter(d => d.id === code_ratio)[0];
     app.current_config.num.push(variable_info.id1);
     app.current_config.denum.push(variable_info.id2);

@@ -40,7 +40,7 @@ function get_bbox_layer_path(name) {
 
 function fitLayer() {
   projection.scale(1).translate([0, 0]);
-  const b = get_bbox_layer_path('frame');
+  const b = get_bbox_layer_path('back');
   const s = 1 / math_max((b[1][0] - b[0][0]) / width_map, (b[1][1] - b[0][1]) / height_map);
   const t = [(width_map - s * (b[1][0] + b[0][0])) / 2, (height_map - s * (b[1][1] + b[0][1])) / 2];
   projection.scale(s).translate(t);
@@ -202,7 +202,7 @@ function getLegendElems(type) {
 
 
 class MapSelect {
-  constructor(nuts, other_layers, user_styles, filter = 'N1') {
+  constructor(territ_layer, other_layers, user_styles, filter = 'N1') {
     styles = Object.assign({}, user_styles);
     const width_value = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
     d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value}px`);
@@ -230,7 +230,7 @@ class MapSelect {
         transform: 'scale(1)',
         'clip-path': 'url(#clip_map)',
       });
-    this.nuts = nuts;
+    this.territ_layer = territ_layer;
     this.zoom_map = d3.zoom()
       .scaleExtent([1, 5])
       .translateExtent([[0, 0], [width_map, height_map]])
@@ -257,7 +257,7 @@ class MapSelect {
         this.target_layer = layers.append('g')
           .attrs(style_layer);
         this.target_layer.selectAll('path')
-          .data(filterLevelGeom(this.nuts.features, filter), d => d.id)
+          .data(filterLevelGeom(this.territ_layer.features, filter), d => d.id)
           .enter()
           .append('path')
           .attrs(fn_attrs_target_layer);
@@ -287,7 +287,7 @@ class MapSelect {
   }
 
   updateLevelRegion(filter = 'N1') {
-    const new_selection = filterLevelGeom(this.nuts.features, filter);
+    const new_selection = filterLevelGeom(this.territ_layer.features, filter);
     const selection = this.target_layer
       .selectAll('path')
       .data(new_selection, d => d.id);

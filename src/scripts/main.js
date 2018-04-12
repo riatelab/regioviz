@@ -54,7 +54,7 @@ export const app = {
   custom_studyzones: {},
 };
 
-function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NUTS1') {
+function setDefaultConfig(code = '249100546', variable = 'DENS', level='EPCI') { // }, level = 'NUTS1') {
   const var_info = variables_info.find(ft => ft.id === variable);
   app.current_config = {
     // The name of the field of the dataset containing the ID of each feature:
@@ -62,7 +62,7 @@ function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NU
     // The name of the field of the dataset containing the name of each feature:
     name_field: 'name',
     // The name of the field of the dataset containing the population of each feature:
-    pop_field: 'POP_AGE_T',
+    pop_field: 'POP',
     // The name of the field of the geojson layer containing the ID of each feature
     // (these values should match with the values of the "id_field" in the
     // tabular dataset)
@@ -78,7 +78,7 @@ function setDefaultConfig(code = 'FRE', variable = 'REVMEN') { // }, level = 'NU
     // Array containing the corresponding denominator id.
     denum: [var_info.id2],
     // The level currently in use:
-    current_level: 'N1',
+    current_level: level,
     // The ID of the region currently in use:
     my_region: code,
     // The name of the region currently in use:
@@ -141,8 +141,8 @@ function updateAvailableRatios(my_region) {
 }
 
 
-function setDefaultConfigMenu(code = 'FRE', variable = 'REVMEN', level = 'N1') {
-  document.querySelector(`.target_region.square[value="${code}"]`).classList.add('checked');
+function setDefaultConfigMenu(code = '249100546', variable = 'DENS', level = 'EPCI') {
+  document.querySelector(`.target_region.square[value="r_${code}"]`).classList.add('checked');
   document.querySelector(`.target_variable.small_square[value="${variable}"]`).classList.add('checked');
   document.querySelector('p[filter-value="DEFAULT"] > .filter_v.square').classList.add('checked');
   document.querySelector(`.territ_level.square[value="${level}"]`).classList.add('checked');
@@ -178,13 +178,6 @@ export function updateMenuStudyZones() {
         }
       }
     });
-}
-
-export function updateMenuTerritLevel() {
-  const o_region = app.full_dataset.find(d => d.id === app.current_config.my_region);
-  d3.select(document.querySelector('.territ_level[value="N1"]').parentNode).classed('disabled', o_region.N1 === '0');
-  d3.select(document.querySelector('.territ_level[value="N12_POL"]').parentNode).classed('disabled', o_region.N12_POL === '0');
-  d3.select(document.querySelector('.territ_level[value="N2"]').parentNode).classed('disabled', o_region.N2 === '0');
 }
 
 export function resetColors() {
@@ -302,7 +295,7 @@ export function bindUI_chart(chart, map_elem) {
         d3.selectAll('span.target_region').attr('class', 'target_region square');
         this.classList.add('checked');
 
-        const id_region = this.getAttribute('value');
+        const id_region = this.getAttribute('value').slice(2);
         const old_nb_var = app.current_config.ratio.length;
 
         // Hide the list of availables regions:
@@ -318,13 +311,12 @@ export function bindUI_chart(chart, map_elem) {
         const new_nb_var = updateAvailableRatios(id_region);
         updateAvailableCharts(new_nb_var);
         updateMyCategorySection();
-        const a = changeRegion(app, id_region, map_elem);
-        updateMenuTerritLevel();
+        changeRegion(app, id_region, map_elem);
         updateMenuStudyZones();
 
         if (new_nb_var >= app.current_config.nb_var) {
           if (old_nb_var === new_nb_var) {
-            if (a === false) chart.updateChangeRegion();
+            chart.updateChangeRegion();
           } else {
             d3.select('span.type_chart.selected').dispatch('click');
             alertify.warning('Une variable précédemment sélectionnée n\'est pas disponible pour cette région.');
@@ -400,16 +392,29 @@ export function bindUI_chart(chart, map_elem) {
         // Reset the study zone :
         d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
-        this.classList.add('checked');
         const level_value = this.getAttribute('value');
+        d3.selectAll('.regioname')
+          .style('display', d => +d[level_value] === 1 ? null : 'none')
+          .selectAll('.square')
+          .classed('checked', false);
+        this.classList.add('checked');
         app.current_config.current_level = level_value;
+        app.current_config.my_region = getRandom(app.full_dataset
+          .filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1).map(d => d.id));
+        app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
+        document.querySelector('.regio_name > #search').value =  app.current_config.my_region_pretty_name;
+        document.querySelector('.regio_name > #autocomplete').value =  app.current_config.my_region_pretty_name;
+        document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`).classList.add('checked');
         updateMenuStudyZones();
         filterLevelVar(app);
         resetColors();
+        d3.selectAll('p > span.filter_v').classed('checked', false);
+        app.current_config.filter_type = 'DEFAULT';
+        app.current_config.filter_key = undefined;
+        filterLevelVar(app);
         map_elem.updateLevelRegion(level_value);
-        map_elem.unbindBrushClick();
-        map_elem.bindBrushClick(chart);
-        chart.changeStudyZone();
+        const _id = app.chart._id.toString();
+        changeChart(_id, chart, map_elem);
       }
     });
 
@@ -711,17 +716,13 @@ function bindCreditsSource() {
 function loadData() {
   d3.queue(4)
     .defer(d3.csv, 'data/REGIOVIZ_DATA.csv')
-    .defer(d3.json, 'data/CGET_nuts_all3035.geojson')
-    .defer(d3.json, 'data/borders3035.geojson')
-    .defer(d3.json, 'data/countries3035.geojson')
-    .defer(d3.json, 'data/countries-remote3035.geojson')
-    .defer(d3.json, 'data/coasts3035.geojson')
-    .defer(d3.json, 'data/coasts-remote3035.geojson')
-    .defer(d3.json, 'data/cyprus_non_espon_space3035.geojson')
-    .defer(d3.json, 'data/countries-remote-boundaries3035.geojson')
-    .defer(d3.json, 'data/frame3035.geojson')
-    .defer(d3.json, 'data/boxes3035.geojson')
-    .defer(d3.json, 'data/line3035.geojson')
+    .defer(d3.json, 'data/territoires_france2154.geojson')
+    .defer(d3.json, 'data/back2154.geojson')
+    .defer(d3.json, 'data/back_countries2154.geojson')
+    .defer(d3.json, 'data/boundaries2154.geojson')
+    .defer(d3.json, 'data/boxes2154.geojson')
+    .defer(d3.json, 'data/coasts2154.geojson')
+    .defer(d3.json, 'data/regions2154.geojson')
     .defer(d3.json, 'data/styles.json')
     .defer(d3.csv, 'data/indicateurs_meta.csv')
     .awaitAll((error, results) => {
@@ -729,30 +730,26 @@ function loadData() {
       document.body.classList.remove('loading');
       removeAll(document.querySelectorAll('.spinner, .top-spinner'));
       const [
-        full_dataset, nuts, borders, countries, countries_remote,
-        coasts, coasts_remote, cyprus_non_espon_space,
-        countries_remote_boundaries, frame, boxes, line, styles_map,
-        metadata_indicateurs,
+        full_dataset, territoires_france, back, back_countries, boundaries, boxes,
+        coasts, regions, styles_map, metadata_indicateurs,
       ] = results;
       alertify.set('notifier', 'position', 'bottom-left');
       prepareVariablesInfo(metadata_indicateurs);
       const features_menu = full_dataset.filter(
-        ft => ft.REGIOVIZ === '1' && (
-          ft.N1 === '1' || ft.N2 === '1'));
+        ft => ft.REGIOVIZ === '1'
+      );
+      console.log(features_menu); console.log(full_dataset);
       // eslint-disable-next-line no-param-reassign
       features_menu.forEach((ft) => { ft.name = ft.name.replace(' — ', ' - '); });
       features_menu.sort((a, b) => a.name.localeCompare(b.name));
       const start_region = getRandom(full_dataset
-        .filter(d => d.REGIOVIZ === '1' && d.level === '1').map(d => d.id));
-      const start_variable = getRandom(
-        ['REVMEN', 'CHOM1574', 'CHOM1524']);
+        .filter(d => d.REGIOVIZ === '1' && +d['EPCI'] === 1).map(d => d.id));
+      const start_variable = 'DENS';
       prepare_dataset(full_dataset, app);
-      setDefaultConfig(start_region, start_variable, 'N1');
-      prepareGeomLayerId(nuts, app.current_config.id_field_geom);
+      setDefaultConfig(start_region, start_variable, 'EPCI');
+      prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
       createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
-      // We filtered the features earlier to only get a region available at both
-      // N1 and N2 levels when the application starts so lets hardcode this :
-      d3.select('#curr_regio_level').html('N1 N2');
+
       bindCreditsSource();
       updateMenuStudyZones();
       bindHelpMenu();
@@ -760,25 +757,20 @@ function loadData() {
       handleInputRegioName(features_menu);
       makeHeaderChart();
       makeHeaderMapSection();
-      setDefaultConfigMenu(start_region, start_variable, 'N1');
+      setDefaultConfigMenu(start_region, start_variable, 'EPCI');
       filterLevelVar(app);
       const other_layers = new Map();
       [
-        ['borders', borders],
         ['boxes', boxes],
-        ['countries', countries],
-        ['countries_remote', countries_remote],
+        ['back', back],
+        ['back_countries', back_countries],
+        ['boundaries', boundaries],
         ['coasts', coasts],
-        ['coasts_remote', coasts_remote],
-        ['cyprus_non_espon_space', cyprus_non_espon_space],
-        ['countries_remote_boundaries', countries_remote_boundaries],
-        ['frame', frame],
-        ['line', line],
-        ['boxes2', boxes],
+        ['regions', regions],
       ].forEach((el) => {
         other_layers.set(el[0], el[1]);
       });
-      const map_elem = new MapSelect(nuts, other_layers, styles_map);
+      const map_elem = new MapSelect(territoires_france, other_layers, styles_map, 'EPCI');
       const chart = new BarChart1(app.current_data);
       bindUI_chart(chart, map_elem);
       map_elem.bindBrushClick(chart);
@@ -787,9 +779,9 @@ function loadData() {
       app.map = map_elem;
       Tooltipsify('[title-tooltip]');
       // Fetch the layer in geographic coordinates now in case the user wants to download it later:
-      d3.request('data/CGET_nuts_all.geojson', (err, result) => {
-        app.geo_layer = result.response;
-      });
+      // d3.request('data/CGET_nuts_all.geojson', (err, result) => {
+      //   app.geo_layer = result.response;
+      // });
       // Load/configure mathjax to render some math formulas in help dialogs:
       MathJax.Hub.Config({
         tex2jax: {

@@ -250,7 +250,7 @@ export default class Similarity1plus {
       const nb_variables = ratios.length;
       const offset = height / nb_variables + 1;
       let height_to_use = offset / 2;
-      const trans = d3.transition().duration(125);
+      // const trans = d3.transition().duration(125);
       for (let i = 0; i < nb_variables; i++) {
         const ratio_name = ratios[i];
         const selector_ratio_name = `l_${ratio_name}`;
@@ -388,7 +388,7 @@ export default class Similarity1plus {
         //   .transition()
         //   .duration(125);
         g = this.draw_group.select(`#${selector_ratio_name}`)
-          .transition(trans)
+          // .transition(trans)
           .attr('transform', `translate(0, ${height_to_use})`);
         g.select('#up_arrow')
           // .transition(_trans)
@@ -442,14 +442,14 @@ export default class Similarity1plus {
           .range([0, width]);
 
         axis
-          .transition(trans)
+          // .transition(trans)
           .call(d3.axisBottom(xScale).tickFormat(formatNumber));
 
         const bubbles1 = layer_other.selectAll('.bubble')
           .data(data.filter(d => app.colors[d.id] === undefined), d => d.id);
 
         bubbles1
-          .transition(trans)
+          // .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -479,14 +479,14 @@ export default class Similarity1plus {
             'stroke-width': 0.75,
             'stroke-opacity': 0.75,
           })
-          .transition(trans)
+          // .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
             else if (x_value < 0) x_value = -200;
             return {
               globalrank: d.globalrank,
-              id: d.id,
+              id: `b_${d.id}`,
               class: 'bubble',
               cx: x_value,
               cy: 10,
@@ -494,13 +494,15 @@ export default class Similarity1plus {
             };
           });
 
-        bubbles1.exit().transition(trans).remove();
+        bubbles1.exit()
+          // .transition(trans)
+          .remove();
 
         const bubbles2 = layer_highlighted.selectAll('.bubble').data(data.filter(
           d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined), d => d.id);
 
         bubbles2
-          .transition(trans)
+          // .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -530,14 +532,14 @@ export default class Similarity1plus {
             'stroke-width': d.globalrank === self.highlight_selection.length ? 0.9 : 0.75,
             'stroke-opacity': d.globalrank === self.highlight_selection.length ? 0.95 : 0.75,
           }))
-          .transition(trans)
+          // .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
             else if (x_value < 0) x_value = -200;
             return {
               globalrank: d.globalrank,
-              id: d.id,
+              id: `b_${d.id}`,
               class: 'bubble',
               cx: x_value,
               cy: 10,
@@ -545,13 +547,15 @@ export default class Similarity1plus {
             };
           });
 
-        bubbles2.exit().transition(trans).remove();
+        bubbles2.exit()
+          // .transition(trans)
+          .remove();
 
         const bubbles3 = layer_top.selectAll('.bubbleMyRegion')
           .data(data.filter(d => d.id === app.current_config.my_region), d => d.id);
 
         bubbles3
-          .transition(trans)
+          // .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
@@ -581,14 +585,14 @@ export default class Similarity1plus {
             'stroke-width': 0.75,
             'stroke-opacity': 0.75,
           }))
-          .transition(trans)
+          // .transition(trans)
           .attrs((d) => {
             let x_value = xScale(d[ratio_name]);
             if (x_value > width) x_value = width + 200;
             else if (x_value < 0) x_value = -200;
             return {
               globalrank: d.globalrank,
-              id: d.id,
+              id: `b_${d.id}`,
               class: 'bubbleMyRegion',
               cx: x_value,
               cy: 10,
@@ -596,7 +600,9 @@ export default class Similarity1plus {
             };
           });
 
-        bubbles3.exit().transition(trans).remove();
+        bubbles3.exit()
+          // .transition(trans)
+          .remove();
         height_to_use += offset;
         // setTimeout(() => {
         //   bubbles1.order();
@@ -613,7 +619,7 @@ export default class Similarity1plus {
       self.makeClassifColors(_values);
       const size_func = self.proportionnal_symbols
         ? new PropSizer(d3.max(data, d => +d[num_name]), 30).scale
-        : () => 4.5;
+        : () => data.length < 400 ? 4.5 : data.length < 800 ? 3 : 2;
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
       this.x = d3.scaleLinear().rangeRound([0, width]);
       const xAxis = d3.axisBottom(this.x).ticks(10, '');
@@ -694,8 +700,8 @@ export default class Similarity1plus {
           .style('fill', 'none');
       } else {
         g.selectAll('.axis-top-v')
-          .transition()
-          .duration(125)
+          // .transition()
+          // .duration(125)
           .call(xAxis);
 
         const cells = g.select('.cells')
@@ -703,8 +709,8 @@ export default class Similarity1plus {
           .data(voro, d => d.data.id);
 
         cells.select('.circle')
-          .transition()
-          .duration(125)
+          // .transition()
+          // .duration(125)
           .attrs(d => ({
             class: 'circle',
             r: size_func(+d.data[num_name]),
@@ -718,8 +724,8 @@ export default class Similarity1plus {
           }));
 
         cells.select('.polygon')
-          .transition()
-          .duration(125)
+          // .transition()
+          // .duration(125)
           .attr('d', d => `M${d.join('L')}Z`)
           .style('fill', 'none');
 
@@ -1132,7 +1138,7 @@ export default class Similarity1plus {
       document.querySelectorAll('.grp_var'),
       (el) => {
         const ty = +el.getAttribute('transform').split('translate(0')[1].replace(',', '').replace(')', '').trim();
-        const bubble = el.querySelector(`#${id_region}`);
+        const bubble = el.querySelector(`#b_${id_region}`);
         coords.push([bubble.cx.baseVal.value, bubble.cy.baseVal.value + ty]);
       });
     coords.sort((a, b) => a[1] - b[1]);

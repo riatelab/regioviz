@@ -21,26 +21,21 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   section1.style.overflow = 'auto';
   // section1.style.height = '15%';
   // section1.style.height = '0';
-  for (let i = 0, len_i = names.length; i < len_i; i++) {
-    // const id = names[i].id;
-    // const name = names[i].name;
-    const { id, name, N1, N2 } = names[i];
-    const entry = document.createElement('p');
-    entry.innerHTML = `<span value="${id}" class='target_region square'></span><span style="margin-right:5px;" class="label_chk">${name}</span>`;
-    if (N1 === '1') {
-      entry.innerHTML += '<span class="minibutton" style="display: none;">N1</span>';
-    }
-    if (N2 === '1') {
-      entry.innerHTML += '<span class="minibutton" style="display: none;">N2</span>';
-    }
-    section1.appendChild(entry);
-    entry.onmouseover = function () {
+  const dsection1 = d3.select(section1);
+  dsection1.selectAll('p')
+    .data(names)
+    .enter()
+    .append('p')
+    .attr('class', 'regioname')
+    .style('display', d => +d[app.current_config.current_level] === 1 ? null : 'none')
+    .html(d => `
+<span value="r_${d.id}" class='target_region square'></span><span style="margin-right:5px;" class="label_chk">${d.name}</span>`)
+    .on('mouseover', function() {
       d3.select(this).selectAll('span.minibutton').style('display', null);
-    };
-    entry.onmouseout = function () {
+    })
+    .on('mouseout', function () {
       d3.select(this).selectAll('span.minibutton').style('display', 'none');
-    };
-  }
+    });
 
   // Second section, groups of variables:
   const title_section2 = document.createElement('p');

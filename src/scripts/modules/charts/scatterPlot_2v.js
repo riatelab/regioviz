@@ -608,24 +608,24 @@ export default class ScatterPlot2 {
   * Update both axis and grid.
   */
   updateAxisGrid() {
-    const trans = d3.transition().duration(125);
+    // const trans = d3.transition().duration(125);
     this.plot.select('.grid-x')
-      .transition(trans)
+      // .transition(trans)
       .call(this.xAxis2
         .ticks(this.mean_variable1 >= 10000 ? 5 : 10)
         .tickSize(-height)
         .tickFormat(''));
     this.plot.select('.grid-y')
-      .transition(trans)
+      // .transition(trans)
       .call(this.yAxis2
         .tickSize(-width)
         .tickFormat(''));
     this.plot.select('#axis--x')
-      .transition(trans)
+      // .transition(trans)
       .call(this.xAxis
         .ticks(this.mean_variable1 >= 10000 ? 5 : 10));
     this.plot.select('#axis--y')
-      .transition(trans)
+      // .transition(trans)
       .call(this.yAxis);
     this.plot.selectAll('.grid')
       .selectAll('line')
@@ -728,7 +728,7 @@ export default class ScatterPlot2 {
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(data, d => d[num_name]), 30).scale
       : () => 5;
-    const _trans = dots.transition().duration(100);
+    // const _trans = dots.transition().duration(100);
     const transform = d3.zoomIdentity;
     transform.k = 1;
     transform.x = 0;
@@ -771,7 +771,7 @@ export default class ScatterPlot2 {
       const default_color = 'lightgray';
 
       dots
-        .transition(_trans)
+        // .transition(_trans)
         .attrs(d => ({
           r: size_func(d[num_name]) / this.k,
           cx: x(d[rank_variable1]),
@@ -831,7 +831,7 @@ export default class ScatterPlot2 {
       const default_color = 'lightgray';
 
       dots
-        .transition(_trans)
+        // .transition(_trans)
         .attrs(d => ({
           r: size_func(d[num_name]) / this.k,
           cx: x(d[variable1]),
@@ -863,33 +863,31 @@ export default class ScatterPlot2 {
         }));
     }
     self.bindTooltips(false);
-    dots.exit().transition(_trans).remove();
+    dots.exit()
+      // .transition(_trans)
+      .remove();
     dots.order();
     this.updateAxisGrid();
 
     const grp_mean = this.plot.select('g.mean');
     grp_mean.selectAll('#mean_x.mean_line, #mean_x.transp_mean_line')
-      .transition(_trans)
       .attrs({
         x1: this.x(this.mean_variable1),
         x2: this.x(this.mean_variable1),
       });
     grp_mean.selectAll('#mean_y.mean_line, #mean_y.transp_mean_line')
-      .transition(_trans)
       .attrs({
         y1: this.y(this.mean_variable2),
         y2: this.y(this.mean_variable2),
       });
 
     grp_mean.selectAll('.mean_line')
-      .transition(_trans)
       .attrs({
         transform: transform,
         'stroke-width': 2 / this.k,
       });
 
     grp_mean.selectAll('.transp_mean_line')
-      .transition(_trans)
       .attrs({
         transform: transform,
         'stroke-width': 14 / this.k,
@@ -913,7 +911,7 @@ export default class ScatterPlot2 {
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
       : () => 5;
-    const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
+    // const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
     trans.attrs(d => ({
       transform: transform,
       r: size_func(d[num_name]) / this.k,
@@ -921,12 +919,12 @@ export default class ScatterPlot2 {
     }));
 
     this.plot.select('#axis--x')
-      .transition(trans)
+      // .transition(trans)
       .call(this.xAxis.scale(new_xScale)
         .ticks(this.mean_variable1 >= 10000 ? 5 : 10));
 
     this.plot.select('.grid-x')
-      .transition(trans)
+      // .transition(trans)
       .call(this.xAxis2.scale(new_xScale)
         .ticks(this.mean_variable1 >= 10000 ? 5 : 10)
         .tickSize(-height)
@@ -935,11 +933,11 @@ export default class ScatterPlot2 {
       .attr('stroke', 'lightgray');
 
     this.plot.select('#axis--y')
-      .transition(trans)
+      // .transition(trans)
       .call(this.yAxis.scale(new_yScale));
 
     this.plot.select('.grid-y')
-      .transition(trans)
+      // .transition(trans)
       .call(this.yAxis2.scale(new_yScale)
         .tickSize(-width)
         .tickFormat(''))
@@ -947,18 +945,18 @@ export default class ScatterPlot2 {
       .attr('stroke', 'lightgray');
 
     this.plot.select('.brush')
-      .transition(trans)
+      // .transition(trans)
       .attr('transform', transform);
 
     this.plot.selectAll('.mean_line')
-      .transition(trans)
+      // .transition(trans)
       .attrs({
         transform: transform,
         'stroke-width': 2 / this.k,
       });
 
     this.plot.selectAll('.transp_mean_line')
-      .transition(trans)
+      // .transition(trans)
       .attrs({
         transform: transform,
         'stroke-width': 14 / this.k,
@@ -1127,15 +1125,15 @@ export default class ScatterPlot2 {
     }
     const grp_mean = this.plot.select('g.mean');
     grp_mean.selectAll('#mean_x.mean_line, #mean_x.transp_mean_line')
-      .transition()
-      .duration(125)
+      // .transition()
+      // .duration(125)
       .attrs({
         x1: this.x(this.mean_variable1),
         x2: this.x(this.mean_variable1),
       });
     grp_mean.selectAll('#mean_y.mean_line, #mean_y.transp_mean_line')
-      .transition()
-      .duration(125)
+      // .transition()
+      // .duration(125)
       .attrs({
         y1: this.y(this.mean_variable2),
         y2: this.y(this.mean_variable2),
