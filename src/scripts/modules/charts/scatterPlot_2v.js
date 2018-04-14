@@ -726,7 +726,7 @@ export default class ScatterPlot2 {
       .data(data, d => d.id);
     const num_name = app.current_config.pop_field;
     const size_func = this.proportionnal_symbols
-      ? new PropSizer(d3.max(data, d => d[num_name]), 30).scale
+      ? new PropSizer(d3.max(data, d => d[num_name]), 40).scale
       : () => 5;
     // const _trans = dots.transition().duration(100);
     const transform = d3.zoomIdentity;

@@ -605,37 +605,16 @@ export default class BarChart1 {
       .call(this.yAxis);
 
     const axis_x = this._focus.select('.axis--x')
-      // .attr('transform', `translate(0, ${this.y(0)})`)
-      .attr('font-size', () => (displayed > 75 ? 6 : 10))
+      .attr('font-size', '10px')
       .call(this.xAxis);
     axis_x
       .selectAll('text')
-      .attrs(() => {
-        if (displayed > 100) {
-          return { dx: '-0.8em', dy: '0.15em', transform: 'rotate(-65)' };
-        } else if (displayed > 20) {
-          return { dx: '-0.8em', dy: '0.15em', transform: 'rotate(-65)' };
-        }
-        return { dx: '0', dy: '0.71em', transform: null };
-      })
-      .style('text-anchor', () => (displayed > 20 ? 'end' : 'middle'))
-      .styles(() => {
-        if (displayed > 100) {
-          return {
-            'text-anchor': 'end',
-            'font-size': displayed > 170 ? '6px' : '7px',
-          };
-        } else if (displayed > 20) {
-          return {
-            'text-anchor': 'end',
-            'font-size': '10px',
-          };
-        }
-        return {
-          'text-anchor': 'middle',
-          'font-size': '11px',
-        };
-      });
+      .attrs(() => ({ dx: '0', dy: '0.71em', transform: null }))
+      .styles(() => ({
+        'text-anchor': 'middle',
+        'font-size': '11px',
+        display: (displayed > 20) ? 'none' : null,
+      }));
 
     this.g_bar.selectAll('.bar')
       .on('mouseover', () => {

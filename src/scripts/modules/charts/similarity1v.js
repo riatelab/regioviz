@@ -435,7 +435,7 @@ export default class Similarity1plus {
         app.colors[app.current_config.my_region] = color_highlight;
 
         const size_func = this.proportionnal_symbols
-          ? new PropSizer(d3.max(data, d => d[num_name]), 30).scale
+          ? new PropSizer(d3.max(data, d => d[num_name]), 40).scale
           : () => 7.5;
         const xScale = d3.scaleLinear()
           .domain([_min, _max])
@@ -621,9 +621,8 @@ export default class Similarity1plus {
         ? new PropSizer(d3.max(data, d => +d[num_name]), 30).scale
         : () => data.length < 400 ? 4.5 : data.length < 800 ? 3 : 2;
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
-      this.x = d3.scaleLinear().rangeRound([0, width]);
+      this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
       const xAxis = d3.axisBottom(this.x).ticks(10, '');
-      this.x.domain(d3.extent(values));
 
       const simulation = d3.forceSimulation(data)
         .force('x', d3.forceX(d => this.x(d.dist)).strength(9))
