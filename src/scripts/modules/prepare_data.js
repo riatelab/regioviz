@@ -1,5 +1,5 @@
 import { color_highlight } from './options';
-import { variables_info, study_zones, territorial_mesh, changeChart } from './../main';
+import { variables_info, study_zones, territorial_mesh } from './../main';
 import { _isNaN } from './helpers';
 
 /* eslint-disable no-param-reassign */
@@ -183,7 +183,8 @@ export function changeRegion(app, id_region, map_elem) {
   //   d3.selectAll('p > span.filter_v').classed('checked', false);
   //   d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true);
   //   d3.selectAll('span.territ_level').attr('class', 'territ_level square');
-  //   d3.select(`span.territ_level[value='${level_value}']`).attr('class', 'territ_level square checked');
+  //   d3.select(`span.territ_level[value='${level_value}']`)
+  //     .attr('class', 'territ_level square checked');
   //   app.current_config.filter_type = 'DEFAULT';
   //   app.current_config.filter_key = undefined;
   //   app.current_config.current_level = level_value;
@@ -217,7 +218,6 @@ export function changeRegion(app, id_region, map_elem) {
 
   filterLevelVar(app);
   // }
-
 }
 
 /**
@@ -279,13 +279,14 @@ export function resetVariables(app, codes_ratio) {
   app.current_config.ratio_unit = [];
   for (let i = 0, len = codes_ratio.length; i < len; i++) {
     const code_ratio = codes_ratio[i];
-    if (!code_ratio) continue;
-    const variable_info = variables_info.filter(d => d.id === code_ratio)[0];
-    app.current_config.num.push(variable_info.id1);
-    app.current_config.denum.push(variable_info.id2);
-    app.current_config.ratio.push(variable_info.id);
-    app.current_config.ratio_pretty_name.push(variable_info.name);
-    app.current_config.ratio_unit.push(variable_info.unit);
+    if (code_ratio) {
+      const variable_info = variables_info.filter(d => d.id === code_ratio)[0];
+      app.current_config.num.push(variable_info.id1);
+      app.current_config.denum.push(variable_info.id2);
+      app.current_config.ratio.push(variable_info.id);
+      app.current_config.ratio_pretty_name.push(variable_info.name);
+      app.current_config.ratio_unit.push(variable_info.unit);
+    }
   }
   filterLevelVar(app);
 }

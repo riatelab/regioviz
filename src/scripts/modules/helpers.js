@@ -1,9 +1,11 @@
 import jsep from 'jsep';
 import tingle from 'tingle.js';
-import { color_inf, color_sup, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
+import { color_inf, color_sup, fixed_dimension, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
 import { isIE, app, bindUI_chart, bindHelpMenu } from './../main';
+
+const array_slice = Array.prototype.slice;
 
 /* eslint-disable wrap-iife, object-shorthand, no-bitwise, strict,
 no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
@@ -256,9 +258,9 @@ const operators = new Map();
 /* eslint-disable no-cond-assign, no-plusplus */
 const getElementsFromPoint = (x, y) => {
   if (document.elementsFromPoint) {
-    return Array.prototype.slice.call(document.elementsFromPoint(x, y));
+    return array_slice.call(document.elementsFromPoint(x, y));
   } else if (document.msElementsFromPoint) {
-    return Array.prototype.slice.call(document.msElementsFromPoint(x, y));
+    return array_slice.call(document.msElementsFromPoint(x, y));
   }
   const elements = [];
   const previousPointerEvents = [];
@@ -697,8 +699,6 @@ function formatNumber(value, precision) {
   return values_list.join(formatnb_decimal_sep);
 }
 
-const array_slice = Array.prototype.slice;
-
 /**
 * Removes all Node of the given NodeList.
 *
@@ -994,6 +994,74 @@ function clickDlPdf(event) {
   return false;
 }
 
+/* eslint-disable no-param-reassign */
+function toggleVisibilityLeftMenu() {
+  const bar_section = document.getElementById('bar_section');
+  const map_section = document.getElementById('map_section');
+  const bar_topsection = document.querySelector('#menutop > .t2');
+  const map_topsection = document.querySelector('#menutop > .t3');
+  const left_elems = document.querySelectorAll('.t1');
+  if (bar_section.classList.contains('zoomed')) {
+    this.innerHTML = '◀';
+    this.parentElement.title = 'Cacher le menu';
+    array_slice.call(left_elems).forEach((elem) => {
+      elem.style.display = null;
+      elem.style.visibility = 'visible';
+      elem.style.transform = 'scaleX(1)';
+    });
+    bar_topsection.classList.remove('zoomed');
+    map_topsection.classList.remove('zoomed');
+    bar_section.classList.remove('zoomed');
+    map_section.classList.remove('zoomed');
+    const w_bar = bar_section.getBoundingClientRect().width;
+    const w_map = map_section.getBoundingClientRect().width;
+    const h_lgd = document.getElementById('svg_legend').viewBox.baseVal.height;
+    d3.select('.cont_svg.cchart')
+      .style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * w_bar}px`);
+    d3.select('.cont_svg.cmap')
+      .style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * w_map}px`);
+    d3.select('.cont_svg.clgd').style('padding-top', `${(h_lgd / fixed_dimension.legend.width) * w_map}px`);
+    d3.select('#selected_summary').remove();
+  } else {
+    this.innerHTML = '▶';
+    this.parentElement.title = 'Afficher le menu';
+    array_slice.call(left_elems).forEach((elem) => {
+      elem.style.visibility = 'hidden';
+      elem.style.transform = 'scaleX(0)';
+    });
+    setTimeout(() => {
+      array_slice.call(left_elems).forEach((elem) => {
+        elem.style.display = 'none';
+      });
+      bar_topsection.classList.add('zoomed');
+      map_topsection.classList.add('zoomed');
+      bar_section.classList.add('zoomed');
+      map_section.classList.add('zoomed');
+      const w_bar = bar_section.getBoundingClientRect().width;
+      const w_map = map_section.getBoundingClientRect().width;
+      const h_lgd = document.getElementById('svg_legend').viewBox.baseVal.height;
+      d3.select('.cont_svg.cchart')
+        .style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * w_bar - 15}px`);
+      d3.select('.cont_svg.cmap')
+        .style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * w_map}px`);
+      d3.select('.cont_svg.clgd').style('padding-top', `${(h_lgd / fixed_dimension.legend.width) * w_map}px`);
+      d3.select('body')
+        .insert('div', '#menutop')
+        .attr('id', 'selected_summary')
+        .styles({
+          color: '#4f81bd',
+          'font-size': '0.9em',
+          'text-align': 'center',
+        })
+        .html(`
+          Maillage : <b>${app.current_config.current_level}</b> -
+          Ma région : <b>${app.current_config.my_region_pretty_name}</b> -
+          Espace d'étude : <b>${''}</b>`);
+    }, 275);
+  }
+}
+/* eslint-enable no-param-reassign */
+
 export {
   comp,
   comp2,
@@ -1034,4 +1102,5 @@ export {
   _isNaN,
   isNumber,
   getScrollValue,
+  toggleVisibilityLeftMenu,
 };

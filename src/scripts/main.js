@@ -6,14 +6,14 @@ import '../styles/tippy.css';
 import '../styles/alertify.min.css';
 import '../styles/semantic.min.css';
 import '../styles/introjs.min.css';
-import { createMenu, handleInputRegioName } from './modules/menuleft';
-import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
-import { MapSelect, svg_map, zoomClick } from './modules/map';
-import { color_highlight, MAX_VARIABLES, fixed_dimension } from './modules/options';
 import BarChart1 from './modules/charts/barChart_1v';
 import ScatterPlot2 from './modules/charts/scatterPlot_2v';
 import RadarChart3 from './modules/charts/radarChart_3v';
 import Similarity1plus from './modules/charts/similarity1v';
+import createMenu from './modules/menuleft';
+import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
+import { MapSelect, svg_map, zoomClick } from './modules/map';
+import { color_highlight, MAX_VARIABLES, fixed_dimension } from './modules/options';
 import { Tooltipsify } from './modules/tooltip';
 import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, clickDlPdf, removeAll } from './modules/helpers';
 import {
@@ -54,7 +54,7 @@ export const app = {
   custom_studyzones: {},
 };
 
-function setDefaultConfig(code = '249100546', variable = 'DENS', level='EPCI') { // }, level = 'NUTS1') {
+function setDefaultConfig(code = '249100546', variable = 'DENS', level = 'EPCI') { // }, level = 'NUTS1') {
   const var_info = variables_info.find(ft => ft.id === variable);
   app.current_config = {
     // The name of the field of the dataset containing the ID of each feature:
@@ -221,6 +221,37 @@ function updateMyCategorySection() {
 }
 
 /**
+* Function to actually remove a chart a draw a new one, based on the current
+* (filtered) dataset stored in `app.current_data`.
+*
+* @param {Object} chart -
+* @param {Object} map_elem -
+* @return {void}
+*/
+export function changeChart(type_new_chart, chart, map_elem) {
+  chart.remove();
+  // eslint-disable-next-line no-param-reassign
+  chart = null;
+  unbindUI();
+  app.colors = {};
+  if (type_new_chart.indexOf('BarChart1') > -1) {
+    chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
+  } else if (type_new_chart.indexOf('ScatterPlot2') > -1) {
+    chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
+  } else if (type_new_chart.indexOf('RadarChart3') > -1) {
+    chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
+  } else if (type_new_chart.indexOf('Similarity1plus') > -1) {
+    chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
+  }
+  bindUI_chart(chart, map_elem); // eslint-disable-line no-use-before-define
+  map_elem.bindBrushClick(chart);
+  chart.bindMap(map_elem);
+  app.chart = chart;
+  app.map = map_elem;
+  Tooltipsify('[title-tooltip]');
+}
+
+/**
 * Create handlers for user event on the left menu and on the map for charts only
 * allowing to use 1 variable.
 *
@@ -229,6 +260,7 @@ function updateMyCategorySection() {
 * @return {void}
 *
 */
+// eslint-disable-next-line no-use-before-define
 export function bindUI_chart(chart, map_elem) {
   // Variable for slight timeout used for
   // some input fields to avoid refreshing as soon as the value is entered:
@@ -394,7 +426,7 @@ export function bindUI_chart(chart, map_elem) {
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
         const level_value = this.getAttribute('value');
         d3.selectAll('.regioname')
-          .style('display', d => +d[level_value] === 1 ? null : 'none')
+          .style('display', d => (+d[level_value] === 1 ? null : 'none'))
           .selectAll('.square')
           .classed('checked', false);
         this.classList.add('checked');
@@ -402,8 +434,8 @@ export function bindUI_chart(chart, map_elem) {
         app.current_config.my_region = getRandom(app.full_dataset
           .filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1).map(d => d.id));
         app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
-        document.querySelector('.regio_name > #search').value =  app.current_config.my_region_pretty_name;
-        document.querySelector('.regio_name > #autocomplete').value =  app.current_config.my_region_pretty_name;
+        document.querySelector('.regio_name > #search').value = app.current_config.my_region_pretty_name;
+        document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
         document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`).classList.add('checked');
         updateMenuStudyZones();
         filterLevelVar(app);
@@ -490,38 +522,7 @@ export function bindUI_chart(chart, map_elem) {
         .on('click', null);
     }
   }
-  bindTopButtons(chart, map_elem);
-}
-
-/**
-* Function to actually remove a chart a draw a new one, based on the current
-* (filtered) dataset stored in `app.current_data`.
-*
-* @param {Object} chart -
-* @param {Object} map_elem -
-* @return {void}
-*/
-export function changeChart(type_new_chart, chart, map_elem) {
-  chart.remove();
-  // eslint-disable-next-line no-param-reassign
-  chart = null;
-  unbindUI();
-  app.colors = {};
-  if (type_new_chart.indexOf('BarChart1') > -1) {
-    chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
-  } else if (type_new_chart.indexOf('ScatterPlot2') > -1) {
-    chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
-  } else if (type_new_chart.indexOf('RadarChart3') > -1) {
-    chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
-  } else if (type_new_chart.indexOf('Similarity1plus') > -1) {
-    chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
-  }
-  bindUI_chart(chart, map_elem);
-  map_elem.bindBrushClick(chart);
-  chart.bindMap(map_elem);
-  app.chart = chart;
-  app.map = map_elem;
-  Tooltipsify('[title-tooltip]');
+  bindTopButtons(chart, map_elem); // eslint-disable-line no-use-before-define
 }
 
 /**
@@ -735,18 +736,16 @@ function loadData() {
       ] = results;
       alertify.set('notifier', 'position', 'bottom-left');
       prepareVariablesInfo(metadata_indicateurs);
-      const features_menu = full_dataset.filter(
-        ft => ft.REGIOVIZ === '1'
-      );
-      console.log(features_menu); console.log(full_dataset);
+      const features_menu = full_dataset.filter(ft => ft.REGIOVIZ === '1');
       // eslint-disable-next-line no-param-reassign
       features_menu.forEach((ft) => { ft.name = ft.name.replace(' — ', ' - '); });
       features_menu.sort((a, b) => a.name.localeCompare(b.name));
+      const start_territorial_mesh = 'EPCI';
       const start_region = getRandom(full_dataset
-        .filter(d => d.REGIOVIZ === '1' && +d['EPCI'] === 1).map(d => d.id));
+        .filter(d => d.REGIOVIZ === '1' && +d[start_territorial_mesh] === 1).map(d => d.id));
       const start_variable = 'DENS';
       prepare_dataset(full_dataset, app);
-      setDefaultConfig(start_region, start_variable, 'EPCI');
+      setDefaultConfig(start_region, start_variable, start_territorial_mesh);
       prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
       createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
 
@@ -754,10 +753,9 @@ function loadData() {
       updateMenuStudyZones();
       bindHelpMenu();
       makeTopMenu();
-      handleInputRegioName(features_menu);
       makeHeaderChart();
       makeHeaderMapSection();
-      setDefaultConfigMenu(start_region, start_variable, 'EPCI');
+      setDefaultConfigMenu(start_region, start_variable, start_territorial_mesh);
       filterLevelVar(app);
       const other_layers = new Map();
       [
@@ -770,7 +768,8 @@ function loadData() {
       ].forEach((el) => {
         other_layers.set(el[0], el[1]);
       });
-      const map_elem = new MapSelect(territoires_france, other_layers, styles_map, 'EPCI');
+      const map_elem = new MapSelect(
+        territoires_france, other_layers, styles_map, start_territorial_mesh);
       const chart = new BarChart1(app.current_data);
       bindUI_chart(chart, map_elem);
       map_elem.bindBrushClick(chart);

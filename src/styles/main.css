@@ -143,10 +143,13 @@ svg {
 
 .cont_svg {
   clear: both;
-  width: 98%;
+  width: 100%;
   height: 0;
   padding-top: 48%;
   position: relative;
+}
+.zoomed > .clgd {
+  width: 82.5%;
 }
 /* End of styles for svg elements and svg container elements */
 
@@ -393,6 +396,18 @@ span.minibutton {
 span.i_regio {
   cursor: pointer;
 }
+
+#button_hide_menu > button {
+  position: absolute;
+  /* margin: 0em 0.4em;
+  padding: 0.5em 0.5em; */
+  color: #4f81bd;
+  font-size: 1.25em;
+  cursor: pointer;
+  outline: 0;
+  border: none;
+  background: transparent;
+}
 /* End on styles for left menu */
 
 /* Styles for top menu */
@@ -487,6 +502,7 @@ span.i_regio {
     background: linear-gradient(to bottom, #7ccaff, #4c7cb5);
     color: #ffffff;
     text-decoration: none;
+    outline: 0;
 }
 .button_blue:active, .button_blue.pressed {
     background: #3f6797;
@@ -519,6 +535,7 @@ span.i_regio {
     background: linear-gradient(to bottom, #ff7abd, #b54a65);
     color: #ffffff;
     text-decoration: none;
+    outline: 0;
 }
 .button_red:active, .button_red.pressed {
     background: #973f55;
@@ -789,6 +806,9 @@ tr {
 .t1 {
   width:25%;
   float: left;
+  transition: 0.3s;
+  visibility: visible;
+  transform: scaleX(1);
 }
 .t2 {
   width:39%;
@@ -796,13 +816,17 @@ tr {
   height:100%;
   padding-left: 1% !important;
  }
-
+.t2.zoomed {
+ width:46.8%;
+}
 .t3 {
   width:31%;
   float:right;
   height:100%;
 }
-
+.t3.zoomed {
+  width: 37.2%;
+}
 .t1, .t2, .t3 {
   padding-left: 0.5%;
   padding-right: 0.5%;

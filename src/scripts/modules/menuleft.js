@@ -1,8 +1,97 @@
-import { removeDuplicates } from './helpers';
+import { removeDuplicates, toggleVisibilityLeftMenu } from './helpers';
 import { app } from './../main';
 
 
-const createMenu = function createMenu(names, variables, study_zones, territorial_mesh) {
+const handleInputRegioName = (allowed_names) => {
+  const ids_names = {};
+  allowed_names.forEach((ft) => { ids_names[ft.name.toLowerCase()] = ft.id; });
+  const names = allowed_names.map(d => d.name.toUpperCase());
+  const names2 = names.map(d => d.toLowerCase());
+
+  document.getElementById('search').onblur = function () {
+    if (!ids_names[this.value.toLowerCase()]) {
+      document.getElementById('autocomplete').value = app.current_config.my_region_pretty_name;
+      this.value = app.current_config.my_region_pretty_name;
+    }
+    document.getElementById('list_regio').classList.add('hidden');
+  };
+
+  document.getElementById('search').onkeyup = function (ev) {
+    const value = this.value;
+    if (!value || value === '') {
+      // document.getElementById('autocomplete').value = app.current_config.my_region_pretty_name;
+      // this.value = app.current_config.my_region_pretty_name;
+      return;
+    }
+    document.getElementById('list_regio').classList.remove('hidden');
+    const new_value = value.toLowerCase();
+    document.getElementById('autocomplete').value = '';
+    for (let i = 0; i < names2.length; i++) {
+      if (names2[i].lastIndexOf(new_value, 0) === 0) {
+        if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
+          const t = value + names2[i].substr(new_value.length, names2[i].length);
+          document.getElementById('search').value = t;
+          document.getElementById('autocomplete').value = t;
+        }
+        const str_after = names2[i].substr(new_value.length, names2[i].length);
+        const new_str = value + str_after;
+        document.getElementById('autocomplete').value = new_str;
+        // if (ev && ev.key === 'Tab') {
+        //   document.querySelector('#search').value = names2[i];
+        //   document.querySelector('#autocomplete').value = names2[i];
+        //   return;
+        // }
+        // const str_after = names2[i].substr(new_value.length, names2[i].length);
+        // const new_str = value + str_after;
+        // document.getElementById('autocomplete').value = new_str;
+        // return;
+      }
+    }
+    const a = document.getElementById('autocomplete').value;
+    const b = document.getElementById('search').value;
+    const code = ids_names[a.toLowerCase()];
+    if (a === b && code) {
+      Array.prototype.slice.call(document.querySelectorAll(`.target_region.square[value="r_${code}"]`))
+        .find(d => +d.__data__[app.current_config.current_level] === 1)
+        .click();
+    }
+  };
+};
+
+const makeButtonMenuLeft = () => {
+  const s = document.createElement('button');
+  const d = document.createElement('div');
+  s.innerHTML = '◀';
+  s.onclick = toggleVisibilityLeftMenu;
+  d.id = 'button_hide_menu';
+  d.style.float = 'left';
+  d.style.cursor = 'pointer';
+  d.style.position = 'absolute';
+  d.style.padding = '0.9em';
+  d.style.margin = '0 0.2em';
+  d.title = 'Cacher le menu';
+  d.appendChild(s);
+  document.getElementById('menutop').appendChild(d);
+  d.onclick = s.click;
+};
+
+export default function createMenu(names, variables, study_zones, territorial_mesh) {
+  // Fourth section:
+  const title_section4 = document.createElement('p');
+  title_section4.className = 'title_menu';
+  title_section4.innerHTML = 'Maillage territorial';
+  const section4 = document.createElement('div');
+  section4.id = 'menu_territ_level';
+  section4.className = 'box';
+  section4.style.overflow = 'auto';
+  section4.style.maxHeight = '20%';
+  for (let i = 0, len_i = territorial_mesh.length; i < len_i; i++) {
+    const entry = document.createElement('p');
+    const territ_level = territorial_mesh[i];
+    entry.innerHTML = `<span value="${territ_level.id}" class='territ_level square'></span><span class="label_chk">${territ_level.name}</span><span class="i_info">i</span>`;
+    section4.appendChild(entry);
+  }
+
   const title_section1 = document.createElement('div');
   title_section1.style.backgroundColor = '#4f81bd';
   title_section1.style.color = 'white';
@@ -27,10 +116,10 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
     .enter()
     .append('p')
     .attr('class', 'regioname')
-    .style('display', d => +d[app.current_config.current_level] === 1 ? null : 'none')
+    .style('display', d => (+d[app.current_config.current_level] === 1 ? null : 'none'))
     .html(d => `
 <span value="r_${d.id}" class='target_region square'></span><span style="margin-right:5px;" class="label_chk">${d.name}</span>`)
-    .on('mouseover', function() {
+    .on('mouseover', function () {
       d3.select(this).selectAll('span.minibutton').style('display', null);
     })
     .on('mouseout', function () {
@@ -88,7 +177,7 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
     const entry = document.createElement('p');
     entry.setAttribute('filter-value', zone.id);
     if (zone.id === 'DEFAULT') {
-      entry.innerHTML = '<span display_level="" class="filter_v square"></span><span class="label_chk">UE28</span><span class="i_info">i</span>';
+      entry.innerHTML = `<span display_level="" class="filter_v square"></span><span class="label_chk">${zone.name}</span><span class="i_info">i</span>`;
     } else if (zone.id === 'SPAT') {
       entry.innerHTML = '<span display_level="" class="filter_v square"></span><span class="label_chk">Région dans un rayon de </span><input value="450" disabled="disabled" style="width: 55px; height: 13px;" type="number" min="0" max="100000" id="dist_filter"></input><span> km</span><span class="i_info">i</span>';
     } else {
@@ -96,27 +185,8 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
     }
     section3.appendChild(entry);
   }
-  // Fourth section:
-  const title_section4 = document.createElement('p');
-  title_section4.className = 'title_menu';
-  title_section4.innerHTML = 'Maillage territorial';
-  const section4 = document.createElement('div');
-  section4.id = 'menu_territ_level';
-  section4.className = 'box';
-  section4.style.overflow = 'auto';
-  section4.style.maxHeight = '20%';
-  for (let i = 0, len_i = territorial_mesh.length; i < len_i; i++) {
-    const entry = document.createElement('p');
-    const territ_level = territorial_mesh[i];
-    entry.innerHTML = `<span value="${territ_level.id}" class='territ_level square'></span><span class="label_chk">${territ_level.name}</span><span class="i_info">i</span>`;
-    section4.appendChild(entry);
-  }
 
   const section5 = document.createElement('div');
-  section4.id = 'menu_territ_level';
-  section4.className = 'box';
-  section4.style.overflow = 'auto';
-  section4.style.maxHeight = '20%';
   const img2 = document.createElement('img');
   img2.className = 'img_scale_logo';
   img2.src = 'img/Marianne_CGET_RVB.png';
@@ -171,69 +241,15 @@ const createMenu = function createMenu(names, variables, study_zones, territoria
   const menu = document.getElementById('menu');
   menu.id = 'menu';
   menu.style.float = 'left';
+  menu.appendChild(title_section4);
+  menu.appendChild(section4);
   menu.appendChild(title_section1);
   menu.appendChild(section1);
   menu.appendChild(title_section2);
   menu.appendChild(section2);
   menu.appendChild(title_section3);
   menu.appendChild(section3);
-  menu.appendChild(title_section4);
-  menu.appendChild(section4);
   menu.appendChild(section5);
-  // handleInputRegioName(names);
-};
-
-const handleInputRegioName = (allowed_names) => {
-  const ids_names = {};
-  allowed_names.forEach((ft) => { ids_names[ft.name.toLowerCase()] = ft.id; });
-  const names = allowed_names.map(d => d.name.toUpperCase());
-  const names2 = names.map(d => d.toLowerCase());
-
-  document.getElementById('search').onblur = function () {
-    if (!ids_names[this.value.toLowerCase()]) {
-      document.getElementById('autocomplete').value = app.current_config.my_region_pretty_name;
-      this.value = app.current_config.my_region_pretty_name;
-    }
-    document.getElementById('list_regio').classList.add('hidden');
-  };
-
-  document.getElementById('search').onkeyup = function (ev) {
-    const value = this.value;
-    if (!value || value === '') {
-      // document.getElementById('autocomplete').value = app.current_config.my_region_pretty_name;
-      // this.value = app.current_config.my_region_pretty_name;
-      return;
-    }
-    document.getElementById('list_regio').classList.remove('hidden');
-    const new_value = value.toLowerCase();
-    document.getElementById('autocomplete').value = '';
-    for (let i = 0; i < names2.length; i++) {
-      if (names2[i].lastIndexOf(new_value, 0) === 0) {
-        if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
-          const t = value + names2[i].substr(new_value.length, names2[i].length);
-          document.getElementById('search').value = t;
-          document.getElementById('autocomplete').value = t;
-        }
-        const str_after = names2[i].substr(new_value.length, names2[i].length);
-        const new_str = value + str_after;
-        document.getElementById('autocomplete').value = new_str;
-        // if (ev && ev.key === 'Tab') {
-        //   document.querySelector('#search').value = names2[i];
-        //   document.querySelector('#autocomplete').value = names2[i];
-        //   return;
-        // }
-        // const str_after = names2[i].substr(new_value.length, names2[i].length);
-        // const new_str = value + str_after;
-        // document.getElementById('autocomplete').value = new_str;
-        // return;
-      }
-    }
-    const a = document.getElementById('autocomplete').value;
-    const b = document.getElementById('search').value;
-    const code = ids_names[a.toLowerCase()];
-    if (a === b && code) {
-      document.querySelector(`.target_region.square[value="${code}"]`).click();
-    }
-  };
-};
-export { createMenu, handleInputRegioName };
+  handleInputRegioName(names);
+  makeButtonMenuLeft();
+}

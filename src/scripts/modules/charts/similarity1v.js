@@ -213,6 +213,8 @@ export default class Similarity1plus {
     if (nb > 0) {
       this.data.forEach((ft) => {
         // eslint-disable-next-line no-param-reassign
+        ft.dist2 = this.data.length - this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
+        // eslint-disable-next-line no-param-reassign
         ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`)
           .map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
       });
@@ -612,25 +614,33 @@ export default class Similarity1plus {
       setTimeout(() => { this.makeTooltips(); }, 200);
     } else if (self.type === 'global') {
       this.draw_group.attr('clip-path', null);
-      data.sort((a, b) => a.dist - b.dist);
-      const values = data.map(ft => ft.dist);
+      data.sort((a, b) => a.dist2 - b.dist2);
+      const values = data.map(ft => ft.dist2);
       const _values = values.slice().splice(2);
       const num_name = app.current_config.pop_field;
       self.makeClassifColors(_values);
       const size_func = self.proportionnal_symbols
         ? new PropSizer(d3.max(data, d => +d[num_name]), 30).scale
-        : () => data.length < 400 ? 4.5 : data.length < 800 ? 3 : 2;
+        : () => (data.length < 400 ? 4.5 : data.length < 800 ? 3 : 2);
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
       this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
       const xAxis = d3.axisBottom(this.x).ticks(10, '');
 
       const simulation = d3.forceSimulation(data)
-        .force('x', d3.forceX(d => this.x(d.dist)).strength(9))
+        .force('x', d3.forceX(d => this.x(d.dist2)).strength(9))
         .force('y', d3.forceY(height / 2).strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)))
         .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
         .stop();
 
-      for (let i = 0; i < 125; ++i) {
+      let _vt;
+      if (values.length <= 125) {
+        _vt = 125;
+      } else if (values.length > 125 && values.length < 1000) {
+        _vt = values.length;
+      } else {
+        _vt = 1100;
+      }
+      for (let i = 0; i < _vt; ++i) {
         simulation.tick();
       }
 
@@ -762,7 +772,7 @@ export default class Similarity1plus {
         self.appendOverlayRect();
       }, 200);
     }
-    this.data.sort((a, b) => a.dist - b.dist);
+    this.data.sort((a, b) => a.dist2 - b.dist2);
   }
   /* eslint-enable no-loop-func */
 
@@ -809,11 +819,11 @@ export default class Similarity1plus {
         app.colors[app.current_config.my_region] = color_highlight;
       } else if (i === 1) {
         app.colors[ft.id] = color_default_dissim;
-      } else if (ft.dist < q1) {
+      } else if (ft.dist2 < q1) {
         app.colors[ft.id] = color_q1;
-      } else if (ft.dist < q2) {
+      } else if (ft.dist2 < q2) {
         app.colors[ft.id] = color_q2;
-      } else if (ft.dist < q3) {
+      } else if (ft.dist2 < q3) {
         app.colors[ft.id] = color_q3;
       } else {
         app.colors[ft.id] = color_q4;
@@ -997,10 +1007,10 @@ export default class Similarity1plus {
           if (+globalrank === 0) {
             content.push('<b>Ma région</b>');
           } else if (+globalrank === 1) {
-            content.push(`Indice de similarité : ${formatNumber(d.data.dist, 2)}`);
+            content.push(`Indice de similarité : ${formatNumber(d.data.dist2, 2)}`);
             content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
-            content.push(`Indice de similarité : ${formatNumber(d.data.dist, 2)}`);
+            content.push(`Indice de similarité : ${formatNumber(d.data.dist2, 2)}`);
             content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
@@ -1230,11 +1240,12 @@ export default class Similarity1plus {
     });
     this.current_ids = this.data.map(d => d.id);
     this.data.forEach((ft) => {
+      ft.dist2 = this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
       // eslint-disable-next-line no-param-reassign, no-restricted-properties
       ft.dist = math_sqrt(this.ratios.map(_v => `dist_${_v}`)
         .map(_v => math_pow(ft[_v], 2)).reduce((a, b) => a + b));
     });
-    this.data.sort((a, b) => a.dist - b.dist);
+    this.data.sort((a, b) => a.dist2 - b.dist2);
     // eslint-disable-next-line no-param-reassign
     this.data.forEach((el, i) => { el.globalrank = i; });
 

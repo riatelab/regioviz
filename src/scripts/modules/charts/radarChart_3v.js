@@ -378,7 +378,7 @@ export default class RadarChart3 {
     const blobWrapper = this.g
       .insert('g', '.radarCircleWrapper')
       .attrs({
-        id: elem.name.indexOf(' ') > -1 ? 'ctx' : elem.name,
+        id: elem.name.indexOf(' ') > -1 ? 'ctx' : `rdc_${elem.name}`,
         class: 'radarWrapper',
       });
 
@@ -748,8 +748,8 @@ export default class RadarChart3 {
           return;
         }
         app.colors[id] = null;
-        self.g.selectAll(`#${id}.radarWrapper`).remove();
-        self.g.selectAll(`#${id}.radarCircleWrapper`).remove();
+        self.g.selectAll(`#rd_${id}.radarWrapper`).remove();
+        self.g.selectAll(`#rdc_${id}.radarCircleWrapper`).remove();
         const ix = self.data.map((_d, i) => [i, _d.name === id]).find(_d => _d[1] === true)[0];
         self.data.splice(ix, 1);
         self.displayed_ids = self.data.map(_d => _d.name);
@@ -769,7 +769,7 @@ export default class RadarChart3 {
       .data(this.data, d => d.name)
       .enter()
       .append('g')
-      .attr('id', d => (d.name.indexOf(' ') > -1 ? 'ctx' : d.name))
+      .attr('id', d => (d.name.indexOf(' ') > -1 ? 'ctx' : `rd_${d.name}`))
       .attr('class', 'radarWrapper');
 
     // Append the backgrounds
@@ -838,7 +838,7 @@ export default class RadarChart3 {
       .enter()
       .append('g')
       .attrs(d => ({
-        id: (d.name.indexOf(' ') > -1 ? 'ctx' : d.name),
+        id: (d.name.indexOf(' ') > -1 ? 'ctx' : `rdc_${d.name}`),
         class: 'radarCircleWrapper',
       }));
 
@@ -1075,8 +1075,8 @@ export default class RadarChart3 {
       this.update();
     } else {
       app.colors[id] = null;
-      this.g.selectAll(`#${id}.radarWrapper`).remove();
-      this.g.selectAll(`#${id}.radarCircleWrapper`).remove();
+      this.g.selectAll(`#rd_${id}.radarWrapper`).remove();
+      this.g.selectAll(`#rdc_${id}.radarCircleWrapper`).remove();
       const ix = this.data.map((_d, i) => [i, _d.name === id]).find(_d => _d[1] === true)[0];
       this.data.splice(ix, 1);
       this.displayed_ids = this.data.map(_d => _d.name);
