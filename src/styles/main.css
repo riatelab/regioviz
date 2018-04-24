@@ -1106,7 +1106,7 @@ span.arrow_right:before {
 h3 {
   color: #4f81bd;
 }
-
+/* Style for variable selection on bar chart */
 .title_variable {
   margin-left: 1.5em;
   font-size: 0.9em;
@@ -1119,7 +1119,9 @@ h3 {
 .title_variable.inversed {
   color: red;
 }
+/* End of style for variable selection on bar chart */
 
+/* Styles for help modal box */
 .tingle-modal {
   z-index: 2000 !important;
 }
@@ -1128,8 +1130,7 @@ h3 {
   font-size: 0.8em;
   font-family: 'Poppins', sans-serif;
 }
-
-
+/* End of styles for help modal box */
 
 /* Styles for beeswarm chart / similarity with global distance */
 .axis-top-v path, .axis-top-v line {

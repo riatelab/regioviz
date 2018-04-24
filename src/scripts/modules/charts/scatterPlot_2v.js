@@ -727,7 +727,7 @@ export default class ScatterPlot2 {
     const num_name = app.current_config.pop_field;
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(data, d => d[num_name]), 40).scale
-      : () => 5;
+      : () => 4;
     // const _trans = dots.transition().duration(100);
     const transform = d3.zoomIdentity;
     transform.k = 1;
@@ -910,7 +910,7 @@ export default class ScatterPlot2 {
     const num_name = app.current_config.pop_field;
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
-      : () => 5;
+      : () => 4;
     // const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
     trans.attrs(d => ({
       transform: transform,
