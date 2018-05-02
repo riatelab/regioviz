@@ -54,7 +54,7 @@ export const app = {
   custom_studyzones: {},
 };
 
-function setDefaultConfig(code = '249100546', variable = 'DENS', level = 'EPCI') { // }, level = 'NUTS1') {
+function setDefaultConfig(code = '249100546', variable = 'MED', level = 'EPCI') { // }, level = 'NUTS1') {
   const var_info = variables_info.find(ft => ft.id === variable);
   app.current_config = {
     // The name of the field of the dataset containing the ID of each feature:
@@ -62,7 +62,7 @@ function setDefaultConfig(code = '249100546', variable = 'DENS', level = 'EPCI')
     // The name of the field of the dataset containing the name of each feature:
     name_field: 'name',
     // The name of the field of the dataset containing the population of each feature:
-    pop_field: 'POP',
+    pop_field: 'P14_POP',
     // The name of the field of the geojson layer containing the ID of each feature
     // (these values should match with the values of the "id_field" in the
     // tabular dataset)
@@ -141,7 +141,7 @@ function updateAvailableRatios(my_region) {
 }
 
 
-function setDefaultConfigMenu(code = '249100546', variable = 'DENS', level = 'EPCI') {
+function setDefaultConfigMenu(code = '249100546', variable = 'MED', level = 'EPCI') {
   document.querySelector(`.target_region.square[value="r_${code}"]`).classList.add('checked');
   document.querySelector(`.target_variable.small_square[value="${variable}"]`).classList.add('checked');
   document.querySelector('p[filter-value="DEFAULT"] > .filter_v.square').classList.add('checked');
@@ -743,7 +743,7 @@ function loadData() {
       const start_territorial_mesh = 'EPCI';
       const start_region = getRandom(full_dataset
         .filter(d => d.REGIOVIZ === '1' && +d[start_territorial_mesh] === 1).map(d => d.id));
-      const start_variable = 'DENS';
+      const start_variable = 'MED';
       prepare_dataset(full_dataset, app);
       setDefaultConfig(start_region, start_variable, start_territorial_mesh);
       prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
@@ -755,6 +755,7 @@ function loadData() {
       makeTopMenu();
       makeHeaderChart();
       makeHeaderMapSection();
+      console.log(start_region, start_variable, start_territorial_mesh);
       setDefaultConfigMenu(start_region, start_variable, start_territorial_mesh);
       filterLevelVar(app);
       const other_layers = new Map();

@@ -1,23 +1,220 @@
 id,Regioviz_item,Theme,Name,Unit,id1,id2,Formula,Year,Data_source,Last_update,Methodology,Methodology.1,URL
 REGIOVIZ,Regions,,,,,,,,,,Sélection de la région sur laquelle porte l'analyse,,
-DENS,Indicateur,Structures démographiques,Densité de population,Habitants par km²,POP,AREA,id1/id2*100,2015.0,GEOFLA,2018-04-05,"Le revenu disponible équivalent correspond au revenu total d?un ménage, après impôt et autres d’éductions, disponible en vue d?être dépensé ou épargné, divisé par le nombre de membres du ménage converti en équivalents adultes. L’?équivalence entre les membres du ménage est obtenue par pondération en fonction de l’?âge, à partir de l?’échelle d’?équivalence « modifiée » de l’?OCDE.
+MED,Indicateur,Chômage / niveau de vie,Revenu médian,Années,P14_MEDMEN,P14_NBMENFISC,id1/id2,2014,"INSEE - Filosofi
+(Table base-cc-filosofi-2014)",2017-12-15,,"Le revenu disponible est le revenu à la disposition du ménage pour consommer et épargner. Il comprend le revenu déclaré (revenus d'activité, indemnités de chômage, retraites et pensions et certains revenus du patrimoine), les revenus financiers non soumis à déclaration imputés par l’Insee
+(livrets exonérés, livrets jeunes, PEA, LEP, CEL, PEL, produits d'assurance vie), les prestations sociales reçues (prestations familiales, minima sociaux et allocations logement) et la prime pour l’emploi. Au total de ces ressources, on déduit les impôts directs : impôt sur le revenu, taxe d'habitation, contribution sociale généralisée (CSG), contribution au remboursement de la dette sociale (CRDS) et autres prélèvements sociaux sur les revenus du patrimoine. La taxe foncière n’est
+pas prise en compte dans le calcul du revenu disponible.  Si on ordonne la distribution des revenus, la médiane est la valeur qui partage cette distribution en deux parties égales. Ainsi, pour une distribution de revenus, la médiane est le salaire au-dessous duquel se situent 50 % des revenus. C'est de manière équivalente le salaire au-dessus duquel se situent 50 % des revenus.
+
+NB - Pour les bassins de vie, les données correspondent à 2010 et non 2014. ",https://www.insee.fr/fr/statistiques/3126432
+TPAUV,Indicateur,Chômage / niveau de vie,Taux de pauvreté,%,P14_TPMEN,P14_NBMENFISC,id1/id2,2014,"INSEE - Filosofi
+(Table base-cc-filosofi-2014)",2017-12-15,,"Le taux de pauvreté correspond à la proportion d'individus (ou de ménages) dont le niveau de vie est inférieur pour une année donnée à un seuil, dénommé seuil de pauvreté (exprimé en euros). L'Insee, comme Eurostat et les autres pays européens, mesure la pauvreté monétaire de manière relative alors que d'autres pays (comme les États-Unis ou l'Australie) ont une approche absolue. Dans l'approche en termes relatifs, le seuil de pauvreté est déterminé par rapport à la distribution des niveaux de vie de l'ensemble de la population. On privilégie en Europe le seuil de 60 % du niveau de vie médian.
+
+NB - Pour les bassins de vie, les données correspondent à 2010 et non 2014. ",https://www.insee.fr/fr/statistiques/3126432
+CHOM1564,Indicateur,Chômage / niveau de vie,Taux de chômage (15-64 ans),%,P14_CHOM1564,P14_ACT1564,id1/id2*100,2014,,2017-06-29,"Le revenu disponible équivalent correspond au revenu total d?un ménage, après impôt et autres d’éductions, disponible en vue d?être dépensé ou épargné, divisé par le nombre de membres du ménage converti en équivalents adultes. L’?équivalence entre les membres du ménage est obtenue par pondération en fonction de l’?âge, à partir de l?’échelle d’?équivalence « modifiée » de l’?OCDE.
 Le revenu disponible équivalent est calculé en trois étapes.
 1. D?abord, tous les revenus monétaires perçus par chaque membre du ménage, peu importe leur origine, sont additionnés. Il s?agit des revenus du travail et des placements et des prestations sociales, auxquels s’?ajoute tout autre revenu perçu par le ménage, tous nets d?’impôts et de cotisations sociales.
 2. Ensuite, afin de prendre en compte les différences de taille et de composition des ménages, le revenu total (net) du ménage est divisé par le nombre d’?équivalents adultes au moyen d?’une échelle standard: l?’échelle modifiée de l?OCDE. Cette échelle assigne une pondération à tous les membres du ménage (dont l?’addition constitue la taille équivalente du ménage): 1 au premier adulte; 0,5 à chaque membre âgé de 14 ans et plus et 0,3 aux enfants de moins de 14 ans.
 3. Enfin, le chiffre obtenu, appelé « revenu disponible équivalent », est distribué à parts égales entre chaque membre du ménage.
-Aux fins des indicateurs de pauvreté, le revenu disponible équivalent est calculé à partir du revenu disponible total de chaque ménage divisé par la taille équivalente du ménage. La période de référence pour le revenu est une période fixe de 12 mois (année calendrier ou exercice fiscal précédent, par exemple). C?’est le cas pour tous les pays sauf pour le Royaume-Uni, qui prend comme période de référence l’?année en cours, et l?’Irlande, qui effectue cette enquête en continu à partir du revenu des douze mois écoulés."," Chiffre de population sans doubles comptes au dernier recensement, en nombre d'habitants. Pour Mayotte, ce chiffre provient du recensement de 1997.",
-ratio1,Indicateur,Catégorie test,Ratio number one,Euros par habitant,STOCK2,STOCK1,id1/id2*101,2018.0,RANDOM,2018-04-05,,Methodology,
-ratio2,Indicateur,Catégorie test,Ratio number two,Euros par km²,STOCK3,STOCK4,id1/id2*101,2018.0,RANDOM,2018-04-05,,Methodology,
-STOCK1,Stock,,A,A,,,,2015.0,RANDOM,2018-04-05,,,
-STOCK2,Stock,,A,A,,,,2015.0,RANDOM,2018-04-05,,,
-STOCK3,Stock,,A,A,,,,2015.0,RANDOM,2018-04-05,,,
-STOCK4,Stock,,A,A,,,,2015.0,RANDOM,2018-04-05,,,
-POP,Stock,,Population totale,Personnes,,,,2015.0,GEOFLA,2018-04-05,,,
-AREA,Stock,,Superficie,Hectares,,,,2015.0,GEOGLA,2018-04-05,,,
+Aux fins des indicateurs de pauvreté, le revenu disponible équivalent est calculé à partir du revenu disponible total de chaque ménage divisé par la taille équivalente du ménage. La période de référence pour le revenu est une période fixe de 12 mois (année calendrier ou exercice fiscal précédent, par exemple). C?’est le cas pour tous les pays sauf pour le Royaume-Uni, qui prend comme période de référence l’?année en cours, et l?’Irlande, qui effectue cette enquête en continu à partir du revenu des douze mois écoulés.",,https://www.insee.fr/fr/statistiques/2862207#consulter
+CHOM1524,Indicateur,Chômage / niveau de vie,Taux de chômage (15-24 ans),%,P14_CHOM1524,P14_ACT1524,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-emploi-pop-act-2014)",2017-06-29,,"Le taux de chômage de 15 à 24 ans est le pourcentage de chômeurs dans la population active de 15 à 24 ans (actifs occupés + chômeurs).
+Les chômeurs au sens du recensement de la population sont les personnes  qui se sont déclarées chômeurs (inscrits ou non à Pôle Emploi) sauf si elles ont, en outre, déclaré explicitement ne pas rechercher de travail ; et d’autre part les personnes qui ne se sont déclarées spontanément ni en emploi, ni en chômage, mais qui ont néanmoins déclaré rechercher un emploi. 
+Un chômeur au sens du recensement n'est pas forcément un chômeur au sens du BIT (et inversement).
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862207#consulter
+CHOM5564,Indicateur,Chômage / niveau de vie,Taux de chômage (55-64 ans),%,P14_CHOM5564,P14_ACT5564,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-emploi-pop-act-2014)",2017-06-29,,"Le taux de chômage de 55 à 64 ans est le pourcentage de chômeurs dans la population active de 55 à 64 ans (actifs occupés + chômeurs).
+Les chômeurs au sens du recensement de la population sont les personnes  qui se sont déclarées chômeurs (inscrits ou non à Pôle Emploi) sauf si elles ont, en outre, déclaré explicitement ne pas rechercher de travail ; et d’autre part les personnes qui ne se sont déclarées spontanément ni en emploi, ni en chômage, mais qui ont néanmoins déclaré rechercher un emploi. 
+Un chômeur au sens du recensement n'est pas forcément un chômeur au sens du BIT (et inversement).
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862207#consulter
+CHOMFEM,Indicateur,Chômage / niveau de vie,Chômage - inégalité femmes / hommes,Indice 100,P14_FCHOM1564,P14_HCHOM1564,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-emploi-pop-act-2014)",2017-06-29,,"Chômage des femmes / chômage des hommes * 100. Un indice supérieur à 100 signifie que le nombre de personnes au chômage de sexe féminin est plus important que le nombre de personnes au chômage de sexe masculin. 
+Les chômeurs au sens du recensement de la population sont les personnes  qui se sont déclarées chômeurs (inscrits ou non à Pôle Emploi) sauf si elles ont, en outre, déclaré explicitement ne pas rechercher de travail ; et d’autre part les personnes qui ne se sont déclarées spontanément ni en emploi, ni en chômage, mais qui ont néanmoins déclaré rechercher un emploi. 
+Un chômeur au sens du recensement n'est pas forcément un chômeur au sens du BIT (et inversement).
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862207#consulter
+EMP1564,Indicateur,Structure de l'emploi,Taux d'emploi (15-64 ans) ,%,P14_ACTOCC1564,P14_POP1564,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-emploi-pop-act-2014)",2017-06-29,,"Le taux d'emploi des 15-64 ans est calculé en rapportant le nombre d'individus âgés de 15 à 64 ans ayant un emploi au nombre total d'individus âgés de 15 à 64 ans. 
+Les personnes employées au sens du recensement de la population sont celles ayant déclaré avoir un emploi dans le formulaire du recensement. Cet emploi est comptabilisé ici dans la commune de résidence.
+Cette notion est différente de celle de l'emploi au sens du BIT qui concerne toutes les personnes ayant travaillé pendant une durée quelconque, ne serait-ce qu'une heure, au cours d'une semaine donnée (appelée semaine de référence).
+La notion d'emploi au sens du recensement est donc plutôt restrictive par rapport à celle au sens du BIT. Certaines personnes peuvent, en effet, ne pas considérer que des emplois occasionnels méritent déclaration au recensement. Néanmoins, certaines activités, principalement bénévoles, peuvent être déclarées au recensement de la population.
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862207#consulter
+EVOLEMP,Indicateur,Structure de l'emploi,Evolution de l'emploi,%,P14_EMPLT,P09_EMPLT,id1/id2*100,2009-2014,"INSEE - RP
+(Table base_cc_comparateur_20171012)",2017-10-12,,"L'indice d'évolution de population correspond au rapport entre la population en 2009 et en 2014 (2009=100, signifiant qu'un indice inférieur à 100 représente une diminution de l'emploi). 
+
+Le lieu de travail est la zone géographique où une personne exerce son activité professionnelle. Certaines personnes exerçant des professions bien déterminées telles que ""chauffeur-routier"", ""chauffeur de taxi"", ""VRP"", ""commerçant ambulant"" ou ""marin pêcheur"" les amenant à se déplacer plus ou moins fréquemment pour leur travail sont, par convention, considérées comme travaillant dans leur commune de résidence.
+
+Les recensements populations 2009 et 2014 étant  associées à deux géographies communales (à partir desquelles les données ont été agrégées). certaines communes peuvent donc être non renseignées (celles qui ont fusionné ou se sont scindées sur la période 2011-2017). 
+",https://www.insee.fr/fr/statistiques/2861854
+TP,Indicateur,Structure de l'emploi,Emploi à temps partiel,%,P14_ACTOCC15P_TP,P14_ACTOCC15P,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-carac-emploi-2014)",2017-06-29,,"L'indicateur d'emploi à temps partiel correspond à la part de la population active occupée de 15 ans et plus disposant d'un emploi à temps partiel. 
+
+Un temps partiel est un temps de travail inférieur à la durée légale du travail ou à la durée conventionnelle si celle-ci est inférieure. Il doit obligatoirement faire l'objet d'un contrat de travail écrit. Le travail à temps partiel peut être mis en place sur l'initiative de l'employeur ou du salarié.
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2861854
+NONCDI,Indicateur,Structure de l'emploi,Emploi précaire,%,P14_SAL15P_NONCDI,P14_SAL15P,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-carac-emploi-2014)",2017-06-29,,"L'indicateur d'emploi précaire correspond à la part des salariés âgés de 15 ans et plus n'étant pas titulaire de la fonction publique ou n'étant pas en contrat à durée indéterminée.
+
+Cela comprend les apprentis sous contrat ; les personnes placées par une agence d'intérim ; les emplois aidés (contrat emploi solidarité, emploi jeune, contrat initiative emploi, contrat de qualification, ...) ; les stagiaires rémunérés (stage d'insertion et de formation à l'emploi, ...) et les contrats à durée déterminée (y compris contrat court, saisonnier, ...). 
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2861854
+EMP_METRO,Indicateur,Structure de l'emploi,Emploi des fonctions métropolitaines,%,EMP14_METRO,ELT14,id1/id2*100,2014,"INSEE - Recensement / exploitation complémentaire
+(Table Analyse_Fonctionnelle_Donnees_communales_2014_Geo2016)",2017-07-12,,"L'indicateur d'emploi des fonctions métropolitaines représente l'emploi dans des fonctions de commerce inter-entreprises, conception-recherche, culture-loisirs, gestion et prestation intellectuelles par rapport à l'emploi total au lieu de travail. ",https://www.insee.fr/fr/statistiques/1893116
+EMP_SERV,Indicateur,Structure de l'emploi,Emploi dans les services à la population,%,EMP14_SERV,ELT14,id1/id2*100,2014,"INSEE - Recensement / exploitation complémentaire
+(Table Analyse_Fonctionnelle_Donnees_communales_2014_Geo2016)",2017-07-12,,"L'indicateur d'emploi des fonctions de service à la population représente l'emploi dans des fonctions de santé-social, éducation-formation, administration publique, distribution et services de proximité par rapport à l'emploi total au lieu de travail. ",https://www.insee.fr/fr/statistiques/1893116
+EMP_PROD,Indicateur,Structure de l'emploi,Empoi dans les fonctions de production concrète,%,EMP14_PROD,ELT14,id1/id2*100,2014,"INSEE - Recensement / exploitation complémentaire
+(Table Analyse_Fonctionnelle_Donnees_communales_2014_Geo2016)",2017-07-12,,"L'indicateur d'emploi des fonctions productives représente l'emploi dans des fonctions de l'agriculture, le BTP et la fabrication par rapport à l'emploi total au lieu de travail.",https://www.insee.fr/fr/statistiques/1893116
+NSCOL15P_SUP,Indicateur,Diplômes - formation,Population non scolarisée ayant un haut niveau d'éducation,%,P14_NSCOL15P_SUP,P14_NSCOL15P,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-diplomes-formation-2014)",2017-06-29,,"L'indicateur de la population non scolarisée ayant un haut niveau d'éducation correspond à la part de la population non scolarisée âgée de 15 ans ou plus titulaire d'un diplôme de l'enseignement supérieur (BTS, DUT, Deug, Deust, diplôme de la santé ou du social de niveau bac+2, diplôme équivalent ; Licence, licence professionnelle, maîtrise, diplôme équivalent de niveau bac+3 ou bac+4 ; Master, DEA, DESS, diplôme de grande école de niveau bac+5, doctorat de santé ; Doctorat de recherche (hors santé).
+Les résultats du recensement de la population font référence au diplôme de niveau le plus élevé que les individus ont déclaré posséder. 
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862015
+NSCOL15P_DIPLMIN,Indicateur,Diplômes - formation,Population non scolarisée sans diplôme,%,P14_NSCOL15P_DIPLMIN,P14_NSCOL15P,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-diplomes-formation-2014)",2017-06-29,,"L'indicateur de la population non scolarisée sans diplôme correspond à la part de la population non scolarisée âgée de 15 ans titulaire d'aucun diplôme ou au plus un BEPC, brevet des collèges ou DNB. 
+Les résultats du recensement de la population font référence au diplôme de niveau le plus élevé que les individus ont déclaré posséder. 
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862015
+SCOL1824,Indicateur,Diplômes - formation,Population scolarisée (18-24 ans),%,P14_SCOL1824,P14_POP1824,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-diplomes-formation-2014)",2017-06-29,,"L'indicateur de la population scolarisée âgée de 18 à 24 ans correspond à la part de la population âgée de 18 à 24 ans inscrite dans un établissement d'enseignement. 
+Les résultats du recensement de la population font référence au diplôme de niveau le plus élevé que les individus ont déclaré posséder. 
+
+Est scolarisé tout individu inscrit, au moment de la collecte du recensement, dans un établissement d'enseignement (y compris apprentissage) pour l'année scolaire en cours :
+Les élèves mineurs résidant dans une cité universitaire sont recensés dans le logement de leurs parents.
+Les élèves mineurs vivant en internat sont comptés au lieu de résidence de leurs parents.
+Les élèves ou étudiants majeurs résidant dans une cité universitaire sont comptabilisés dans les communautés de la commune de la cité universitaire.
+Les élèves ou étudiants majeurs vivant en internat (lycée agricole, école militaire, ...) sont recensés au lieu où est situé l’internat.
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862015
+SCOL1117,Indicateur,Diplômes - formation,Population scolarisée (11-17 ans),%,P14_SCOL1117,P14_POPL1117,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-diplomes-formation-2014)",2017-06-29,,"L'indicateur de la population scolarisée âgée de 11 à 17 ans correspond à la part de la population âgée de 11 à 17 ans inscrite dans un établissement d'enseignement. 
+Les résultats du recensement de la population font référence au diplôme de niveau le plus élevé que les individus ont déclaré posséder. 
+
+Est scolarisé tout individu inscrit, au moment de la collecte du recensement, dans un établissement d'enseignement (y compris apprentissage) pour l'année scolaire en cours :
+Les élèves mineurs résidant dans une cité universitaire sont recensés dans le logement de leurs parents.
+Les élèves mineurs vivant en internat sont comptés au lieu de résidence de leurs parents.
+Les élèves ou étudiants majeurs résidant dans une cité universitaire sont comptabilisés dans les communautés de la commune de la cité universitaire.
+Les élèves ou étudiants majeurs vivant en internat (lycée agricole, école militaire, ...) sont recensés au lieu où est situé l’internat.
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862015
+AGEMED,Indicateur,Structures démographiques,Age médian,Années,P14_MED_POP,P14_POP,id1/id2,2014,"UMS RIATE à partir de l'INSEE - RP
+(Table BTX_TD_POP1B_2014)",2017-06-29,,"L'âge médian est l'âge qui divise la population en deux : la moitié étant plus jeune et l’autre moitié plus âgée.
+L'âge médian a été calculé à partir de la pyramide des âges (classes d'âge annuelle) au niveau communal. Les données ont ensuite été réagrégées au niveau supérieur par le bais d'une moyenne pondérée. 
+
+NB - Les données de Mayotte correspondent au recensement de 2012. 
+",https://www.insee.fr/fr/statistiques/2862034
+JEUN,Indicateur,Structures démographiques,Moins de 25 ans,%,P14_POP024,P14_POP,id1/id2*100,2014,"INSEE - RP
+(Table BTX_TD_POP1B_2014)",2017-06-29,,"La part des moins de 25 ans exprime le ratio entre la population âgée de 0 à 24 ans et la population totale.
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862034
+VIEU,Indicateur,Structures démographiques,Plus de 65 ans,%,P14_POP65,P14_POP,id1/id2*100,2014,"INSEE - RP
+(Table BTX_TD_POP1B_2014)",2017-06-29,,"La part des plus de 65 ans exprime le ratio entre la population âgée de 65 ans et plus et la population totale.
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862034
+JEUNACT,Indicateur,Structures démographiques,Ratio 0-24 / 25-64 ans (renouvellement des actifs),%,P14_POP024,P14_POP2564,id1/id2*100,2014,"INSEE - RP
+(Table BTX_TD_POP1B_2014)",2017-06-29,POP_2564,"L'indice de renouvellement des actifs exprime le ratio entre la population âgée de 0 à 24 ans et la population âgée de 25 à 64 ans. Cet indicateur correspond au taux de dépendance des jeunes. Plus cet indice est élevé, plus la part de la population jeune est importante, toute chose égale par rapport à l'importance de la population en âge de travailler. Un indice supérieur à 100 signifie qu'il y a davantage de jeunes que de personnes en âge de travailler, et qu'en conséquence le renouvellement de la population en âge de travailler a davantage de probabilité d'être assuré à l'avenir (hors effets migratoires). 
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862034
+JEUNACT10,Indicateur,Structures démographiques,Ratio 0-24 / 55-64 ans (renouvellement des actifs d'ici 10 ans),%,P14_POP1524,P14_POP5564,id1/id2*100,2014,"INSEE - RP
+(Table BTX_TD_POP1B_2014)",2017-06-29,POP_5564,"L'indice de renouvellement des actifs dans les 10 ans à venir exprime le ratio entre la population âgée de 15 à 24 ans et la population âgée  de 55 à 64 ans. Cet indicateur est inspiré des taux de dépendance. Plus cet indice est élevé, plus la part de la population qui va arriver sur le marché du travail dans les 10 ans à venir est importante, toute chose égale par rapport à l'importance de la population qui va être en âge de partir en retraite. Un indice supérieur à 100 signifie que la population âgée de 15 à 24 ans est supérieure à la population âgée de 55 à 64 ans, et qu'en conséquence la population en âge de travailler a davantage de probabilité d'être renouvelée dans les 10 ans à venir (hors effets migratoires). 
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862034
+VIEUACT,Indicateur,Structures démographiques,Ratio 65 ans et plus / 25-64 ans (pression sur financement des retraites),%,P14_POP65,P14_POP2564,id1/id2*100,2014,"INSEE - RP
+(Table BTX_TD_POP1B_2014)",2017-06-29,POP_2564,"L'indice de pression sur le financement des retraites exprime le ratio entre la population âgée de 65 ans et plus et la population âgée de 25 à 64 ans. Cet indicateur correspond au taux de dépendance des vieux. Plus cet indice est élevé, plus la part de la population âgée est importante, toute chose égale par rapport à l'importance de la population en âge de travailler. Un indice supérieur à 100 signifie qu'il y a davantage de personnes âgées que de personnes en âge de travailler, et qu'en conséquence le financement des retraites a moins de probabilité d'être assuré par la masse des personnes en âge de travailler à l'avenir. 
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862034
+EVOLPOP,Indicateur,Structures démographiques,Evolution de la population,,P14_POP,P09_POP,id1/id2*100,2009-2014,"INSEE - RP
+(Table base_cc_comparateur_20171012)",2017-10-12,,"L'indice d'évolution de population correspond au rapport entre la population en 2009 et en 2014 (2009=100, signifiant qu'un indice inférieur à 100 représente une diminution de la population).
+
+ Les chiffres de population présentés correspondent à l'ensemble des personnes dont la résidence habituelle se situe sur le territoire considéré. La population comprend : la population des résidences principales (ou population des ménages) ; la population des personnes vivant en communautés ; la population des habitations mobiles, les sans-abris et les bateliers rattachés au territoire.
+
+Les recensements populations 2009 et 2014 étant  associées à deux géographies communales (à partir desquelles les données ont été agrégées). certaines communes peuvent donc être non renseignées (celles qui ont fusionné ou se sont scindées sur la période 2011-2017). 
+",https://www.insee.fr/fr/statistiques/2861854
+NPER_PROP,Indicateur,Logement,Propriétaires,%,P14_NPER_RP_PROP,P14_NPER_RP,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-logement-2014)",2017-06-29,,"L'indicateur des propriataires correspond à la part des ménages propriétaires de leur logement. 
+
+Les résidences principales sont les logements occupés de façon habituelle et à titre principal par une ou plusieurs personnes, qui constituent un ménage. Il y a ainsi égalité entre le nombre de résidences principales et le nombre de ménages. Le statut de propriétaire s'applique aux ménages propriétaires, copropriétaires et accédant à la propriété.  
+
+NB - Les données de Mayotte correspondent au recensement de 2012. ",https://www.insee.fr/fr/statistiques/2862034
+PMEN_02,Indicateur,Logement,Ménages ayant récemment emménagé,%,P14_PMEN_ANEM0002,P14_PMEN,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-logement-2014)",2017-06-29,,"L'indicateur des ménages ayant récemment emménagé correspond à la part des ménages ayant emménagé depuis moins de 2 ans. 
+
+L'ancienneté d’emménagement dans le logement correspond au nombre d’années écoulées depuis la date d'emménagement dans le logement. Par exemple, pour les individus enquêtés en 2016 ayant déclaré avoir emménagé en 2016, l'ancienneté d'emménagement est de 0 an ; pour ceux qui ont déclaré 2015, l'ancienneté d'emménagement est de 1 an, etc.
+
+Si tous les occupants présents au moment du recensement ne sont pas arrivés en même temps, la date d'emménagement correspond à celle du premier arrivé. Si cette personne a toujours vécu dans le logement, l'année d'emménagement correspond à son année de naissance. ",https://www.insee.fr/fr/statistiques/2862034
+RSECOCC,Indicateur,Logement,Résidences secondaires,%,P14_RSECOCC,P14_LOG,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-logement-2014)",2017-06-29,,"L'indicateur des résidences secondaires correspond à la part de résidences secondaires et logements occasionnels sur le nombre total de logements.
+
+Les résidences secondaires sont les logements utilisés pour les week-ends, les loisirs ou les vacances, y compris les logements meublés loués (ou à louer) pour des séjours touristiques. Les logements occasionnels sont les logements ou pièces indépendantes utilisés occasionnellement pour des raisons professionnelles (par exemple, un pied-à-terre professionnel d'une personne qui ne rentre qu'en fin de semaine auprès de sa famille). 
+
+Un logement, ou logement ordinaire, est défini du point de vue de son utilisation. C'est un local utilisé pour l'habitation.
+
+NB - Les données de Mayotte correspondent au recensement de 2012.   ",https://www.insee.fr/fr/statistiques/2862034
+LOGVAC,Indicateur,Logement,Logements vacants,%,P14_LOGVAC,P14_LOG,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-logement-2014)",2017-06-29,,"L'indicateur de logements vacants correspond à la part des logements vacants sur le nombre total de logements.
+
+Les logements vacants sont les logements inoccupés se trouvant dans l'un des cas suivants : proposé à la vente, à la location, déjà attribué à un acheteur ou un locataire et en attente d'occupation, en attente de règlement de succession, conservé par un employeur pour un usage futur au profit d'un de ses employés. 
+
+Un logement, ou logement ordinaire, est défini du point de vue de son utilisation. C'est un local utilisé pour l'habitation.
+
+NB - Les données de Mayotte correspondent au recensement de 2012.   ",https://www.insee.fr/fr/statistiques/2862034
+LOCHLMV,Indicateur,Logement,Parc social,%,P14_RP_LOCHLMV,P14_RP,id1/id2*100,2014,"INSEE - RP
+(Table base-cc-logement-2014)",2017-06-29,,"L'indicateur de parc social correspond à la part de HLM loué vide sur le nombre de résidences principales. 
+
+Les logements du secteur social sont les logement appartenant à des organismes HLM (Habitation à loyer modéré) ou à d'autres bailleurs de logements sociaux (par exemple, logements détenus par les sociétés immobilières d'économie mixte- SEM) et qui sont soumis à la législation HLM pour la fixation de leur loyer ;
+les logements en dehors du champ des organismes de HLM mais pratiquant un loyer HLM.",https://www.insee.fr/fr/statistiques/2862034
+P14_CHOM1564,Stock,,Chômeurs 15-64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_ACT1564,Stock,,Actifs 15-64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_CHOM1524,Stock,,Chômeurs 15-24 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_ACT1524,Stock,,Actifs 15-24 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_CHOM5564,Stock,,Chômeurs 55-64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_ACT5564,Stock,,Actifs 55-64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_ACTOCC1564,Stock,,Actifs occupés 15-64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POP1564,Stock,,Nombre de personnes de 15 à 64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_FCHOM1564,Stock,,"Chômeurs 15-24 ans, femmes",Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_HCHOM1564,Stock,,"Chômeurs 15-24 ans, hommes",Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_NSCOL15P_SUP,Stock,,Nombre de personnes non scolarisées de 15 ans ou plus titulaires d'un diplôme de l'enseignement supérieur,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_NSCOL15P,Stock,,Nombre de personnes non scolarisées de 15 ans ou plus,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_NSCOL15P_DIPLMIN,Stock,,"Nombre de personnes non scolarisées de 15 ans ou plus titulaires d'aucun diplôme ou au plus un BEPC, brevet des collèges ou DNB",Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_SCOL1117,Stock,,Nombre de personnes scolarisées de 11 à 17 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_SCOL1824,Stock,,Nombre de personnes scolarisées de 18 à 24 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POPL1117,Stock,,Nombre de personnes de 11 à 17 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POP1824,Stock,,Nombre de personnes de 18 à 24 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POP,Poids,,Population totale,Personnes,,,,2014,INSEE,2017-06-29,,,
+P09_POP,Stock,,Population totale,Personnes,,,,2009,INSEE,2017-10-12,,,
+P14_MED_POP,Stock,,Agé médian multiplié par la population,Nombre d'années vécues,,,,2014,UMS RIATE,2017-06-29,,,
+P14_POP024,Stock,,Nombre de personnes de 0 à 24 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POP65,Stock,,Nombre de personnes de plus de 65 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POP2564,Stock,,Nombre de personnes de 25 à 64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POP1524,Stock,,Nombre de personnes de 15 à 24 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_POP5564,Stock,,Nombre de personnes de 55 à 64 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_NPER_RP_PROP,Stock,,Nombre de personnes des résidences principales occupées par des propriétaires,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_NPER_RP,Stock,,Nombre de personnes des résidences principales,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_PMEN_ANEM0002,Stock,,Nombre de pièces des résidences principales dans lesquelles le ménage a emménagé depuis moins de 2 ans,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_PMEN,Stock,,Population des ménages,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_RSECOCC,Stock,,Nombre de résidences secondaires et logements occasionnels,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_LOG,Stock,,Nombre de logements,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_LOGVAC,Stock,,Nombre de logements vacants,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_RP_LOCHLMV,Stock,,Nombre de résidences principales HLM loué vide,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_RP,Stock,,Nombre de résidences principales,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_ACTOCC15P_TP,Stock,, Nombre de personnes actives occupées de 15 ans ou plus à temps partiel,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_ACTOCC15P,Stock,,Nombre de personnes actives occupées de 15 ans ou plus,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_SAL15P_NONCDI,Stock,,Nombre de personnes salariées de 15 ans ou plus non titulaires de la fonction publique ou d'un contrat à durée indéterminée,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_SAL15P,Stock,,Nombre de personnes salariées de 15 ans ou plus,Personnes,,,,2014,INSEE,2017-06-29,,,
+P14_EMPLT,Stock,,Nombre d'emplois au lieu de travail,Personnes,,,,2014,INSEE,2017-10-12,,,
+P09_EMPLT,Stock,,Nombre d'emplois au lieu de travail,Personnes,,,,2009,INSEE,2017-10-12,,,
+EMP14_METRO,Stock,,Nombre de cadres des fonctions métropolitaines au LIT,Personnes,,,,2014,INSEE,2017-07-12,,,
+EMP14_SERV,Stock,,Nombre d'emploi dans les fonctions de service à la population au LT,Personnes,,,,2014,INSEE,2017-07-12,,,
+EMP14_PROD,Stock,,Nombre d'emploi dans les fonctions de production concrète au LT,Personnes,,,,2014,INSEE,2017-07-12,,,
+ELT14,Stock,,Nombre d'emplois au lieu de travail,Personnes,,,,2014,INSEE,2017-07-12,,,
+P14_MEDMEN,Stock,,Médiane du niveau de vie multiplié par le nombre de ménages fiscaux,euros,,,,2014,INSEE,2017-12-15,,,
+P14_NBMENFISC,Stock,,Nombre de ménages fiscaux,ménages,,,,2014,INSEE,2017-12-15,,,
+P14_TPMEN,Stock,,Taux de pauvreté multiplié par le nombre de ménages fiscaux,ménages,,,,2014,INSEE,2017-12-15,,,
 ZEMP,Territorial division,,Zones d'emploi 2010,,,,ZEMP = 1,,INSEE,2018-04-05,Nomenclature officielle NUTS1 version 2016 : http://ec.europa.eu/eurostat/fr/web/nuts/history,"Une zone d'emploi est un espace géographique à l'intérieur duquel la plupart des actifs résident et travaillent. Effectué conjointement par l'Insee et les services statistiques du Ministère du Travail, le découpage en zones d'emploi constitue une partition du territoire adaptée aux études locales sur l'emploi et son environnement. Les déplacements domicile-travail constituent la variable de base pour la détermination de ce zonage.
 Le découpage des zones d'emploi 1990 respectait nécessairement les limites régionales, et le plus souvent les limites cantonales (et donc a fortiori départementales). Il était recommandé de ne pas créer de zones réunissant moins de 25 000 actifs. Il comportait 364 zones.
 Le groupe de travail du Conseil National de l’Information Statistique (Cnis) sur les « Statistiques et nouvelles tendances de localisation des populations et des activités sur le territoire » a préconisé, dans son rapport de septembre 2009, une actualisation du découpage des zones d’emploi qui prend en compte les données les plus récentes en matière de recensement de la population et de migrations domicile - lieu de travail. Cette actualisation permet de mieux identifier les « marchés locaux du travail ».",
-BV,Territorial division,,Bassin de vie 2012,,,,BV = 1,,INSEE,2018-04-05,La Maille Infra Nationale de Décision combine les niveaux 1 et 2 de la nomenclature territoriale NUTS pour proposer un maillage territorial comparable d'un point de vue statistique et pertinent d'un point de vue de la prise de décision politique. A titre d'exemple pour la France,"Le découpage de la France « en bassins de vie » a été réalisé pour faciliter la compréhension de la structuration du territoire de la France métropolitaine.
+BV,Territorial division,,Bassins de vie 2012,,,,BV = 1,,INSEE,2018-04-05,La Maille Infra Nationale de Décision combine les niveaux 1 et 2 de la nomenclature territoriale NUTS pour proposer un maillage territorial comparable d'un point de vue statistique et pertinent d'un point de vue de la prise de décision politique. A titre d'exemple pour la France,"Le découpage de la France « en bassins de vie » a été réalisé pour faciliter la compréhension de la structuration du territoire de la France métropolitaine.
 Le bassin de vie est le plus petit territoire sur lequel les habitants ont accès aux équipements et services les plus courants.
 
 Les services et équipements de la vie courante servant à définir les bassins de vie sont classés en 6 grands domaines:
@@ -28,7 +225,7 @@ Les services et équipements de la vie courante servant à définir les bassins 
 - sports, loisirs et culture
 - transports
 ",
-EPCI,Territorial division,,Intercommunalité - métropole 2016,,,,EPCI = 1,,INSEE,2018-04-05,,"Les établissements publics de coopération intercommunale (EPCI) sont des regroupements de communes ayant pour objet l'élaboration de ""projets communs de développement au sein de périmètres de solidarité"". Ils sont soumis à des règles communes, homogènes et comparables à celles de collectivités locales. Les EPCI à fiscalité propre sont ceux qui ont le droit de lever des impôts. Il s'agit des communautés urbaines, des communautés d'agglomération, des communautés de communes, des syndicats d'agglomération nouvelle et des métropoles. Seuls ces EPCI sont disponibles dans les résultats. Les syndicats de communes et les syndicats mixtes sont des EPCI sans fiscalité propre.
+EPCI,Territorial division,,Intercommunalités - métropoles 2016,,,,EPCI = 1,,INSEE,2018-04-05,,"Les établissements publics de coopération intercommunale (EPCI) sont des regroupements de communes ayant pour objet l'élaboration de ""projets communs de développement au sein de périmètres de solidarité"". Ils sont soumis à des règles communes, homogènes et comparables à celles de collectivités locales. Les EPCI à fiscalité propre sont ceux qui ont le droit de lever des impôts. Il s'agit des communautés urbaines, des communautés d'agglomération, des communautés de communes, des syndicats d'agglomération nouvelle et des métropoles. Seuls ces EPCI sont disponibles dans les résultats. Les syndicats de communes et les syndicats mixtes sont des EPCI sans fiscalité propre.
 
 Les métropoles d'Aix-Marseille-Provence et du Grand Paris sont deux métropoles à statut particulier.
 
@@ -40,13 +237,7 @@ Le zonage en aires urbaines 2010 distingue également :
 - les ""petites aires"", ensemble de communes, d'un seul tenant et sans enclave, constitué par un pôle (unité urbaine) de 1 500 à 5 000 emplois, et par des communes rurales ou unités urbaines dont au moins 40 % de la population résidente ayant un emploi travaille dans le pôle ou dans des communes attirées par celui-ci.
 Les aires urbaines, datées de 2010, ont été établies en référence à la population connue au recensement de 2008 et sur la géographie du territoire au 1er janvier 2010.
 Les communes isolées ou multipolarisées ont été exclues du jeu de données (incompatibles avec le modèle de données Regioviz)",
-TAU,Territorial division,,Catégorie d'aire urbaine 2010,,,,TAU = 1,,INSEE,2018-04-05,,"Une aire urbaine ou ""grande aire urbaine"" est un ensemble de communes, d'un seul tenant et sans enclave, constitué par un pôle urbain (unité urbaine) de plus de 10 000 emplois, et par des communes rurales ou unités urbaines (couronne périurbaine) dont au moins 40 % de la population résidente ayant un emploi travaille dans le pôle ou dans des communes attirées par celui-ci.
-Le zonage en aires urbaines 2010 distingue également : 
--  les ""moyennes aires"", ensemble de communes, d'un seul tenant et sans enclave, constitué par un pôle (unité urbaine) de 5 000 à 10 000 emplois, et par des communes rurales ou unités urbaines dont au moins 40 % de la population résidente ayant un emploi travaille dans le pôle ou dans des communes attirées par celui-ci.
-- les ""petites aires"", ensemble de communes, d'un seul tenant et sans enclave, constitué par un pôle (unité urbaine) de 1 500 à 5 000 emplois, et par des communes rurales ou unités urbaines dont au moins 40 % de la population résidente ayant un emploi travaille dans le pôle ou dans des communes attirées par celui-ci.
-Les aires urbaines, datées de 2010, ont été établies en référence à la population connue au recensement de 2008 et sur la géographie du territoire au 1er janvier 2010.
-Les communes isolées ou multipolarisées ont été exclues du jeu de données (incompatibles avec le modèle de données Regioviz)",
-UU,Territorial division,,Unité urbaine ,,,,UU = 1,,INSEE,2018-04-05,,"La notion d'unité urbaine repose sur la continuité du bâti et le nombre d’habitants. On appelle unité urbaine une commune ou un ensemble de communes présentant une zone de  bâti continu (pas de coupure de plus de 200 mètres entre deux constructions)  qui compte au moins 2 000 habitants.
+UU,Territorial division,,Unités urbaines 2010,,,,UU = 1,,INSEE,2018-04-05,,"La notion d'unité urbaine repose sur la continuité du bâti et le nombre d’habitants. On appelle unité urbaine une commune ou un ensemble de communes présentant une zone de  bâti continu (pas de coupure de plus de 200 mètres entre deux constructions)  qui compte au moins 2 000 habitants.
 Si l’unité urbaine se situe sur une seule commune, elle est dénommée ville isolée. Si l’unité urbaine s’étend sur plusieurs communes, et si chacune de ces communes concentre plus de la moitié de sa population dans la zone de bâti continu, elle est dénommé agglomération multicommunale.
 Sont considérées comme rurales les communes qui ne rentrent pas dans la constitution d’une unité urbaine : les communes sans zone de bâti continu de 2 000 habitants, et celles dont moins de la moitié de la population municipale est dans une zone de bâti continu.
 Remarque : Ces seuils, 200 mètres pour la continuité du bâti et 2 000 habitants pour la population des zones bâties, résultent de recommandations adoptées au niveau international.
@@ -58,3 +249,102 @@ DEFAULT,Study Area,,France,,,,,,UMS RIATE,2018-04-05,,"Les unités territoriales
 SPAT,Study Area,,Voisinage géographique,,,,,,UMS RIATE,2018-04-05,,Les unités territoriales sont comparées aux régions dont le centre géométrique (distance de centroïde à centroïde) est situé à un pas de distance défini par l’utilisateur. Par défaut celui-ci est paramétré pour être adapté à la surface moyenne des unités territoriales de l'espace d'étude.,
 OLD_REG,Study Area,,Anciennes régions,,,,,,UMS RIATE,2018-04-05,Ce contexte permet de comparer toutes les entités de même appartenance territoriale entre elles. ,"Ce contexte permet de comparer les unités territoriales partageant la même appartenance régionale (avant la réforme de 2016). Pour les unités territoriales situées entre deux régions, le critère de maximum de population au niveau communal a été utilisé pour définir son appartenance régionale.  ",
 REG,Study Area,,Nouvelles régions,,,,,,UMS RIATE,2018-04-05,,"Ce contexte permet de comparer les unités territoriales partageant la même appartenance régionale (après la réforme de 2016). Pour les unités territoriales situées entre deux régions, le critère de maximum de population au niveau communal a été utilisé pour définir son appartenance régionale.  ",
+TZE2015,Study Area,ZEMP,Poids démographique,,Zones d'emploi 2010,,,,UMS RIATE,2018-04-29,"La typologie du niveau d'urbanisation prend en compte la part de la population régionale en 2000 qui réside dans une unité urbaine (Zone Morphologique Urbaine) de plus de 10 000 habitants. La série statistique est ensuite décomposée en quatre classes, correspondant à peu de choses près aux quartiles de la distribution statistique. Lorsque ce contexte est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. Les catégories utilisées pour ce contexte sont les suivantes :
+- Part de la population urbaine comprise entre 4 et 33 %
+- Part de la population urbaine comprise entre 33 et 50 %
+- Part de la population urbaine comprise entre 50 et 67 %
+- Part de la population urbaine comprise entre 67 et 100 %","Ce filtre spatial peut être utilisé pour comparer les régions caractérisées par un poids démographique semblable. Il est proposé dans Regioviz afin de mieux rendre compte de l’hétérogénéité de taille démographique des mailles territoriales. Lorsque cet espace d'étude est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. 
+
+Les catégories proposées sont les suivantes (population en 2015). Ces catégories suivent à peu de choses près les ordres de grandeur de la distribution (effectifs égaux, arrondis pour des besoins d'interprétation)  : 
+- Zones d'emploi de moins de 50 000 habitants
+- Zones d'emploi entre 50 000 et 100 000 habitants
+- Zones d'emploi entre 100 000 et 200 000 habitants
+- Zones d'emploi de plus de 300 000 habitants",
+ZE2010_SPE,Study Area,ZEMP,Spécialisation socio-économique,,Zones d'emploi 2010,,,,Observatoire des territoires,2018-04-29,"La typologie du niveau d'urbanisation prend en compte la part de la population régionale en 2000 qui réside dans une unité urbaine (Zone Morphologique Urbaine) de plus de 10 000 habitants. La série statistique est ensuite décomposée en quatre classes, correspondant à peu de choses près aux quartiles de la distribution statistique. Lorsque ce contexte est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. Les catégories utilisées pour ce contexte sont les suivantes :
+- Part de la population urbaine comprise entre 4 et 33 %
+- Part de la population urbaine comprise entre 33 et 50 %
+- Part de la population urbaine comprise entre 50 et 67 %
+- Part de la population urbaine comprise entre 67 et 100 %","La DATAR a confié à l’Institut d’aménagement et d’urbanisme de la région Ile-de-France (IAU-IdF) une étude qui a débouché sur une classification des zones d’emploi en six types à partir de leurs caractéristiques structurelles. Cette classification se révèle pertinente pour rendre compte de l’évolution de l’emploi ou de l’accès aux services. 
+L’IAU-IdF a réparti les zones d’emplois métropolitaines 2010 en six types de territoires à partir de 14 indicateurs reflétant la structure de l’appareil productif, les caractéristiques de l’offre de travail ainsi que la démographie. Les indicateurs retenus pour définir la structure de l’appareil productif ont permis d’analyser les zones d’emplois en fonction de leurs spécialisations relatives et non du volume d’emplois présents. Ces indicateurs apparaissent comme les plus discriminants de la typologie. Viennent ensuite les indicateurs démographiques.
+
+Les catégories proposées sont les suivantes :
+- Les zones denses avec surreprésentation des emplois de cadre
+- Les zones peu spécialisées à orientation tertiaire
+- Les zones à orientation tertiaire public
+- Les zones à spécialisation industrielle
+- Les zones peu denses à orientation agricole ou agri-alimentaire
+- Les zones à orientation touristique
+- Les zones non couvertes par la classification, recodées en tant que zones d'emploi d'Outre-Mer (UMS RIATE). 
+",
+TAU2015,Study Area,AU,Poids démographique,,Aires urbaines 2010,,,,INSEE,2018-04-29,"La typologie du niveau d'urbanisation prend en compte la part de la population régionale en 2000 qui réside dans une unité urbaine (Zone Morphologique Urbaine) de plus de 10 000 habitants. La série statistique est ensuite décomposée en quatre classes, correspondant à peu de choses près aux quartiles de la distribution statistique. Lorsque ce contexte est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. Les catégories utilisées pour ce contexte sont les suivantes :
+- Part de la population urbaine comprise entre 4 et 33 %
+- Part de la population urbaine comprise entre 33 et 50 %
+- Part de la population urbaine comprise entre 50 et 67 %
+- Part de la population urbaine comprise entre 67 et 100 %","Ce filtre spatial peut être utilisé pour comparer les régions caractérisées par un poids démographique semblable. Il est proposé dans Regioviz afin de mieux rendre compte de l’hétérogénéité de taille démographique des mailles territoriales. Lorsque cet espace d'étude est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. 
+
+Les catégories proposées sont les suivantes (population en 2015). Elles correspondent aux catégories de tranches d'aires urbaines proposées par l'INSEE: 
+- Aires urbaines de moins de 15 000 habitants
+- Aires urbaines de 15 000 à 20 000 habitants
+- Aires urbaines de 20 000 à 25 000 habitants
+- Aires urbaines de 25 000 à 35 000 habitants
+- Aires urbaines de 35 000 à 50 000 habitants
+- Aires urbaines de 50 000 à 100 000 habitants
+- Aires urbaines de 100 000 à 200 000 habitants
+- Aires urbaines de 200 000 à 500 000 habitants
+- Aires urbaines de 500 000 à 10 000 000 habitants
+- Aires urbaine de Paris",
+TUU2015,Study Area,UU,Poids démographique,,Unités urbaines 2010,,,,INSEE,2018-04-29,"La typologie du niveau d'urbanisation prend en compte la part de la population régionale en 2000 qui réside dans une unité urbaine (Zone Morphologique Urbaine) de plus de 10 000 habitants. La série statistique est ensuite décomposée en quatre classes, correspondant à peu de choses près aux quartiles de la distribution statistique. Lorsque ce contexte est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. Les catégories utilisées pour ce contexte sont les suivantes :
+- Part de la population urbaine comprise entre 4 et 33 %
+- Part de la population urbaine comprise entre 33 et 50 %
+- Part de la population urbaine comprise entre 50 et 67 %
+- Part de la population urbaine comprise entre 67 et 100 %","Ce filtre spatial peut être utilisé pour comparer les régions caractérisées par un poids démographique semblable. Il est proposé dans Regioviz afin de mieux rendre compte de l’hétérogénéité de taille démographique des mailles territoriales. Lorsque cet espace d'étude est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. 
+
+Les catégories proposées sont les suivantes (population en 2015). Elles correspondent aux catégories de tranches d'unités urbaines proposées par l'INSEE: 
+- Unités urbaines de 2 000 à 5 000 habitants
+- Unités urbaines de 5 000 à 10 000 habitants
+- Unités urbaines de 10 000 à 20 000 habitants
+- Unités urbaines de 20 000 à 50 000 habitants
+- Unités urbaines de 50 000 à 100 000 habitants
+- Unités urbaines de 100 000 à 2 000 000 habitants
+- Unité urbaine de Paris",
+TBV2015,Study Area,BV,Poids démographique,,Bassins de vie 2012,,,,UMS RIATE,2018-04-29,"La typologie du niveau d'urbanisation prend en compte la part de la population régionale en 2000 qui réside dans une unité urbaine (Zone Morphologique Urbaine) de plus de 10 000 habitants. La série statistique est ensuite décomposée en quatre classes, correspondant à peu de choses près aux quartiles de la distribution statistique. Lorsque ce contexte est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. Les catégories utilisées pour ce contexte sont les suivantes :
+- Part de la population urbaine comprise entre 4 et 33 %
+- Part de la population urbaine comprise entre 33 et 50 %
+- Part de la population urbaine comprise entre 50 et 67 %
+- Part de la population urbaine comprise entre 67 et 100 %","Ce filtre spatial peut être utilisé pour comparer les régions caractérisées par un poids démographique semblable. Il est proposé dans Regioviz afin de mieux rendre compte de l’hétérogénéité de taille démographique des mailles territoriales. Lorsque cet espace d'étude est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. 
+
+Les catégories proposées sont les suivantes (population en 2015). Ces catégories suivent à peu de choses près les ordres de grandeur de la distribution (effectifs égaux, arrondis pour des besoins d'interprétation)  : 
+- Bassins de vie de moins de 5 000 habitants
+- Bassins de vie entre 5 000 et 10 000 habitants
+- Bassins de vie entre 10 000 et 15 000 habitants
+- Bassins de vie entre 15 000 et 20 000 habitants
+- Bassins de vie entre 20 000 et 30 000 habitants
+- Bassins de vie entre 30 000 et 50 000 habitants
+- Bassins de vie entre 50 000 et 100 000 habitants
+- Bassins de vie de plus de 100 000 habitants",
+NATURE_EPC,Study Area,EPCI,Nature d'EPCI,,Intercommunalités - métropoles 2016,,,,INSEE,2018-04-29,"La typologie du niveau d'urbanisation prend en compte la part de la population régionale en 2000 qui réside dans une unité urbaine (Zone Morphologique Urbaine) de plus de 10 000 habitants. La série statistique est ensuite décomposée en quatre classes, correspondant à peu de choses près aux quartiles de la distribution statistique. Lorsque ce contexte est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. Les catégories utilisées pour ce contexte sont les suivantes :
+- Part de la population urbaine comprise entre 4 et 33 %
+- Part de la population urbaine comprise entre 33 et 50 %
+- Part de la population urbaine comprise entre 50 et 67 %
+- Part de la population urbaine comprise entre 67 et 100 %","Ce filtre spatial regroupe les EPCI de même nature
+
+Les catégories proposées sont les suivantes (catégories de 2016). 
+- Communautés de communes
+- Communautés d'agglomération
+- Communautés urbaines
+- Métropoles",
+TEPCI2015,Study Area,EPCI,Poids démographique,,Intercommunalités - métropoles 2016,,,,UMS RIATE,2018-04-29,"La typologie du niveau d'urbanisation prend en compte la part de la population régionale en 2000 qui réside dans une unité urbaine (Zone Morphologique Urbaine) de plus de 10 000 habitants. La série statistique est ensuite décomposée en quatre classes, correspondant à peu de choses près aux quartiles de la distribution statistique. Lorsque ce contexte est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. Les catégories utilisées pour ce contexte sont les suivantes :
+- Part de la population urbaine comprise entre 4 et 33 %
+- Part de la population urbaine comprise entre 33 et 50 %
+- Part de la population urbaine comprise entre 50 et 67 %
+- Part de la population urbaine comprise entre 67 et 100 %","Ce filtre spatial peut être utilisé pour comparer les régions caractérisées par un poids démographique semblable. Il est proposé dans Regioviz afin de mieux rendre compte de l’hétérogénéité de taille démographique des mailles territoriales. Lorsque cet espace d'étude est activé, la région sélectionnée est comparée aux autres régions partageant des caractéristiques similaires. 
+
+Les catégories proposées sont les suivantes (population en 2015). Ces catégories suivent à peu de choses près les ordres de grandeur de la distribution (effectifs égaux, arrondis pour des besoins d'interprétation)  : 
+- EPCI de moins de 5 000 habitants
+- EPCI entre 5 000 et 10 000 habitants
+- EPCI entre 10 000 et 15 000 habitants
+- EPCI entre 15 000 et 20 000 habitants
+- EPCI entre 20 000 et 30 000 habitants
+- EPCI entre 30 000 et 50 000 habitants
+- EPCI entre 50 000 et 100 000 habitants
+- EPCI de plus de 100 000 habitants",
