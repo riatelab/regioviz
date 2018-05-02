@@ -378,15 +378,21 @@ export default class RadarChart3 {
     const blobWrapper = this.g
       .insert('g', '.radarCircleWrapper')
       .attrs({
-        id: elem.name.indexOf(' ') > -1 ? 'ctx' : `rdc_${elem.name}`,
+        id: elem.name.indexOf(' ') > -1 ? 'ctx' : `rd_${elem.name}`,
         class: 'radarWrapper',
       });
 
     // Append the backgrounds
     blobWrapper
       .append('path')
-      .attrs({ class: 'radarArea', d: this.radarLine(elem.axes) })
-      .styles({ fill: app.colors[elem.name], 'fill-opacity': cfg.opacityArea })
+      .attrs({
+        class: 'radarArea',
+        d: this.radarLine(elem.axes),
+      })
+      .styles({
+        fill: app.colors[elem.name],
+        'fill-opacity': cfg.opacityArea,
+      })
       .on('mouseover', function () {
         // Dim all blobs
         self.g.selectAll('.radarArea')
@@ -423,7 +429,10 @@ export default class RadarChart3 {
 
     // Create the outlines
     blobWrapper.append('path')
-      .attrs({ class: 'radarStroke', d: this.radarLine(elem.axes) })
+      .attrs({
+        class: 'radarStroke',
+        d: this.radarLine(elem.axes),
+      })
       .styles({
         fill: 'none',
         stroke: app.colors[elem.name],
@@ -456,7 +465,7 @@ export default class RadarChart3 {
     // Wrapper for the invisible circles on top
     const blobCircleWrapper = this.g
       .append('g')
-      .attr('id', elem.name.indexOf(' ') > -1 ? 'ctx' : elem.name)
+      .attr('id', elem.name.indexOf(' ') > -1 ? 'ctx' : `rdc_${elem.name}`)
       .attr('class', 'radarCircleWrapper');
 
     blobCircleWrapper.node().__data__ = elem;

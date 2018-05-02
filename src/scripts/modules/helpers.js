@@ -1049,9 +1049,16 @@ function toggleVisibilityLeftMenu() {
         .insert('div', '#menutop')
         .attr('id', 'selected_summary')
         .styles({
-          color: '#4f81bd',
+          background: '#4f81bd',
+          'border-color': '#4f81bd',
+          'border-style': 'outset',
+          'border-width': '2px',
+          color: 'white',
           'font-size': '0.9em',
+          'line-height': '1.5em',
+          margin: 'auto',
           'text-align': 'center',
+          'width': '60%',
         })
         .html(`
           Maillage : <b>${app.current_config.current_level}</b> -
