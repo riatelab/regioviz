@@ -6,7 +6,7 @@ import {
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, resetColors, variables_info, territorial_mesh, study_zones } from './../../main';
+import { app, execWithWaitingOverlay, resetColors, variables_info, territorial_mesh, study_zones } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import { prepareTooltip, Tooltipsify } from './../tooltip';
@@ -137,14 +137,7 @@ export default class Similarity1plus {
 
     const menu_distance = d3.select('#bar_section')
       .insert('div', '.cont_svg.cchart')
-      .attr('id', 'type_dist')
-      .styles({
-        color: '#64889c',
-        display: 'inline-block',
-        'font-size': '0.8em',
-        position: 'absolute',
-        'z-index': 1000,
-      });
+      .attr('id', 'type_dist');
 
     menu_distance.append('p').html('Type de similarité:');
 
@@ -274,8 +267,16 @@ export default class Similarity1plus {
     this.updateMapRegio(nb);
   }
 
-  /* eslint-disable no-loop-func */
   update() {
+    if (document.getElementById('overlay').style.display === 'none'){
+      execWithWaitingOverlay(() => { this._update(); });
+    } else {
+      this._update();
+    }
+  }
+
+  /* eslint-disable no-loop-func */
+  _update() {
     const self = this;
     const data = self.data;
     const field_distance = this.type_distance === 'euclidienne'
