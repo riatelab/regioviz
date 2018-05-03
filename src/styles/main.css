@@ -661,7 +661,7 @@ input.nb_select::-webkit-outer-spin-button {
 }
 
 .minitable > tbody > tr > td, .minitable > thead > tr > th  {
-  padding: 0.4em 0.75em;
+  padding: 0.4em 0.6em;
   font-size: 0.8em;
   font-weight: 400;
 }

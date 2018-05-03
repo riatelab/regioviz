@@ -834,5 +834,5 @@ export const execWithWaitingOverlay = function(func) {
     setTimeout(() => {
       func();
       waitingOverlay.hide();
-    }, 5);
+    }, 10);
 }

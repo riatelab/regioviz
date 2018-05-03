@@ -26,7 +26,7 @@ const updateDimensions = () => {
       svgContextMenu(app.chart, svg_bar, app.map, selec);
     })
     .on('wheel', () => { d3.event.preventDefault(); });
-  margin = { top: 20, right: 20, bottom: 40, left: 50 };
+  margin = { top: 45, right: 20, bottom: 40, left: 50 };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
