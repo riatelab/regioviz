@@ -554,6 +554,12 @@ span.i_regio {
   padding: 0em 1em 0.5em;
 }
 
+#type_dist {
+  font-size: 0.85em;
+  font-family: "Signika",sans-serif;
+  padding: 0em 1em 0.5em;
+}
+
 /* Styles for buttons on the top of the map */
 .map_button {
   margin: -0.2em 0.3em 0 0.3em;
@@ -1160,3 +1166,68 @@ h3 {
   font-size: 1em;
 }
 /* End of styles for guided tour */
+
+/* Style for custom radio buttons */
+.cont_radio {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.cont_radio input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom radio button */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.cont_radio:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.cont_radio input:checked ~ .checkmark {
+    background-color: #64889c; /*#2196F3;*/
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.cont_radio input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.cont_radio .checkmark:after {
+  top: 6px;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+/* End of style for custom radio buttons */

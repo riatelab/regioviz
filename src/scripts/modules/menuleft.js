@@ -27,33 +27,36 @@ const handleInputRegioName = (allowed_names) => {
     const new_value = value.toLowerCase();
     document.getElementById('autocomplete').value = '';
     for (let i = 0; i < names2.length; i++) {
-      if (names2[i].lastIndexOf(new_value, 0) === 0) {
-        if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
-          const t = value + names2[i].substr(new_value.length, names2[i].length);
-          document.getElementById('search').value = t;
-          document.getElementById('autocomplete').value = t;
+      if (+allowed_names[i][app.current_config.current_level] === 1) {
+        if (names2[i].lastIndexOf(new_value, 0) === 0) {
+          if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
+            const t = value + names2[i].substr(new_value.length, names2[i].length);
+            document.getElementById('search').value = t;
+            document.getElementById('autocomplete').value = t;
+          }
+          const str_after = names2[i].substr(new_value.length, names2[i].length);
+          const new_str = value + str_after;
+          document.getElementById('autocomplete').value = new_str;
+          // if (ev && ev.key === 'Tab') {
+          //   document.querySelector('#search').value = names2[i];
+          //   document.querySelector('#autocomplete').value = names2[i];
+          //   return;
+          // }
+          // const str_after = names2[i].substr(new_value.length, names2[i].length);
+          // const new_str = value + str_after;
+          // document.getElementById('autocomplete').value = new_str;
+          // return;
         }
-        const str_after = names2[i].substr(new_value.length, names2[i].length);
-        const new_str = value + str_after;
-        document.getElementById('autocomplete').value = new_str;
-        // if (ev && ev.key === 'Tab') {
-        //   document.querySelector('#search').value = names2[i];
-        //   document.querySelector('#autocomplete').value = names2[i];
-        //   return;
-        // }
-        // const str_after = names2[i].substr(new_value.length, names2[i].length);
-        // const new_str = value + str_after;
-        // document.getElementById('autocomplete').value = new_str;
-        // return;
       }
     }
     const a = document.getElementById('autocomplete').value;
     const b = document.getElementById('search').value;
     const code = ids_names[a.toLowerCase()];
     if (a === b && code) {
-      Array.prototype.slice.call(document.querySelectorAll(`.target_region.square[value="r_${code}"]`))
-        .find(d => +d.__data__[app.current_config.current_level] === 1)
-        .click();
+      document.querySelector(`.target_region.square[value="r_${code}"]`).click();
+      // Array.prototype.slice.call(document.querySelectorAll(`.target_region.square[value="r_${code}"]`))
+      //   .find(d => +d.parentElement.__data__[app.current_config.current_level] === 1)
+      //   .click();
     }
   };
 };

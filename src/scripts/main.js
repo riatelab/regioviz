@@ -302,8 +302,8 @@ export function bindUI_chart(chart, map_elem) {
           document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
           applyFilter(app, filter_type);
         }
-        updateMyCategorySection();
         chart.changeStudyZone();
+        updateMyCategorySection();
       }
     });
 
@@ -317,6 +317,7 @@ export function bindUI_chart(chart, map_elem) {
         const ids = map_elem.getUnitsWithin(+this.value);
         applyFilter(app, ids);
         chart.changeStudyZone();
+        updateMyCategorySection();
       }, 275);
     });
 
@@ -342,10 +343,9 @@ export function bindUI_chart(chart, map_elem) {
         // variables after that:
         const new_nb_var = updateAvailableRatios(id_region);
         updateAvailableCharts(new_nb_var);
-        updateMyCategorySection();
         changeRegion(app, id_region, map_elem);
         updateMenuStudyZones();
-
+        updateMyCategorySection();
         if (new_nb_var >= app.current_config.nb_var) {
           if (old_nb_var === new_nb_var) {
             chart.updateChangeRegion();

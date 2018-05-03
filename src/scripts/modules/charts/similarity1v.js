@@ -135,6 +135,50 @@ export default class Similarity1plus {
       .attrs({ class: 'label not_selected noselect', for: 'check_sorted_axis' })
       .text('Classement par degré de ressemblance');
 
+    const menu_distance = d3.select('#bar_section')
+      .insert('div', '.cont_svg.cchart')
+      .attr('id', 'type_dist')
+      .styles({
+        color: '#64889c',
+        display: 'inline-block',
+        'font-size': '0.8em',
+        position: 'absolute',
+        'z-index': 1000,
+      });
+
+    menu_distance.append('p').html('Type de similarité:');
+
+    const dist_norm_rank = menu_distance.append('div')
+      .append('label')
+      .attr('class', 'cont_radio');
+
+    const dist_eucl = menu_distance.append('div')
+      .append('label')
+      .attr('class', 'cont_radio');
+
+    dist_norm_rank.append('input')
+      .attrs({
+        type: 'radio',
+        name: 'radio_dist',
+        value: 'rank_norm'
+      })
+      .property('checked', 'checked');
+    dist_norm_rank.append('span')
+      .attr('class', 'checkmark');
+    dist_norm_rank.append('span')
+      .html('Rangs normalisés');
+
+    dist_eucl.append('input')
+      .attrs({
+        type: 'radio',
+        name: 'radio_dist',
+        value: 'eucl',
+      });
+    dist_eucl.append('span')
+      .attr('class', 'checkmark');
+    dist_eucl.append('span')
+      .html('Distance euclidienne');
+
     this.bindMenu();
     this.makeTableStat();
   }
@@ -234,6 +278,8 @@ export default class Similarity1plus {
   update() {
     const self = this;
     const data = self.data;
+    const field_distance = this.type_distance === 'euclidienne'
+      ? 'dist' : 'dist2';
     this.draw_group.select('.brush').remove();
     this.draw_group.select('#axis-title-global-dist').remove();
     this.draw_group.selectAll('.overlayrect').remove();
@@ -614,8 +660,8 @@ export default class Similarity1plus {
       setTimeout(() => { this.makeTooltips(); }, 200);
     } else if (self.type === 'global') {
       this.draw_group.attr('clip-path', null);
-      data.sort((a, b) => a.dist2 - b.dist2);
-      const values = data.map(ft => ft.dist2);
+      data.sort((a, b) => a[field_distance] - b[field_distance]);
+      const values = data.map(ft => ft[field_distance]);
       const _values = values.slice().splice(2);
       const num_name = app.current_config.pop_field;
       self.makeClassifColors(_values);
@@ -625,25 +671,23 @@ export default class Similarity1plus {
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
       this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
       const xAxis = d3.axisBottom(this.x).ticks(10, '');
-
       const simulation = d3.forceSimulation(data)
-        .force('x', d3.forceX(d => this.x(d.dist2)).strength(9))
-        .force('y', d3.forceY(height / 2).strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)))
+        .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
+        .force('y', d3.forceY(height / 2)/*.strength(d => (d.id === app.current_config.my_region ? 1 : 0.06))*/)
         .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
         .stop();
 
       let _vt;
-      if (values.length <= 125) {
+      if (values.length <= 300) {
         _vt = 125;
-      } else if (values.length > 125 && values.length < 1000) {
-        _vt = values.length;
+      } else if (values.length > 300 && values.length < 100) {
+        _vt = Math.round(values.length * 0.33);
       } else {
-        _vt = 1100;
+        _vt = 350;
       }
       for (let i = 0; i < _vt; ++i) {
         simulation.tick();
       }
-
       const voro = d3.voronoi()
         .extent([
           [-margin.left, -margin.top * 2],
@@ -772,7 +816,7 @@ export default class Similarity1plus {
         self.appendOverlayRect();
       }, 200);
     }
-    this.data.sort((a, b) => a.dist2 - b.dist2);
+    this.data.sort((a, b) => a[field_distance] - b[field_distance]);
   }
   /* eslint-enable no-loop-func */
 
@@ -810,6 +854,8 @@ export default class Similarity1plus {
   }
 
   makeClassifColors(_values) {
+    const field_distance = this.type_distance === 'euclidienne'
+      ? 'dist' : 'dist2';
     const q1 = d3.quantile(_values, 0.25);
     const q2 = d3.quantile(_values, 0.5);
     const q3 = d3.quantile(_values, 0.75);
@@ -819,11 +865,11 @@ export default class Similarity1plus {
         app.colors[app.current_config.my_region] = color_highlight;
       } else if (i === 1) {
         app.colors[ft.id] = color_default_dissim;
-      } else if (ft.dist2 < q1) {
+      } else if (ft[field_distance] < q1) {
         app.colors[ft.id] = color_q1;
-      } else if (ft.dist2 < q2) {
+      } else if (ft[field_distance] < q2) {
         app.colors[ft.id] = color_q2;
-      } else if (ft.dist2 < q3) {
+      } else if (ft[field_distance] < q3) {
         app.colors[ft.id] = color_q3;
       } else {
         app.colors[ft.id] = color_q4;
@@ -1002,15 +1048,17 @@ export default class Similarity1plus {
         circle.style.stroke = 'black';
         circle.style.strokeWidth = '2';
         const content = [];
-        const globalrank = d.data.globalrank;
+        const globalrank = d.data.globalrank
+        const field_distance = self.type_distance === 'euclidienne'
+          ? 'dist' : 'dist2';
         if (!_isNaN(globalrank)) {
           if (+globalrank === 0) {
             content.push('<b>Ma région</b>');
           } else if (+globalrank === 1) {
-            content.push(`Indice de similarité : ${formatNumber(d.data.dist2, 2)}`);
+            content.push(`Indice de similarité : ${formatNumber(d.data[field_distance], 2)}`);
             content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
-            content.push(`Indice de similarité : ${formatNumber(d.data.dist2, 2)}`);
+            content.push(`Indice de similarité : ${formatNumber(d.data[field_distance], 2)}`);
             content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
@@ -1207,47 +1255,98 @@ export default class Similarity1plus {
   }
 
   prepareData() {
+    const data = this.data;
+    const nb_features = data.length;
+    const nb_ratios = this.ratios.length;
     this.means = {};
     this.stddevs = {};
-    this.ratios.forEach((v) => {
-      const values = this.data.map(ft => +ft[v]);
-      const mean = getMean2(this.data, v, variables_info);
+    this.current_ids = [];
+    // this.ratios.forEach((v) => {
+    //   const values = this.data.map(ft => +ft[v]);
+    //   const mean = getMean2(this.data, v, variables_info);
+    //   this.means[v] = mean;
+    //   this.stddevs[v] = getStdDev(values, mean);
+    // });
+    for (let i = 0; i < nb_ratios; i++) {
+      const v = this.ratios[i];
+      const values = data.map(ft => +ft[v]);
+      const mean = getMean2(data, v, variables_info);
       this.means[v] = mean;
       this.stddevs[v] = getStdDev(values, mean);
-    });
-    this.data
-      .forEach((ft) => {
-        this.ratios.forEach((v) => {
-          // eslint-disable-next-line no-param-reassign
-          ft[`cr_${v}`] = (+ft[v] - this.means[v]) / this.stddevs[v];
-          // // eslint-disable-next-line no-param-reassign
-          // ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
-        });
-      });
-    this.my_region = this.data.find(d => d.id === app.current_config.my_region);
-    this.data
-      .forEach((ft) => {
-        this.ratios.forEach((v) => {
-          // eslint-disable-next-line no-param-reassign
-          ft[`dist_${v}`] = math_abs(+ft[`cr_${v}`] - +this.my_region[`cr_${v}`]);
-        });
-      });
-    this.ratios.forEach((ratio_name) => {
-      this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
-      this.data.forEach((ft, _ix) => {
-        ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
-      });
-    });
-    this.current_ids = this.data.map(d => d.id);
-    this.data.forEach((ft) => {
-      ft.dist2 = this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
-      // eslint-disable-next-line no-param-reassign, no-restricted-properties
+    }
+    for (let i = 0; i < nb_features; i++) {
+      const ft = data[i];
+      this.current_ids.push(ft.id);
+      for (let j = 0; j < nb_ratios; j++) {
+        const v = this.ratios[j];
+        ft[`cr_${v}`] = (+ft[v] - this.means[v]) / this.stddevs[v];
+      }
+    }
+    // this.data
+    //   .forEach((ft) => {
+    //     this.ratios.forEach((v) => {
+    //       // eslint-disable-next-line no-param-reassign
+    //       ft[`cr_${v}`] = (+ft[v] - this.means[v]) / this.stddevs[v];
+    //       // // eslint-disable-next-line no-param-reassign
+    //       // ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
+    //     });
+    //   });
+    this.my_region = data.find(d => d.id === app.current_config.my_region);
+    // this.data
+    //   .forEach((ft) => {
+    //     this.ratios.forEach((v) => {
+    //       // eslint-disable-next-line no-param-reassign
+    //       ft[`dist_${v}`] = math_abs(+ft[`cr_${v}`] - +this.my_region[`cr_${v}`]);
+    //     });
+    //   });
+    for (let i = 0; i < nb_features; i++) {
+      const ft = data[i];
+      for (let j = 0; j < nb_ratios; j++) {
+        const v = this.ratios[j];
+        // eslint-disable-next-line no-param-reassign
+        ft[`dist_${v}`] = math_abs(+ft[`cr_${v}`] - +this.my_region[`cr_${v}`]);
+      }
+    }
+    for (let j = 0; j < nb_ratios; j++) {
+      const ratio_name = this.ratios[j];
+      data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
+      for (let i = 0; i < nb_features; i++) {
+        data[i][`rank_${ratio_name}`] = i;
+      }
+    }
+    // this.ratios.forEach((ratio_name) => {
+    //   this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
+    //   this.data.forEach((ft, _ix) => {
+    //     ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
+    //   });
+    // });
+    // this.current_ids = this.data.map(d => d.id);
+    // this.data.forEach((ft) => {
+    //   ft[field_distance] = this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
+    //   // eslint-disable-next-line no-param-reassign, no-restricted-properties
+    //   ft.dist = math_sqrt(this.ratios.map(_v => `dist_${_v}`)
+    //     .map(_v => math_pow(ft[_v], 2)).reduce((a, b) => a + b));
+    // });
+
+    for (let i = 0; i < nb_features; i++) {
+      const ft = data[i];
+      ft.dist2 = this.ratios.map(_v => `rank_${_v}`)
+        .map(_v => ft[_v])
+        .reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
       ft.dist = math_sqrt(this.ratios.map(_v => `dist_${_v}`)
         .map(_v => math_pow(ft[_v], 2)).reduce((a, b) => a + b));
-    });
-    this.data.sort((a, b) => a.dist2 - b.dist2);
+    }
+    this.my_region.dist = 0;
+    this.my_region.dist2 = 0;
+    const field_distance = this.type_distance === 'euclidienne'
+      ? 'dist' : 'dist2';
+    data.sort((a, b) => a[field_distance] - b[field_distance]);
     // eslint-disable-next-line no-param-reassign
-    this.data.forEach((el, i) => { el.globalrank = i; });
+    // this.data.forEach((el, i) => { el.globalrank = i; });
+
+    for (let i = 0; i < nb_features; i++) {
+      data[i].globalrank = i;
+    }
 
     d3.select('#menu_selection').select('.nb_select').property('max', this.data.length - 1);
   }
@@ -1379,6 +1478,17 @@ export default class Similarity1plus {
         self.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
         self.map_elem.displayLegend(2);
       });
+
+    d3.selectAll('[name="radio_dist"]')
+      .on('change', function () {
+        if (this.checked && this.value === 'eucl') {
+          self.type_distance = 'euclidienne';
+        } else if (this.checked && this.value === 'rank_norm') {
+          self.type_distance = 'rank_norm';
+        }
+        self.update();
+        self.updateMapRegio();
+      });
   }
 
   removeLines() {
@@ -1458,6 +1568,7 @@ export default class Similarity1plus {
     this.map_elem = null;
     this.table_stats.remove();
     this.table_stats = null;
+    d3.select('#type_dist').remove();
     svg_bar.text('').html('');
   }
 
