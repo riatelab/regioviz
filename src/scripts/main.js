@@ -810,7 +810,7 @@ function loadData() {
     d3.transition().tween("progress", function() {
       return function(t) {
         progress = i(t);
-        text.text(`Préparation de la page ... ${formatPercent(progress - 0.1)}`);
+        text.text(`Préparation de la page ... ${formatPercent(progress * 0.91)}`);
       };
     });
   });
