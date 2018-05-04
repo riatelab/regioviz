@@ -209,14 +209,18 @@ function updateAvailableCharts(nb_var) {
 }
 
 function updateMyCategorySection() {
+  let name_territorial_mesh = territorial_mesh
+    .find(d => d.id === app.current_config.current_level).name;
+  name_territorial_mesh = name_territorial_mesh.toLowerCase();
   if (app.current_config.my_category) {
     document.querySelector('.filter_info').innerHTML = app.current_config.my_category;
   } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
-    document.querySelector('.filter_info').innerHTML = `Territoires dans un voisinage de ${+d3.select('#dist_filter').property('value')} km`;
+    name_territorial_mesh = name_territorial_mesh.charAt(0).toUpperCase() + name_territorial_mesh.slice(1);
+    document.querySelector('.filter_info').innerHTML = `${name_territorial_mesh} dans un voisinage de ${+d3.select('#dist_filter').property('value')} km`;
   } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
-    document.querySelector('.filter_info').innerHTML = 'Sélection personnalisée de territoires';
+    document.querySelector('.filter_info').innerHTML = `Sélection personnalisée de ${name_territorial_mesh}`;
   } else {
-    document.querySelector('.filter_info').innerHTML = 'Ensemble des territoires';
+    document.querySelector('.filter_info').innerHTML = `Ensemble des ${name_territorial_mesh}`;
   }
 }
 
@@ -444,7 +448,7 @@ export function bindUI_chart(chart, map_elem) {
           document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
           document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`).classList.add('checked');
           updateMenuStudyZones();
-          filterLevelVar(app);
+          // filterLevelVar(app);
           resetColors();
           d3.selectAll('p > span.filter_v').classed('checked', false);
           app.current_config.filter_type = 'DEFAULT';
@@ -722,100 +726,22 @@ function bindCreditsSource() {
 }
 
 function loadData() {
-  const req = d3.request('data/data.zip')
-    .responseType('arraybuffer');
-  // d3.queue(4)
-  //   .defer(d3.csv, 'data/REGIOVIZ_DATA.csv')
-  //   .defer(d3.json, 'data/territoires_france2154.geojson')
-  //   .defer(d3.json, 'data/back2154.geojson')
-  //   .defer(d3.json, 'data/back_countries2154.geojson')
-  //   .defer(d3.json, 'data/boundaries2154.geojson')
-  //   .defer(d3.json, 'data/boxes2154.geojson')
-  //   .defer(d3.json, 'data/coasts2154.geojson')
-  //   .defer(d3.json, 'data/regions2154.geojson')
-  //   .defer(d3.json, 'data/styles.json')
-  //   .defer(d3.csv, 'data/indicateurs_meta.csv')
-  //   .awaitAll((error, results) => {
-  //     if (error) throw error;
-  //     document.body.classList.remove('loading');
-  //     removeAll(document.querySelectorAll('.spinner, .top-spinner'));
-  //     const [
-  //       full_dataset, territoires_france, back, back_countries, boundaries, boxes,
-  //       coasts, regions, styles_map, metadata_indicateurs,
-  //     ] = results;
-  //     alertify.set('notifier', 'position', 'bottom-left');
-  //     prepareVariablesInfo(metadata_indicateurs);
-  //     const features_menu = full_dataset.filter(ft => ft.REGIOVIZ === '1');
-  //     // eslint-disable-next-line no-param-reassign
-  //     features_menu.forEach((ft) => { ft.name = ft.name.replace(' — ', ' - '); });
-  //     features_menu.sort((a, b) => a.name.localeCompare(b.name));
-  //     const start_territorial_mesh = 'EPCI';
-  //     const start_region = getRandom(full_dataset
-  //       .filter(d => d.REGIOVIZ === '1' && +d[start_territorial_mesh] === 1).map(d => d.id));
-  //     const start_variable = 'MED';
-  //     prepare_dataset(full_dataset, app);
-  //     setDefaultConfig(start_region, start_variable, start_territorial_mesh);
-  //     prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
-  //     createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
-  //
-  //     bindCreditsSource();
-  //     updateMenuStudyZones();
-  //     bindHelpMenu();
-  //     makeTopMenu();
-  //     makeHeaderChart();
-  //     makeHeaderMapSection();
-  //     console.log(start_region, start_variable, start_territorial_mesh);
-  //     setDefaultConfigMenu(start_region, start_variable, start_territorial_mesh);
-  //     filterLevelVar(app);
-  //     const other_layers = new Map();
-  //     [
-  //       ['boxes', boxes],
-  //       ['back', back],
-  //       ['back_countries', back_countries],
-  //       ['boundaries', boundaries],
-  //       ['coasts', coasts],
-  //       ['regions', regions],
-  //     ].forEach((el) => {
-  //       other_layers.set(el[0], el[1]);
-  //     });
-  //     const map_elem = new MapSelect(
-  //       territoires_france, other_layers, styles_map, start_territorial_mesh);
-  //     const chart = new BarChart1(app.current_data);
-  //     bindUI_chart(chart, map_elem);
-  //     map_elem.bindBrushClick(chart);
-  //     chart.bindMap(map_elem);
-  //     app.chart = chart;
-  //     app.map = map_elem;
-  //     Tooltipsify('[title-tooltip]');
-  //     // Fetch the layer in geographic coordinates now in case the user wants to download it later:
-  //     // d3.request('data/CGET_nuts_all.geojson', (err, result) => {
-  //     //   app.geo_layer = result.response;
-  //     // });
-  //     // Load/configure mathjax to render some math formulas in help dialogs:
-  //     MathJax.Hub.Config({
-  //       tex2jax: {
-  //         inlineMath: [['$', '$'], ['\\(', '\\)']],
-  //         processEscapes: true,
-  //       },
-  //     });
-  //     // const tour = makeTour();
-  //     // d3.select('#tour_link').on('click', () => { tour.start(); });
-  //   });
   let progress = 0;
   const total = 13718521;
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
-  req.on('progress', function(val) {
-    const i = d3.interpolate(progress, val.loaded / total);
-    d3.transition().tween("progress", function() {
-      return function(t) {
-        progress = i(t);
-        text.text(`Préparation de la page ... ${formatPercent(progress * 0.91)}`);
-      };
-    });
-  });
-
-  req.get(function(error, data) {
+  const req = d3.request('data/data.zip')
+    .responseType('arraybuffer')
+    .on('progress', function(val) {
+      const i = d3.interpolate(progress, val.loaded / total);
+      d3.transition().tween("progress", function() {
+        return function(t) {
+          progress = i(t);
+          text.text(`Préparation de la page ... ${formatPercent(progress * 0.91)}`);
+        };
+      });
+    })
+    .get(function(error, data) {
       if (error) throw error;
       const p = [];
       text.text(`Préparation de la page ... 95%`);
@@ -899,6 +825,7 @@ function loadData() {
               app.chart = chart;
               app.map = map_elem;
               Tooltipsify('[title-tooltip]');
+              updateMyCategorySection();
               // Fetch the layer in geographic coordinates now in case the user wants to download it later:
               // d3.request('data/CGET_nuts_all.geojson', (err, result) => {
               //   app.geo_layer = result.response;

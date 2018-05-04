@@ -1,5 +1,6 @@
 import {
-  comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean2, getStdDev, _isNaN,
+  comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean2,
+  getNameStudyZone, getStdDev, _isNaN,
   formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect,
   svgPathToCoords, getScrollValue,
 } from './../helpers';
@@ -1634,12 +1635,7 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
     const name_territorial_mesh = territorial_mesh
       .find(d => d.id === app.current_config.current_level).name;
     // eslint-disable-next-line no-nested-ternary
-    const name_study_zone = !app.current_config.filter_key
-      ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
-        ? ['UE28 (Territoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
-        : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
-          ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
-          : study_zones.find(d => d.id === app.current_config.filter_key).name;
+    const name_study_zone = getNameStudyZone();
     const help1 = [];
     this.ratios.forEach((v, i) => {
       help1.push(`<b>Indicateur ${i + 1}</b> : ${info_var[i + 1].name} (<i>${info_var[i + 1].id}</i>)<br>`);
@@ -1651,13 +1647,13 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
         `<b>Espace d'étude</b> : Territoires de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
       help1.push(
-        `<b>Espace d'étude</b> : UE28 (Territoires dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+        `<b>Espace d'étude</b> : France (Territoires dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
     } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
       help1.push(
         `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} territoires`);
     } else {
       help1.push( // eslint-disable-next-line quotes
-        `<b>Espace d'étude</b> : UE28`);
+        `<b>Espace d'étude</b> : France`);
     }
     // const my_region = this.my_region;
     let compl = calcCompletudeSubset(app, this.ratios, 'array');

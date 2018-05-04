@@ -1040,6 +1040,9 @@ function toggleVisibilityLeftMenu() {
       const w_bar = bar_section.getBoundingClientRect().width;
       const w_map = map_section.getBoundingClientRect().width;
       const h_lgd = document.getElementById('svg_legend').viewBox.baseVal.height;
+
+      const name_study_zone = getNameStudyZone();
+
       d3.select('.cont_svg.cchart')
         .style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * w_bar - 15}px`);
       d3.select('.cont_svg.cmap')
@@ -1061,13 +1064,20 @@ function toggleVisibilityLeftMenu() {
           'width': '60%',
         })
         .html(`
-          Maillage : <b>${app.current_config.current_level}</b> -
+          Unités territoriales : <b>${app.current_config.current_level}</b> -
           Mon territoire : <b>${app.current_config.my_region_pretty_name}</b> -
-          Espace d'étude : <b>${''}</b>`);
+          Espace d'étude : <b>${name_study_zone}</b>`);
     }, 275);
   }
 }
 /* eslint-enable no-param-reassign */
+
+const getNameStudyZone = () => !app.current_config.filter_key
+  ? 'France' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
+    ? ['France (Territoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+    : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
+      ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
+      : study_zones.find(d => d.id === app.current_config.filter_key).name;
 
 export {
   comp,
@@ -1110,4 +1120,5 @@ export {
   isNumber,
   getScrollValue,
   toggleVisibilityLeftMenu,
+  getNameStudyZone,
 };
