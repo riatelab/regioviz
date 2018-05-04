@@ -309,7 +309,7 @@ export default class BarChart1 {
         } else if (app.current_config.filter_key) {
           content.push(
             '<br>',
-            ' (Régions dans un voisinage de ',
+            ' (Territoires dans un voisinage de ',
             document.getElementById('dist_filter').value,
             'km)');
           _h += 20;
@@ -483,7 +483,7 @@ export default class BarChart1 {
     menu_selection.append('p')
       .attr('id', 'selection_subtitle')
       .styles({ margin: '10px 0px 2px 0px' })
-      .html('Sélection des régions ayant des valeurs...');
+      .html('Sélection des territoires ayant des valeurs...');
 
     menu_selection.append('div')
       .attr('class', 'cont_btn')
@@ -500,7 +500,7 @@ export default class BarChart1 {
       .attr('class', 'cont_btn')
       .append('button')
       .attrs({ class: 'button_blue', id: 'btn_above_my_region' })
-      .text('inférieurs à ma région')
+      .text('inférieurs à mon territoire')
       .on('click', function () {
         menu_selection.selectAll('button').attr('class', 'button_blue');
         this.classList.add('pressed');
@@ -522,7 +522,7 @@ export default class BarChart1 {
       .attr('class', 'cont_btn')
       .append('button')
       .attrs({ class: 'button_blue', id: 'btn_below_my_region' })
-      .text('supérieures à ma région')
+      .text('supérieures à mon territoire')
       .on('click', function () {
         menu_selection.selectAll('button').attr('class', 'button_blue');
         this.classList.add('pressed');
@@ -1069,7 +1069,7 @@ export default class BarChart1 {
       Med: d3.median(values),
       id: ratio_to_use,
       Variable: ratio_to_use,
-      'Ma région': this.ref_value,
+      'Mon territoire': this.ref_value,
     };
   }
 
@@ -1084,12 +1084,12 @@ export default class BarChart1 {
 <h3>Position - 1 Indicateur</h3>
 <b>Aide générale</b>
 
-Ce graphique en bâtons (<i>bar-plot</i>) permet de comparer la situation de la région sélectionnée sur <b>un indicateur</b>, pour un espace d’étude et un maillage territorial d’analyse donné.
+Ce graphique en bâtons (<i>bar-plot</i>) permet de comparer la situation du territoire sélectionné sur <b>un indicateur</b>, pour un espace d’étude et un maillage territorial d’analyse donné.
 
 L’utilisateur est invité à renseigner l’indicateur qu’il souhaite voir apparaître sur le graphique.
 Par défaut, les rangs sont calculés de façon décroissante (premier rang : valeur maximale ; dernier rang : valeur minimale). Il est possible d’inverser cet ordre de classement.
 
-Ce graphique rend également possible le positionnement des régions au regard de la moyenne.
+Ce graphique rend également possible le positionnement des territoires au regard de la moyenne.
 
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_1ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
@@ -1115,7 +1115,7 @@ Ce graphique rend également possible le positionnement des régions au regard d
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
-        ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+        ? ['UE28 (Territoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
           ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
           : study_zones.find(d => d.id === app.current_config.filter_key).name;
@@ -1126,13 +1126,13 @@ Ce graphique rend également possible le positionnement des régions au regard d
 
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : Territoires de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
       help1.push(
-        `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+        `<b>Espace d'étude</b> : UE28 (Territoires dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
     } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
       help1.push(
-        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} régions`);
+        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} territoires`);
     } else {
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);

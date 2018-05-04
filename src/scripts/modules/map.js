@@ -160,41 +160,41 @@ function getLegendElems(type) {
   if (type === 0) {
     return [
       [
-        { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
-        { color: color_countries, text: 'Autres régions de l\'espace d\'étude' },
-        { color: color_sup, text: 'Rang plus élevé que ma région' },
-        { color: color_inf, text: 'Rang moins élevé que ma région' },
+        { color: color_highlight, text: `Mon territoire : ${app.current_config.my_region_pretty_name}` },
+        { color: color_countries, text: 'Autres territoires de l\'espace d\'étude' },
+        { color: color_sup, text: 'Rang plus élevé que mon territoire' },
+        { color: color_inf, text: 'Rang moins élevé que mon territoire' },
       ],
       '80', '41',
     ];
   } else if (type === 1) {
     return [
       [
-        { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
-        { color: color_countries, text: 'Autres régions de l\'espace d\'étude' },
-        { color: color_sup, text: 'Rang plus élevé que ma région (2 indicateurs)' },
-        { color: color_inf, text: 'Rang moins élevé que ma région (2 indicateurs)' },
-        { color: ['orange', 'rgb(160, 30, 160)'], text: 'Rang plus élevé que ma région (1 indicateur sur 2)' },
+        { color: color_highlight, text: `Mon territoire : ${app.current_config.my_region_pretty_name}` },
+        { color: color_countries, text: 'Autres territoires de l\'espace d\'étude' },
+        { color: color_sup, text: 'Rang plus élevé que mon territoire (2 indicateurs)' },
+        { color: color_inf, text: 'Rang moins élevé que mon territoire (2 indicateurs)' },
+        { color: ['orange', 'rgb(160, 30, 160)'], text: 'Rang plus élevé que mon territoire (1 indicateur sur 2)' },
       ],
       '100', '50',
     ];
   } else if (type === 4) {
     return [
       [
-        { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
-        { color: color_default_dissim, text: 'Région la plus ressemblante' },
-        { color: color_q1, text: 'Régions très ressemblantes' },
-        { color: color_q2, text: 'Régions ressemblantes' },
-        { color: color_q3, text: 'Régions dissemblantes' },
-        { color: color_q4, text: 'Régions très dissemblantes' },
+        { color: color_highlight, text: `Mon territoire : ${app.current_config.my_region_pretty_name}` },
+        { color: color_default_dissim, text: 'Territoire le plus ressemblant' },
+        { color: color_q1, text: 'Territoires très ressemblants' },
+        { color: color_q2, text: 'Territoires ressemblants' },
+        { color: color_q3, text: 'Territoires dissemblants' },
+        { color: color_q4, text: 'Territoires très dissemblants' },
       ],
       '120', '60',
     ];
   }
   return [
     [
-      { color: color_highlight, text: `Ma région : ${app.current_config.my_region_pretty_name}` },
-      { color: color_countries, text: 'Autres régions de l\'espace d\'étude (sélectionnables)' },
+      { color: color_highlight, text: `Mon territoire : ${app.current_config.my_region_pretty_name}` },
+      { color: color_countries, text: 'Autres territoires de l\'espace d\'étude (sélectionnables)' },
     ],
     '50', '22.5',
   ];
@@ -375,7 +375,7 @@ class MapSelect {
   // eslint-disable-next-line class-methods-use-this
   updateLegend() {
     d3.select('#svg_legend > g > .legend > text')
-      .text(`Ma région : ${app.current_config.my_region_pretty_name}`);
+      .text(`Mon territoire : ${app.current_config.my_region_pretty_name}`);
   }
 
   removeRectBrush() {

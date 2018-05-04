@@ -212,11 +212,11 @@ function updateMyCategorySection() {
   if (app.current_config.my_category) {
     document.querySelector('.filter_info').innerHTML = app.current_config.my_category;
   } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
-    document.querySelector('.filter_info').innerHTML = `Régions dans un voisinage de ${+d3.select('#dist_filter').property('value')} km`;
+    document.querySelector('.filter_info').innerHTML = `Territoires dans un voisinage de ${+d3.select('#dist_filter').property('value')} km`;
   } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
-    document.querySelector('.filter_info').innerHTML = 'Sélection personnalisée de régions';
+    document.querySelector('.filter_info').innerHTML = 'Sélection personnalisée de territoires';
   } else {
-    document.querySelector('.filter_info').innerHTML = 'Ensemble des régions';
+    document.querySelector('.filter_info').innerHTML = 'Ensemble des territoires';
   }
 }
 
@@ -353,13 +353,13 @@ export function bindUI_chart(chart, map_elem) {
               chart.updateChangeRegion();
             } else {
               d3.select('span.type_chart.selected').dispatch('click');
-              alertify.warning('Une variable précédemment sélectionnée n\'est pas disponible pour cette région.');
+              alertify.warning('Une variable précédemment sélectionnée n\'est pas disponible pour ce territoire.');
             }
           } else {
             // If there fewer selected variables than requested by the current chart,
             // redraw the first (default) kind of chart:
             d3.select('span.chart_t1[value="BarChart1"]').dispatch('click');
-            alertify.warning('Des variables sélectionnées sont indisponibles pour cette région. Un changement de représentation est nécessaire.');
+            alertify.warning('Des variables sélectionnées sont indisponibles pour ce territoire. Un changement de représentation est nécessaire.');
           }
         });
       }
@@ -609,7 +609,7 @@ export function bindHelpMenu() {
           },
         });
         const content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Espace d'étude créé par l'utilisateur :</b></p>
-<p style="color: #4f81bd;font-size: 1.2rem;"><b>${name_studyzone} (${regions.length} régions)</b></p>
+<p style="color: #4f81bd;font-size: 1.2rem;"><b>${name_studyzone} (${regions.length} territoires)</b></p>
 <p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>
 <br>
 <br>

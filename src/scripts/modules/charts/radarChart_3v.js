@@ -717,7 +717,7 @@ export default class RadarChart3 {
           .html([
             `${code_variable} : ${formatNumber(d.raw_value, 1)} ${d.raw_value_unit}`,
             `Rang : ${formatNumber(d.value, 1)}/100`,
-            `${formatNumber(100 - d.value, 1)} ${self.cfg.unit} des régions ont une valeur ${direction}`,
+            `${formatNumber(100 - d.value, 1)} ${self.cfg.unit} des territoires ont une valeur ${direction}`,
           ].join('<br>'));
         self.tooltip
           .styles({
@@ -1066,7 +1066,7 @@ export default class RadarChart3 {
       Med: d3.median(values),
       id: this.variables[i],
       Variable: this.variables[i],
-      'Ma région': my_region[this.variables[i]],
+      'Mon territoire': my_region[this.variables[i]],
     }));
     return features;
   }
@@ -1076,7 +1076,7 @@ export default class RadarChart3 {
     if (this.current_ids.indexOf(id) < 0 || id === this.id_my_region) return;
     if (this.displayed_ids.indexOf(id) < 0) {
       if (this.data.length > 6) {
-        alertify.warning('Le nombre maximal de régions sélectionnées est atteint.');
+        alertify.warning('Le nombre maximal de territoires sélectionnées est atteint.');
         return;
       }
       const a = prepare_data_radar_ft(this.ref_data, this.variables, id);
@@ -1133,18 +1133,18 @@ export default class RadarChart3 {
 <h3>Position - 3 indicateurs</h3>
 <b>Aide générale</b>
 
-Ce graphique en radar permet de comparer la situation d’une région sélectionnée en fonction d’un jeu de <b>3 indicateurs et plus</b>. Afin de rendre comparables les indicateurs exprimés dans des ordres de grandeur et des unités de mesure hétérogènes, ceux-ci sont préalablement normalisés au regard du rang des régions sur chacun des indicateurs sélectionnés. Ainsi, pour un indicateur donné, une valeur d’indice sera comprise entre 0 et 100. Par exemple, une valeur de 60 signifiera que 60 % des régions sont caractérisées par des valeurs inférieures sur cet indicateur et 40 % par des valeurs supérieures.
-Le rang normalisé X’ d’une région i est calculé en effectuant le rapport entre la valeur du rang absolu et le nombre total d’observations multiplié par 100 :
+Ce graphique en radar permet de comparer la situation d’un territoire sélectionné en fonction d’un jeu de <b>3 indicateurs et plus</b>. Afin de rendre comparables les indicateurs exprimés dans des ordres de grandeur et des unités de mesure hétérogènes, ceux-ci sont préalablement normalisés au regard du rang des territoires sur chacun des indicateurs sélectionnés. Ainsi, pour un indicateur donné, une valeur d’indice sera comprise entre 0 et 100. Par exemple, une valeur de 60 signifiera que 60 % des territoires sont caractérisées par des valeurs inférieures sur cet indicateur et 40 % par des valeurs supérieures.
+Le rang normalisé X’ d’un territoire i est calculé en effectuant le rapport entre la valeur du rang absolu et le nombre total d’observations multiplié par 100 :
 <p id="formula" style="text-align: center; font-size: 0.9em;">
-$Rang\\ Normalisé\\ X’ (Région\\ i) = {Rang\\ X\\ (Région\\ i) - 1 \\over {N - 1}} * 100$
+$Rang\\ Normalisé\\ X’ (Territoire\\ i) = {Rang\\ X\\ (Territoire\\ i) - 1 \\over {N - 1}} * 100$
 </p>
 <small>
 Avec :
 X : Indicateur X
 Rang : position décroissante dans la distribution (croissant lorsque l’indicateur est inversé)
-N : Nombre total de régions de l’espace d’étude
+N : Nombre total de territoires de l’espace d’étude
 </small>
-Cette méthode permet de rendre comparables les positions relatives des régions sur différents indicateurs en termes de rangs, mais elle ne restitue pas d’information sur l’ampleur des écarts entre ces régions.
+Cette méthode permet de rendre comparables les positions relatives des territoires sur différents indicateurs en termes de rangs, mais elle ne restitue pas d’information sur l’ampleur des écarts entre ces territoires.
 A partir de ces indices, on peut construire un graphique en radar qui correspond à un graphique multidimensionnel de rangs relatifs.
 
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_3ind.pdf">Aide détaillée (.pdf)</a></p>`;
@@ -1161,7 +1161,7 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
-        ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+        ? ['UE28 (Térritoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
           ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
           : study_zones.find(d => d.id === app.current_config.filter_key).name;
@@ -1173,13 +1173,13 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
 
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : Territoires de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
       help1.push(
-        `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+        `<b>Espace d'étude</b> : UE28 (Territoires dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
     } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
       help1.push(
-        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} régions`);
+        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} territoires`);
     } else {
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);

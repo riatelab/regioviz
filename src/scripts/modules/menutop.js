@@ -58,7 +58,7 @@ export function makeTopMenu() {
   top_menu
     .append('div')
     .attrs({ class: 'title_section t3' })
-    .html('QUELLES RÉGIONS ?');
+    .html('QUELS TERRITOIRES ?');
 }
 
 /**

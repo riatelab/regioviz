@@ -841,7 +841,7 @@ function createStudyZone(regions) {
   });
   const n_custom_studyzone = Object.keys(app.custom_studyzones).length + 1;
   const content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Création d'un espace d'étude personnalisé</b></p>
-  <p>Régions sélectionnées : </p>
+  <p>Territoires sélectionnés : </p>
 <p style="text-align: justify;">${regions.map(r => `<span class="i_regio" title="${app.feature_names[r]}">${r}</span>`).join(', ')}</p>
 <div>
   <p>
@@ -927,7 +927,7 @@ function svgContextMenu(current_chart, svg_elem, map_elem, colors_selection) {
     // add an extra option in the menu allowing to zoom the map on this feature:
     if (elem_id) {
       items_menu.push({
-        name: 'Zoomer la carte sur la région sélectionnée',
+        name: 'Zoomer la carte sur le territoire sélectionné',
         action: () => { map_elem.zoomOnFeature(elem_id); },
       });
     }
@@ -1062,7 +1062,7 @@ function toggleVisibilityLeftMenu() {
         })
         .html(`
           Maillage : <b>${app.current_config.current_level}</b> -
-          Ma région : <b>${app.current_config.my_region_pretty_name}</b> -
+          Mon territoire : <b>${app.current_config.my_region_pretty_name}</b> -
           Espace d'étude : <b>${''}</b>`);
     }, 275);
   }

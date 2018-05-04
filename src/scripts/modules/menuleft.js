@@ -79,29 +79,13 @@ const makeButtonMenuLeft = () => {
 };
 
 export default function createMenu(names, variables, study_zones, territorial_mesh) {
-  // Fourth section:
-  const title_section4 = document.createElement('p');
-  title_section4.className = 'title_menu';
-  title_section4.innerHTML = 'Maillage territorial';
-  const section4 = document.createElement('div');
-  section4.id = 'menu_territ_level';
-  section4.className = 'box';
-  section4.style.overflow = 'auto';
-  section4.style.maxHeight = '20%';
-  for (let i = 0, len_i = territorial_mesh.length; i < len_i; i++) {
-    const entry = document.createElement('p');
-    const territ_level = territorial_mesh[i];
-    entry.innerHTML = `<span value="${territ_level.id}" class='territ_level square'></span><span class="label_chk">${territ_level.name}</span><span class="i_info">i</span>`;
-    section4.appendChild(entry);
-  }
-
   const title_section1 = document.createElement('div');
   title_section1.style.backgroundColor = '#4f81bd';
   title_section1.style.color = 'white';
   title_section1.style.overflow = 'hidden';
   title_section1.innerHTML = `
 <div class="regio_name">
-<p>Ma région : </p>
+<p>Mon territoire : </p>
 <input type = "text" id = "search"/>
 <input id="autocomplete" type="text" disabled="disabled" />
 <span class='down_arrow'> &#x25BE;</span>
@@ -128,6 +112,22 @@ export default function createMenu(names, variables, study_zones, territorial_me
     .on('mouseout', function () {
       d3.select(this).selectAll('span.minibutton').style('display', 'none');
     });
+
+  // Fourth section:
+  const title_section4 = document.createElement('p');
+  title_section4.className = 'title_menu';
+  title_section4.innerHTML = 'Unités territoriales';
+  const section4 = document.createElement('div');
+  section4.id = 'menu_territ_level';
+  section4.className = 'box';
+  section4.style.overflow = 'auto';
+  section4.style.maxHeight = '20%';
+  for (let i = 0, len_i = territorial_mesh.length; i < len_i; i++) {
+    const entry = document.createElement('p');
+    const territ_level = territorial_mesh[i];
+    entry.innerHTML = `<span value="${territ_level.id}" class='territ_level square'></span><span class="label_chk">${territ_level.name}</span><span class="i_info">i</span>`;
+    section4.appendChild(entry);
+  }
 
   // Second section, groups of variables:
   const title_section2 = document.createElement('p');
@@ -182,7 +182,7 @@ export default function createMenu(names, variables, study_zones, territorial_me
     if (zone.id === 'DEFAULT') {
       entry.innerHTML = `<span display_level="" class="filter_v square"></span><span class="label_chk">${zone.name}</span><span class="i_info">i</span>`;
     } else if (zone.id === 'SPAT') {
-      entry.innerHTML = '<span display_level="" class="filter_v square"></span><span class="label_chk">Région dans un rayon de </span><input value="450" disabled="disabled" style="width: 55px; height: 13px;" type="number" min="0" max="100000" id="dist_filter"></input><span> km</span><span class="i_info">i</span>';
+      entry.innerHTML = '<span display_level="" class="filter_v square"></span><span class="label_chk">Territoires dans un rayon de </span><input value="450" disabled="disabled" style="width: 55px; height: 13px;" type="number" min="0" max="100000" id="dist_filter"></input><span> km</span><span class="i_info">i</span>';
     } else {
       entry.innerHTML = `<span display_level="${zone.display_level}" class='filter_v square'></span><span class="label_chk">${zone.name}</span><span class="i_info">i</span>`;
     }
@@ -244,10 +244,10 @@ export default function createMenu(names, variables, study_zones, territorial_me
   const menu = document.getElementById('menu');
   menu.id = 'menu';
   menu.style.float = 'left';
-  menu.appendChild(title_section4);
-  menu.appendChild(section4);
   menu.appendChild(title_section1);
   menu.appendChild(section1);
+  menu.appendChild(title_section4);
+  menu.appendChild(section4);
   menu.appendChild(title_section2);
   menu.appendChild(section2);
   menu.appendChild(title_section3);

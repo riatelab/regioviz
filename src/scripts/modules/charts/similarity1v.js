@@ -114,7 +114,7 @@ export default class Similarity1plus {
       .styles({ color: '#4f81bd', 'margin-left': '1px' })
       .property('value', 1);
     selection_close.append('span')
-      .html('<sup>ème</sup> région la plus proche');
+      .html('<sup>ème</sup> territoire le plus proche');
 
     const section = menu_selection.append('div')
       .append('section')
@@ -966,19 +966,19 @@ export default class Similarity1plus {
           //     math_abs(100 *
           //       (d[ratio_n] - self.my_region[ratio_n]) / self.my_region[ratio_n]), 1)} %`);
           if (+indic_rank === 2) {
-            content.push('<br><b>Région la plus proche</b> sur cet indicateur');
+            content.push('<br><b>Territoire le plus proche</b> sur cet indicateur');
           } else {
-            content.push(`<br><b>${indic_rank - 1}ème</b> région la plus proche sur cet indicateur`);
+            content.push(`<br><b>${indic_rank - 1}ème</b> territoire le plus proche sur cet indicateur`);
           }
         }
         if (!_isNaN(globalrank)) {
           _h += 30;
           if (+globalrank === 0) {
-            content.push('<br><b>Ma région</b>');
+            content.push('<br><b>Mon territoire</b>');
           } else if (+globalrank === 1) {
-            content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
+            content.push(`<b>Territoire le plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
-            content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
+            content.push(`<b>${globalrank}ème</b> territoire le plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
         self.tooltip.select('.title')
@@ -1054,13 +1054,13 @@ export default class Similarity1plus {
           ? 'dist' : 'dist2';
         if (!_isNaN(globalrank)) {
           if (+globalrank === 0) {
-            content.push('<b>Ma région</b>');
+            content.push('<b>Mon territoire</b>');
           } else if (+globalrank === 1) {
             content.push(`Indice de similarité : ${formatNumber(d.data[field_distance], 2)}`);
-            content.push(`<b>Région la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
+            content.push(`<b>Territoire la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
             content.push(`Indice de similarité : ${formatNumber(d.data[field_distance], 2)}`);
-            content.push(`<b>${globalrank}ème</b> région la plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
+            content.push(`<b>${globalrank}ème</b> territoire le plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
         self.tooltip.select('.title')
@@ -1592,7 +1592,7 @@ export default class Similarity1plus {
       Med: d3.median(values),
       id: this.ratios[i],
       Variable: this.ratios[i],
-      'Ma région': my_region[this.ratios[i]],
+      'Mon territoire': my_region[this.ratios[i]],
     }));
     return features;
   }
@@ -1613,13 +1613,13 @@ export default class Similarity1plus {
 <h3>Ressemblances</h3>
 <b>Aide générale</b>
 
-Les graphiques de ressemblance permettent de visualiser pour un indicateur et plus 1 les régions les plus proches statistiquement d'une région de référence. Cette proximité statistique est évaluée selon une méthode classique : la distance euclidienne (ou distance à vol d'oiseau) prenant en compte des données préalablement standardisées. Si la valeur de l'indice équivaut à 0, la similarité est totale entre ces deux unités territoriales. Plus la valeur de la distance est élevée, moins la similarité est importante.
+Les graphiques de ressemblance permettent de visualiser pour un indicateur et plus 1 les territoires les plus proches statistiquement d'un territoire de référence. Cette proximité statistique est évaluée selon une méthode classique : la distance euclidienne (ou distance à vol d'oiseau) prenant en compte des données préalablement standardisées. Si la valeur de l'indice équivaut à 0, la similarité est totale entre ces deux unités territoriales. Plus la valeur de la distance est élevée, moins la similarité est importante.
 
 L'interface Regioviz propose deux niveaux pour la visualisation de ces ressemblances : la <b>ressemblance globale</b> et la <b>ressemblance détaillée</b> indicateur par indicateur.
 
-L'option de distance globale propose une visualisation synthétique de l'éloignement statistique existant entre « ma région » et les autres régions de l'espace d'étude sur les n indicateurs sélectionnés. Ce module est composé d’un graphique en essaim (beeswarm) qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre ma région et les autres régions de l'espace d'étude. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (régions les plus ressemblantes) apparaissent dans des tonalités rouges, les 25 % les plus importantes (régions les moins ressemblantes) sont représentées par des tonalités bleues.
+L'option de distance globale propose une visualisation synthétique de l'éloignement statistique existant entre « mon territoire » et les autres territoires de l'espace d'étude sur les n indicateurs sélectionnés. Ce module est composé d’un graphique en essaim (beeswarm) qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre mon territoires et les autres territoires de l'espace d'étude. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (territoires les plus ressemblantes) apparaissent dans des tonalités rouges, les 25 % les plus importantes (territoires les moins ressemblants) sont représentées par des tonalités bleues.
 
-Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d'évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l'application décompose cette ressemblance pour l'unité territoriale qui ressemble le plus à « ma région » de référence d'après la mesure globale de ressemblance. Libre ensuite à l'utilisateur de choisir plus ou moins d'unités territoriales de comparaison (les n unités les plus ressemblantes) en fonction de ses objectifs d'analyse.
+Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d'évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l'application décompose cette ressemblance pour l'unité territoriale qui ressemble le plus à « mon territoire » de référence d'après la mesure globale de ressemblance. Libre ensuite à l'utilisateur de choisir plus ou moins d'unités territoriales de comparaison (les n unités les plus ressemblantes) en fonction de ses objectifs d'analyse.
 
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_ressemblances.pdf">Aide détaillée (.pdf)</a></p>`;
   }
@@ -1636,7 +1636,7 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
     // eslint-disable-next-line no-nested-ternary
     const name_study_zone = !app.current_config.filter_key
       ? 'UE28' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
-        ? ['UE28 (Régions dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+        ? ['UE28 (Territoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
         : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
           ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
           : study_zones.find(d => d.id === app.current_config.filter_key).name;
@@ -1648,13 +1648,13 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
 
     if (app.current_config.my_category) {
       help1.push(
-        `<b>Espace d'étude</b> : Régions de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
+        `<b>Espace d'étude</b> : Territoires de même ${name_study_zone}<br><b>Catégorie</b> : ${app.current_config.my_category}`);
     } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
       help1.push(
-        `<b>Espace d'étude</b> : UE28 (Régions dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
+        `<b>Espace d'étude</b> : UE28 (Territoires dans un voisinage de ${document.getElementById('dist_filter').value} km)`);
     } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
       help1.push(
-        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} régions`);
+        `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} territoires`);
     } else {
       help1.push( // eslint-disable-next-line quotes
         `<b>Espace d'étude</b> : UE28`);
