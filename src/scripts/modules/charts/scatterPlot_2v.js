@@ -914,11 +914,13 @@ export default class ScatterPlot2 {
       ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
       : () => 4;
     // const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
-    trans.attrs(d => ({
-      transform: transform,
-      r: size_func(d[num_name]) / this.k,
-      'stroke-width': 1 / this.k,
-    }));
+    this.plot.select('#scatterplot')
+      .selectAll('circle')
+      .attrs(d => ({
+        transform: transform,
+        r: size_func(d[num_name]) / this.k,
+        'stroke-width': 1 / this.k,
+      }));
 
     this.plot.select('#axis--x')
       // .transition(trans)
