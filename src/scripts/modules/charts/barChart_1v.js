@@ -5,7 +5,7 @@ import {
 } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
+import { app, execWithWaitingOverlay, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
@@ -544,6 +544,14 @@ export default class BarChart1 {
   }
 
   update() {
+    if (document.getElementById('overlay').style.display === 'none'){
+      execWithWaitingOverlay(() => { this._update.bind(this); });
+    } else {
+      this._update();
+    }
+  }
+
+  _update() {
     displayed = 0;
     const ratio_to_use = this.ratio_to_use;
     const self = this;

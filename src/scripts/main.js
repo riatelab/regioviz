@@ -287,29 +287,27 @@ export function bindUI_chart(chart, map_elem) {
     .on('click', function () {
       if (this.classList.contains('disabled')) return;
       if (!this.classList.contains('checked')) {
-        execWithWaitingOverlay(() => {
-          d3.selectAll('span.filter_v').attr('class', 'filter_v square');
-          this.classList.add('checked');
-          const filter_type = this.parentElement.getAttribute('filter-value');
-          if (filter_type === 'SPAT') {
-            app.current_config.filter_type = 'SPAT';
-            const input_elem = document.getElementById('dist_filter');
-            input_elem.removeAttribute('disabled');
-            const dist = +input_elem.value;
-            const ids = map_elem.getUnitsWithin(dist);
-            applyFilter(app, ids);
-          } else if (filter_type === 'CUSTOM') {
-            app.current_config.filter_type = 'CUSTOM';
-            document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
-            applyFilter(app, app.custom_studyzones[this.nextSibling.innerHTML]);
-          } else {
-            app.current_config.filter_type = 'DEFAULT';
-            document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
-            applyFilter(app, filter_type);
-          }
-          chart.changeStudyZone();
-          updateMyCategorySection();
-        });
+        d3.selectAll('span.filter_v').attr('class', 'filter_v square');
+        this.classList.add('checked');
+        const filter_type = this.parentElement.getAttribute('filter-value');
+        if (filter_type === 'SPAT') {
+          app.current_config.filter_type = 'SPAT';
+          const input_elem = document.getElementById('dist_filter');
+          input_elem.removeAttribute('disabled');
+          const dist = +input_elem.value;
+          const ids = map_elem.getUnitsWithin(dist);
+          applyFilter(app, ids);
+        } else if (filter_type === 'CUSTOM') {
+          app.current_config.filter_type = 'CUSTOM';
+          document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
+          applyFilter(app, app.custom_studyzones[this.nextSibling.innerHTML]);
+        } else {
+          app.current_config.filter_type = 'DEFAULT';
+          document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
+          applyFilter(app, filter_type);
+        }
+        chart.changeStudyZone();
+        updateMyCategorySection();
       }
     });
 
@@ -333,39 +331,37 @@ export function bindUI_chart(chart, map_elem) {
       if (!this.classList.contains('checked')) {
         d3.selectAll('span.target_region').attr('class', 'target_region square');
         this.classList.add('checked');
-        execWithWaitingOverlay(() => {
-          const id_region = this.getAttribute('value').slice(2);
-          const old_nb_var = app.current_config.ratio.length;
+        const id_region = this.getAttribute('value').slice(2);
+        const old_nb_var = app.current_config.ratio.length;
 
-          // Hide the list of availables regions:
-          document.getElementById('list_regio').classList.add('hidden');
-          // Set the name of the region (completed, with correct case, etc.) in
-          // the input field:
-          document.querySelector('.regio_name > #search').value = app.feature_names[id_region];
-          document.querySelector('.regio_name > #autocomplete').value = app.feature_names[id_region];
-          // Update the availables ratio on the left menu
-          // (this may change the current selected ratio(s) as some variables are
-          // not available for some features) and fetch the number of selected
-          // variables after that:
-          const new_nb_var = updateAvailableRatios(id_region);
-          updateAvailableCharts(new_nb_var);
-          changeRegion(app, id_region, map_elem);
-          updateMenuStudyZones();
-          updateMyCategorySection();
-          if (new_nb_var >= app.current_config.nb_var) {
-            if (old_nb_var === new_nb_var) {
-              chart.updateChangeRegion();
-            } else {
-              d3.select('span.type_chart.selected').dispatch('click');
-              alertify.warning('Une variable précédemment sélectionnée n\'est pas disponible pour ce territoire.');
-            }
+        // Hide the list of availables regions:
+        document.getElementById('list_regio').classList.add('hidden');
+        // Set the name of the region (completed, with correct case, etc.) in
+        // the input field:
+        document.querySelector('.regio_name > #search').value = app.feature_names[id_region];
+        document.querySelector('.regio_name > #autocomplete').value = app.feature_names[id_region];
+        // Update the availables ratio on the left menu
+        // (this may change the current selected ratio(s) as some variables are
+        // not available for some features) and fetch the number of selected
+        // variables after that:
+        const new_nb_var = updateAvailableRatios(id_region);
+        updateAvailableCharts(new_nb_var);
+        changeRegion(app, id_region, map_elem);
+        updateMenuStudyZones();
+        updateMyCategorySection();
+        if (new_nb_var >= app.current_config.nb_var) {
+          if (old_nb_var === new_nb_var) {
+            chart.updateChangeRegion();
           } else {
-            // If there fewer selected variables than requested by the current chart,
-            // redraw the first (default) kind of chart:
-            d3.select('span.chart_t1[value="BarChart1"]').dispatch('click');
-            alertify.warning('Des variables sélectionnées sont indisponibles pour ce territoire. Un changement de représentation est nécessaire.');
+            d3.select('span.type_chart.selected').dispatch('click');
+            alertify.warning('Une variable précédemment sélectionnée n\'est pas disponible pour ce territoire.');
           }
-        });
+        } else {
+          // If there fewer selected variables than requested by the current chart,
+          // redraw the first (default) kind of chart:
+          d3.select('span.chart_t1[value="BarChart1"]').dispatch('click');
+          alertify.warning('Des variables sélectionnées sont indisponibles pour ce territoire. Un changement de représentation est nécessaire.');
+        }
       }
     });
 
@@ -390,74 +386,71 @@ export function bindUI_chart(chart, map_elem) {
   d3.selectAll('span.target_variable')
     .on('click', function () {
       if (this.classList.contains('disabled')) return;
-      execWithWaitingOverlay(() => {
-        let nb_var = Array.prototype.slice.call(
-          document.querySelectorAll('span.target_variable'))
-          .filter(elem => !!elem.classList.contains('checked')).length;
-        // Select a new variable and trigger the appropriate changes on the current chart:
-        if (!this.classList.contains('checked')) {
-          // We don't want the user to be able to select more than
-          // MAX_VARIABLES (default = 7) variables simultaneously:
-          if (nb_var >= MAX_VARIABLES) {
-            alertify.warning('Le nombre maximal de variables sélectionnées est atteint.');
-            return;
-          }
-          this.classList.add('checked');
-          const code_variable = this.getAttribute('value');
-          addVariable(app, code_variable);
-
-          chart.addVariable(code_variable);
-          nb_var += 1;
-        } else { // Remove a variable from the selection:
-          nb_var -= 1;
-          // We don't want to let the user remove the variable if
-          // it's the only one selected or if the currently displayed
-          // chart need a minimum number of variables:
-          if (nb_var < app.current_config.nb_var) {
-            return;
-          }
-          const code_variable = this.getAttribute('value');
-          this.classList.remove('checked');
-          removeVariable(app, code_variable);
-          chart.removeVariable(code_variable);
+      let nb_var = Array.prototype.slice.call(
+        document.querySelectorAll('span.target_variable'))
+        .filter(elem => !!elem.classList.contains('checked')).length;
+      // Select a new variable and trigger the appropriate changes on the current chart:
+      if (!this.classList.contains('checked')) {
+        // We don't want the user to be able to select more than
+        // MAX_VARIABLES (default = 7) variables simultaneously:
+        if (nb_var >= MAX_VARIABLES) {
+          alertify.warning('Le nombre maximal de variables sélectionnées est atteint.');
+          return;
         }
-        // Update the top menu to display available charts according to the current
-        // number of available variables:
-        updateAvailableCharts(nb_var);
-      });
+        this.classList.add('checked');
+        const code_variable = this.getAttribute('value');
+        addVariable(app, code_variable);
+
+        chart.addVariable(code_variable);
+        nb_var += 1;
+      } else { // Remove a variable from the selection:
+        nb_var -= 1;
+        // We don't want to let the user remove the variable if
+        // it's the only one selected or if the currently displayed
+        // chart need a minimum number of variables:
+        if (nb_var < app.current_config.nb_var) {
+          return;
+        }
+        const code_variable = this.getAttribute('value');
+        this.classList.remove('checked');
+        removeVariable(app, code_variable);
+        chart.removeVariable(code_variable);
+      }
+      // Update the top menu to display available charts according to the current
+      // number of available variables:
+      updateAvailableCharts(nb_var);
     });
 
   d3.selectAll('span.territ_level')
     .on('click', function () {
       if (!this.classList.contains('checked') && !this.parentNode.classList.contains('disabled')) {
-        execWithWaitingOverlay(() => {
-          // Reset the study zone :
-          d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
-          d3.selectAll('span.territ_level').attr('class', 'territ_level square');
-          const level_value = this.getAttribute('value');
-          d3.selectAll('.regioname')
-            .style('display', d => (+d[level_value] === 1 ? null : 'none'))
-            .selectAll('.square')
-            .classed('checked', false);
-          this.classList.add('checked');
-          app.current_config.current_level = level_value;
-          app.current_config.my_region = getRandom(app.full_dataset
-            .filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1).map(d => d.id));
-          app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
-          document.querySelector('.regio_name > #search').value = app.current_config.my_region_pretty_name;
-          document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
-          document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`).classList.add('checked');
-          updateMenuStudyZones();
-          // filterLevelVar(app);
-          resetColors();
-          d3.selectAll('p > span.filter_v').classed('checked', false);
-          app.current_config.filter_type = 'DEFAULT';
-          app.current_config.filter_key = undefined;
-          filterLevelVar(app);
-          map_elem.updateLevelRegion(level_value);
-          const _id = app.chart._id.toString();
-          changeChart(_id, chart, map_elem);
-        });
+        // Reset the study zone :
+        d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
+        d3.selectAll('span.territ_level').attr('class', 'territ_level square');
+        const level_value = this.getAttribute('value');
+        d3.selectAll('.regioname')
+          .style('display', d => (+d[level_value] === 1 ? null : 'none'))
+          .selectAll('.square')
+          .classed('checked', false);
+        this.classList.add('checked');
+        app.current_config.current_level = level_value;
+        app.current_config.my_region = getRandom(app.full_dataset
+          .filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1).map(d => d.id));
+        app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
+        document.querySelector('.regio_name > #search').value = app.current_config.my_region_pretty_name;
+        document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
+        document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`).classList.add('checked');
+        // filterLevelVar(app);
+        resetColors();
+        d3.selectAll('p > span.filter_v').classed('checked', false);
+        app.current_config.filter_type = 'DEFAULT';
+        app.current_config.filter_key = undefined;
+        filterLevelVar(app);
+        map_elem.updateLevelRegion(level_value);
+        const _id = app.chart._id.toString();
+        changeChart(_id, chart, map_elem);
+        updateMenuStudyZones();
+        updateMyCategorySection();
       }
     });
 

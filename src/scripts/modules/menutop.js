@@ -15,7 +15,7 @@ export function makeTopMenu() {
 
   top_menu
     .append('div')
-    .attrs({ class: 'title_section t1' })
+    .attr('class', 'title_section t1')
     .html('SÉLECTION');
 
   const type_chart = top_menu

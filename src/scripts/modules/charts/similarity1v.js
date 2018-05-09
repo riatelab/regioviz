@@ -270,7 +270,7 @@ export default class Similarity1plus {
 
   update() {
     if (document.getElementById('overlay').style.display === 'none'){
-      execWithWaitingOverlay(() => { this._update(); });
+      execWithWaitingOverlay(() => { this._update.bind(this); });
     } else {
       this._update();
     }

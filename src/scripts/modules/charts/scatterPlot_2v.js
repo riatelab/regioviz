@@ -7,7 +7,7 @@ import {
 } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
+import { app, execWithWaitingOverlay, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
 import ContextMenu from './../contextMenu';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
@@ -44,10 +44,11 @@ export default class ScatterPlot2 {
    */
   constructor(ref_data) {
     this.brushed = () => {
-      if (d3.event && !d3.event.selection) {
-        if (d3.event.type === 'end' && d3.event.sourceEvent.type === 'mouseup') {
+      if (!d3.event || (d3.event && !d3.event.selection)) {
+        if (d3.event && d3.event.type === 'end' && d3.event.sourceEvent && d3.event.sourceEvent.type === 'mouseup') {
           this.map_elem.removeRectBrush();
         }
+        this.map_elem.removeRectBrush();
         app.colors = {};
         app.colors[app.current_config.my_region] = color_highlight;
         this.updateLight();
@@ -718,10 +719,19 @@ export default class ScatterPlot2 {
       }));
   }
 
+  update() {
+    if (document.getElementById('overlay').style.display === 'none'){
+      execWithWaitingOverlay(() => { this._update.bind(this); });
+    } else {
+      this._update();
+    }
+  }
+
+
   /**
   * Redraw the scatterplot.
   */
-  update() {
+  _update() {
     const self = this;
     const data = self.data;
     const dots = this.scatter.selectAll('.dot')
@@ -897,6 +907,7 @@ export default class ScatterPlot2 {
   }
 
   zoomed(transform) {
+    console.log(transform);
     // if (transform.k === 1) {
     //   transform.x = 0; // eslint-disable-line no-param-reassign
     //   transform.y = 0; // eslint-disable-line no-param-reassign
@@ -913,12 +924,13 @@ export default class ScatterPlot2 {
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
       : () => 4;
-    // const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
-    trans.attrs(d => ({
-      transform: transform,
-      r: size_func(d[num_name]) / this.k,
-      'stroke-width': 1 / this.k,
-    }));
+    this.plot
+      .selectAll('circle')
+      .attrs(d => ({
+        transform: transform,
+        r: size_func(d[num_name]) / this.k,
+        'stroke-width': 1 / this.k,
+      }));
 
     this.plot.select('#axis--x')
       // .transition(trans)
