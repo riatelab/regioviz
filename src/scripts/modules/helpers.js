@@ -994,8 +994,11 @@ function clickDlPdf(event) {
   return false;
 }
 
+let tm_leftmenu;
+
 /* eslint-disable no-param-reassign */
 function toggleVisibilityLeftMenu() {
+  if (tm_leftmenu) return;
   const bar_section = document.getElementById('bar_section');
   const map_section = document.getElementById('map_section');
   const bar_topsection = document.querySelector('#menutop > .t2');
@@ -1029,7 +1032,7 @@ function toggleVisibilityLeftMenu() {
       elem.style.visibility = 'hidden';
       elem.style.transform = 'scaleX(0)';
     });
-    setTimeout(() => {
+    tm_leftmenu = setTimeout(() => {
       array_slice.call(left_elems).forEach((elem) => {
         elem.style.display = 'none';
       });
@@ -1067,6 +1070,7 @@ function toggleVisibilityLeftMenu() {
           Unités territoriales : <b>${app.current_config.current_level}</b> -
           Mon territoire : <b>${app.current_config.my_region_pretty_name}</b> -
           Espace d'étude : <b>${name_study_zone}</b>`);
+      tm_leftmenu = undefined;
     }, 275);
   }
 }
