@@ -99,8 +99,10 @@ export function filterLevelGeom(target_features, filter = 'N1') {
 *
 */
 export function prepareVariablesInfo(metadata_indicateurs) {
+  // Fill the 'variables_info' variable with relevant informations:
+  const type_var = ['Indicateur', 'Stock', 'Poids'];
   metadata_indicateurs
-    .filter(ft => ft.Regioviz_item === 'Indicateur' || ft.Regioviz_item === 'Stock')
+    .filter(ft => type_var.indexOf(ft.Regioviz_item) > -1)
     .forEach((ft) => {
       variables_info.push({
         id: ft.id,
@@ -115,6 +117,8 @@ export function prepareVariablesInfo(metadata_indicateurs) {
         formula: ft.Formula,
       });
     });
+
+  // Fill the 'study_zones' variable with relevant informations:
   metadata_indicateurs
     .filter(ft => ft.Regioviz_item === 'Study Area')
     .forEach((ft) => {
@@ -126,6 +130,7 @@ export function prepareVariablesInfo(metadata_indicateurs) {
         url: ft.URL,
       });
     });
+  // Fill the 'territorial_mesh' variable with relevant informations:
   metadata_indicateurs
     .filter(ft => ft.Regioviz_item === 'Territorial division')
     .forEach((ft) => {
@@ -162,42 +167,17 @@ export function applyFilter(app, filter_type) {
 * @param {Object} app - The variable containing the global parameters about
 *   the current state of the application.
 * @param {String} id_region - The id of the new targeted feature (my region).
-* @param {Object} map_elem - The current instance of the displayed map.
 * @return {Void}
 *
 */
-export function changeRegion(app, id_region, map_elem) {
-  // const current_level = app.current_config.current_level;
-  // const o_region = app.full_dataset.find(d => d.id === id_region);
-  // const available_level = [];
+export function changeRegion(app, id_region) {
   app.current_config.my_region = id_region;
   app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
-  // if (o_region.N1 === '1') available_level.push('N1');
-  // if (o_region.N2 === '1') available_level.push('N2');
-  // // TODO: Wrap this in a function/put this somewhere else:
-  // d3.select('#curr_regio_level').html(available_level.join(' '));
-  // // Do we need to switch to a new territorial level ?
-  // const redraw = available_level.indexOf(current_level) < 0;
-  // if (redraw) {
-  //   const level_value = available_level[0];
-  //   d3.selectAll('p > span.filter_v').classed('checked', false);
-  //   d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true);
-  //   d3.selectAll('span.territ_level').attr('class', 'territ_level square');
-  //   d3.select(`span.territ_level[value='${level_value}']`)
-  //     .attr('class', 'territ_level square checked');
-  //   app.current_config.filter_type = 'DEFAULT';
-  //   app.current_config.filter_key = undefined;
-  //   app.current_config.current_level = level_value;
-  //   filterLevelVar(app);
-  //   map_elem.updateLevelRegion(level_value);
-  //   const _id = app.chart._id.toString();
-  //   changeChart(_id, app.chart, app.map);
-  // } else {
   // Compute the new distance matrix between this feature and each other one:
-  map_elem.computeDistMat();
+  app.map.computeDistMat();
   // Set the minimum distance in order to select two regions:
   app.current_config.min_km_closest_unit = Math.round(
-    map_elem.dist_to_my_region[2].dist / 1000) + 1;
+    app.map.dist_to_my_region[2].dist / 1000) + 1;
   const input_dist = document.querySelector('#dist_filter');
   input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
   if (input_dist.value < app.current_config.min_km_closest_unit) {
@@ -210,7 +190,7 @@ export function changeRegion(app, id_region, map_elem) {
       && app.current_config.filter_key.indexOf(id_region)) {
     d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
   } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
-    app.current_config.filter_key = map_elem.getUnitsWithin(+document.getElementById('dist_filter').value);
+    app.current_config.filter_key = app.map.getUnitsWithin(+document.getElementById('dist_filter').value);
   }
   // Reset the color to use on the chart/map:
   app.colors = {};

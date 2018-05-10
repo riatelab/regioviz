@@ -46,9 +46,9 @@ export default class ScatterPlot2 {
     this.brushed = () => {
       if (!d3.event || (d3.event && !d3.event.selection)) {
         if (d3.event && d3.event.type === 'end' && d3.event.sourceEvent && d3.event.sourceEvent.type === 'mouseup') {
-          this.map_elem.removeRectBrush();
+          app.map.removeRectBrush();
         }
-        this.map_elem.removeRectBrush();
+        // app.map.removeRectBrush();
         app.colors = {};
         app.colors[app.current_config.my_region] = color_highlight;
         this.updateLight();
@@ -96,7 +96,7 @@ export default class ScatterPlot2 {
       app.colors[app.current_config.my_region] = color_highlight;
       this.updateLight();
       this.updateMapRegio();
-      this.map_elem.removeRectBrush();
+      app.map.removeRectBrush();
     };
     this._id = Symbol('ScatterPlot2');
     updateDimensions();
@@ -432,7 +432,7 @@ export default class ScatterPlot2 {
             .style('fill', 'black');
         }
         if (self.last_map_selection) {
-          self.map_elem.callBrush(self.last_map_selection);
+          app.map.callBrush(self.last_map_selection);
         } else {
           self.update();
         }
@@ -464,7 +464,7 @@ export default class ScatterPlot2 {
             .style('fill', 'black');
         }
         if (self.last_map_selection) {
-          self.map_elem.callBrush(self.last_map_selection);
+          app.map.callBrush(self.last_map_selection);
         } else {
           self.update();
         }
@@ -721,7 +721,7 @@ export default class ScatterPlot2 {
 
   update() {
     if (document.getElementById('overlay').style.display === 'none'){
-      execWithWaitingOverlay(() => { this._update.bind(this); });
+      execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();
     }
@@ -788,7 +788,7 @@ export default class ScatterPlot2 {
           r: size_func(d[num_name]) / this.k,
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
-          transform: transform,
+          transform,
           'stroke-width': 1 / this.k,
         }))
         .styles(d => ({
@@ -812,7 +812,7 @@ export default class ScatterPlot2 {
           r: size_func(d[num_name]) / this.k,
           cx: x(d[rank_variable1]),
           cy: y(d[rank_variable2]),
-          transform: transform,
+          transform,
           class: 'dot',
         }));
     } else if (this.type === 'value') {
@@ -907,7 +907,6 @@ export default class ScatterPlot2 {
   }
 
   zoomed(transform) {
-    console.log(transform);
     // if (transform.k === 1) {
     //   transform.x = 0; // eslint-disable-line no-param-reassign
     //   transform.y = 0; // eslint-disable-line no-param-reassign
@@ -925,7 +924,7 @@ export default class ScatterPlot2 {
       ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
       : () => 4;
     // const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
-    this.plot.select('#scatterplot')
+    this.plot
       .selectAll('circle')
       .attrs(d => ({
         transform: transform,
@@ -992,8 +991,7 @@ export default class ScatterPlot2 {
   * Update the map linked to this chart to sync the colors in use.
   */
   updateMapRegio() {
-    if (!this.map_elem) return;
-    this.map_elem.target_layer.selectAll('path')
+    app.map.target_layer.selectAll('path')
       .attr('fill-opacity', 1)
       .attr('fill', d => (this.current_ids.indexOf(d.id) > -1
         ? (app.colors[d.id] || color_countries)
@@ -1009,14 +1007,14 @@ export default class ScatterPlot2 {
       this.last_map_selection = undefined;
       return;
     }
-    this.map_elem.tooltip.style('display', 'none');
+    app.map.tooltip.style('display', 'none');
     svg_container.select('.brush').call(this.brush.move, null);
     const self = this;
     const [topleft, bottomright] = event.selection;
     this.last_map_selection = [topleft, bottomright];
     const rect = new Rect(topleft, bottomright);
     app.colors = {};
-    self.map_elem.target_layer.selectAll('path')
+    app.map.target_layer.selectAll('path')
       .attr('fill', function (d) {
         const id = d.id;
         if (id === app.current_config.my_region) {
@@ -1169,9 +1167,9 @@ export default class ScatterPlot2 {
       this.data.push(tmp_my_region);
       this.ref_value1 = tmp_my_region[this.variable1];
       this.ref_value2 = tmp_my_region[this.variable2];
-      this.map_elem.removeRectBrush();
-      this.map_elem.updateLegend();
-      this.map_elem.resetColors(this.current_ids);
+      app.map.removeRectBrush();
+      app.map.updateLegend();
+      app.map.resetColors(this.current_ids);
       this.update();
     }
   }
@@ -1203,7 +1201,7 @@ export default class ScatterPlot2 {
     this.ref_value1 = tmp_my_region[this.variable1];
     this.ref_value2 = tmp_my_region[this.variable2];
 
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
     this.updateItemsCtxMenu();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1356,14 +1354,12 @@ export default class ScatterPlot2 {
 
   remove() {
     this.table_stats.remove();
-    this.map_elem.unbindBrushClick();
-    this.map_elem = null;
+    app.map.unbindBrushClick();
     svg_bar.text('').html('');
   }
 
-  bindMap(map_elem) {
-    this.map_elem = map_elem;
-    this.map_elem.displayLegend(1);
+  bindMap() {
+    app.map.displayLegend(1);
     this.updateMapRegio();
     this.update();
     this.updateCompletude();
@@ -1434,7 +1430,7 @@ export default class ScatterPlot2 {
     app.colors[app.current_config.my_region] = color_highlight;
     this.updateLight();
     this.updateMapRegio();
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
   }
 
   selectBelowMyRegion() {
@@ -1452,7 +1448,7 @@ export default class ScatterPlot2 {
     app.colors[app.current_config.my_region] = color_highlight;
     this.updateLight();
     this.updateMapRegio();
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
   }
 
   selectAboveMean() {
@@ -1475,7 +1471,7 @@ export default class ScatterPlot2 {
     app.colors[app.current_config.my_region] = color_highlight;
     this.updateLight();
     this.updateMapRegio();
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
   }
 
   selectAboveMyRegion() {
@@ -1493,7 +1489,7 @@ export default class ScatterPlot2 {
     app.colors[app.current_config.my_region] = color_highlight;
     this.updateLight();
     this.updateMapRegio();
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
   }
 
   prepareTableStat() {

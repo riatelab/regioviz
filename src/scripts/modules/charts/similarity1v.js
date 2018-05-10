@@ -180,7 +180,7 @@ export default class Similarity1plus {
   brushed() {
     const e = d3.event;
     if (!e.selection && e.type === 'end' && !this.last_selection && !e.sourceEvent.sourceEvent) {
-      this.map_elem.removeRectBrush();
+      app.map.removeRectBrush();
       const elems = getElementsFromPoint(e.sourceEvent.clientX, e.sourceEvent.clientY);
       const elem = elems.find(el => el.className.baseVal === 'polygon' || el.className.baseVal === 'circle');
       if (elem) {
@@ -198,7 +198,7 @@ export default class Similarity1plus {
     } else if (e.sourceEvent.sourceEvent) {
       this.draw_group.selectAll('.circle')
         .style('fill', d => app.colors[d.data.id]);
-      this.map_elem.target_layer.selectAll('path')
+      app.map.target_layer.selectAll('path')
         .attr('fill-opacity', 1)
         .attr('fill', (d) => {
           const _id = d.id;
@@ -212,7 +212,7 @@ export default class Similarity1plus {
         });
       this.last_selection = null;
     } else {
-      this.map_elem.removeRectBrush();
+      app.map.removeRectBrush();
       this.removeMapClonedFeatures();
       if (!e.selection || e.selection.length < 2) { return; }
       const selection = [e.selection[0] - 1, e.selection[1] + 1.5];
@@ -228,7 +228,7 @@ export default class Similarity1plus {
           return app.colors[d.data.id];
         });
 
-      this.map_elem.target_layer.selectAll('path')
+      app.map.target_layer.selectAll('path')
         .attr('fill-opacity', 1)
         .attr('fill', (d) => {
           const _id = d.id;
@@ -251,13 +251,26 @@ export default class Similarity1plus {
     if (nb > 0) {
       this.data.forEach((ft) => {
         // eslint-disable-next-line no-param-reassign
-        ft.dist2 = this.data.length - this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
+        ft.dist2 = this.ratios.map(_v => `rank_${_v}`)
+          .map(_v => ft[_v])
+          .reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
         // eslint-disable-next-line no-param-reassign
         ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`)
           .map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
       });
-      this.data.sort((a, b) => a.dist - b.dist);
-      this.data.forEach((el, i) => { el.globalrank = i; }); // eslint-disable-line no-param-reassign
+      // this.data.sort((a, b) => a.dist - b.dist);
+      // this.data.forEach((el, i) => { el.globalrank = i; }); // eslint-disable-line no-param-reassign
+
+      const field_distance = this.type_distance === 'euclidienne'
+        ? 'dist' : 'dist2';
+      this.data.sort((a, b) => a[field_distance] - b[field_distance]);
+      // eslint-disable-next-line no-param-reassign
+      // this.data.forEach((el, i) => { el.globalrank = i; });
+
+      for (let i = 0, nb_features = this.data.length; i < nb_features; i++) {
+        this.data[i].globalrank = i;
+      }
+
       this.highlight_selection = this.data.slice(1, nb + 1);
     } else {
       this.highlight_selection = [];
@@ -270,7 +283,7 @@ export default class Similarity1plus {
 
   update() {
     if (document.getElementById('overlay').style.display === 'none'){
-      execWithWaitingOverlay(() => { this._update.bind(this); });
+      execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();
     }
@@ -829,11 +842,11 @@ export default class Similarity1plus {
   }
 
   updateMapRegio(ix_last_selec) {
-    if (!this.map_elem) return;
+    // if (!app.map) return;
     const target_id = ix_last_selec && this.data[ix_last_selec]
       ? this.data[ix_last_selec].id
       : null;
-    this.map_elem.target_layer.selectAll('path')
+    app.map.target_layer.selectAll('path')
       .attr('fill-opacity', 1)
       .attr('fill', (d) => {
         const _id = d.id;
@@ -847,7 +860,7 @@ export default class Similarity1plus {
         return color_disabled;
       });
     if (this.type === 'detailled' && target_id) {
-      this.map_elem.target_layer.selectAll('path')
+      app.map.target_layer.selectAll('path')
         .attr('fill-opacity', d => (
           (app.colors[d.id] && !(d.id === target_id || d.id === app.current_config.my_region))
             ? 0.6
@@ -998,12 +1011,12 @@ export default class Similarity1plus {
         if (this.style.fill !== color_countries) {
           self.displayLine(d.id);
         }
-        self.map_elem.target_layer
+        app.map.target_layer
           .selectAll('path')
           .each(function (ft) {
             if (ft.id === d.id) {
               const cloned = this.cloneNode();
-              self.map_elem.layers.select('#temp').node().appendChild(cloned);
+              app.map.layers.select('#temp').node().appendChild(cloned);
               const _cloned = d3.select(cloned)
                 .attr('class', 'cloned')
                 .styles({
@@ -1058,7 +1071,7 @@ export default class Similarity1plus {
             content.push('<b>Mon territoire</b>');
           } else if (+globalrank === 1) {
             content.push(`Indice de similarité : ${formatNumber(d.data[field_distance], 2)}`);
-            content.push(`<b>Territoire la plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
+            content.push(`<b>Territoire le plus proche</b> sur ces <b>${self.ratios.length}</b> indicateurs`);
           } else {
             content.push(`Indice de similarité : ${formatNumber(d.data[field_distance], 2)}`);
             content.push(`<b>${globalrank}ème</b> territoire le plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
@@ -1081,7 +1094,7 @@ export default class Similarity1plus {
         const circle = this.parentNode.querySelector('circle');
         if (self.highlighted.indexOf(id) > -1) {
           self.highlighted.splice(self.highlighted.indexOf(id), 1);
-          self.map_elem.target_layer
+          app.map.target_layer
             .selectAll('path')
             .each(function (ft) {
               if (ft.id === id) {
@@ -1091,7 +1104,7 @@ export default class Similarity1plus {
             });
         } else {
           self.highlighted.push(id);
-          self.map_elem.target_layer
+          app.map.target_layer
             .selectAll('path')
             .each(function (ft) {
               if (ft.id === id) {
@@ -1109,7 +1122,7 @@ export default class Similarity1plus {
         self.highlighted = [];
         self.draw_group.selectAll('.circle')
           .style('fill', d => app.colors[d.data.id]);
-        self.map_elem.target_layer.selectAll('path')
+        app.map.target_layer.selectAll('path')
           .attr('fill', (d) => {
             const _id = d.id;
             if (_id === app.current_config.my_region) {
@@ -1223,7 +1236,7 @@ export default class Similarity1plus {
     if (app.current_config.filter_key !== undefined) {
       this.changeStudyZone();
     } else {
-      this.map_elem.updateLegend();
+      app.map.updateLegend();
       this.prepareData();
       this.updateCompletude();
       this.updateTableStat();
@@ -1235,7 +1248,7 @@ export default class Similarity1plus {
   changeStudyZone() {
     this.removeLines();
     this.removeMapClonedFeatures();
-    this.map_elem.updateLegend();
+    app.map.updateLegend();
     this.ratios = app.current_config.ratio;
     this.nums = app.current_config.num;
     this.data = app.current_data.filter(
@@ -1276,14 +1289,7 @@ export default class Similarity1plus {
       this.means[v] = mean;
       this.stddevs[v] = getStdDev(values, mean);
     }
-    for (let i = 0; i < nb_features; i++) {
-      const ft = data[i];
-      this.current_ids.push(ft.id);
-      for (let j = 0; j < nb_ratios; j++) {
-        const v = this.ratios[j];
-        ft[`cr_${v}`] = (+ft[v] - this.means[v]) / this.stddevs[v];
-      }
-    }
+
     // this.data
     //   .forEach((ft) => {
     //     this.ratios.forEach((v) => {
@@ -1293,6 +1299,16 @@ export default class Similarity1plus {
     //       // ft[`dist_${v}`] = math_abs(+ft[v] - +this.my_region[v]);
     //     });
     //   });
+    // this.current_ids = this.data.map(d => d.id);
+    for (let i = 0; i < nb_features; i++) {
+      const ft = data[i];
+      this.current_ids.push(ft.id);
+      for (let j = 0; j < nb_ratios; j++) {
+        const v = this.ratios[j];
+        ft[`cr_${v}`] = (+ft[v] - this.means[v]) / this.stddevs[v];
+      }
+    }
+
     this.my_region = data.find(d => d.id === app.current_config.my_region);
     // this.data
     //   .forEach((ft) => {
@@ -1309,22 +1325,23 @@ export default class Similarity1plus {
         ft[`dist_${v}`] = math_abs(+ft[`cr_${v}`] - +this.my_region[`cr_${v}`]);
       }
     }
-    for (let j = 0; j < nb_ratios; j++) {
-      const ratio_name = this.ratios[j];
-      data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
-      for (let i = 0; i < nb_features; i++) {
-        data[i][`rank_${ratio_name}`] = i;
-      }
-    }
+
     // this.ratios.forEach((ratio_name) => {
     //   this.data.sort((a, b) => b[`dist_${ratio_name}`] - a[`dist_${ratio_name}`]);
     //   this.data.forEach((ft, _ix) => {
     //     ft[`rank_${ratio_name}`] = _ix; // eslint-disable-line no-param-reassign
     //   });
     // });
-    // this.current_ids = this.data.map(d => d.id);
+    for (let j = 0; j < nb_ratios; j++) {
+      const ratio_name = this.ratios[j];
+      data.sort((a, b) => a[`dist_${ratio_name}`] - b[`dist_${ratio_name}`]);
+      for (let i = 0; i < nb_features; i++) {
+        data[i][`rank_${ratio_name}`] = i;
+      }
+    }
+
     // this.data.forEach((ft) => {
-    //   ft[field_distance] = this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
+    //   ft.dist2 = this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
     //   // eslint-disable-next-line no-param-reassign, no-restricted-properties
     //   ft.dist = math_sqrt(this.ratios.map(_v => `dist_${_v}`)
     //     .map(_v => math_pow(ft[_v], 2)).reduce((a, b) => a + b));
@@ -1456,11 +1473,11 @@ export default class Similarity1plus {
         menu.select('.selection_display').style('display', 'none');
         menu.select('.scsorted').style('display', 'none');
         self.draw_group.selectAll('g').remove();
-        self.map_elem.unbindBrushClick();
-        self.map_elem.bindBrushClick(self);
+        app.map.unbindBrushClick();
+        app.map.bindBrushClick(self);
         self.update();
         self.updateMapRegio();
-        self.map_elem.displayLegend(4);
+        app.map.displayLegend(4);
       });
 
     menu.select('#ind_dist_detailled')
@@ -1475,10 +1492,10 @@ export default class Similarity1plus {
         menu.select('.selection_display').style('display', null);
         menu.select('.scsorted').style('display', null);
         self.draw_group.selectAll('g').remove();
-        self.map_elem.unbindBrushClick();
-        self.map_elem.bindBrushClick(self);
+        app.map.unbindBrushClick();
+        app.map.bindBrushClick(self);
         self.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
-        self.map_elem.displayLegend(2);
+        app.map.displayLegend(2);
       });
 
     d3.selectAll('[name="radio_dist"]')
@@ -1498,7 +1515,7 @@ export default class Similarity1plus {
   }
 
   removeMapClonedFeatures() {
-    this.map_elem.layers.selectAll('.cloned').remove();
+    app.map.layers.selectAll('.cloned').remove();
   }
 
   getElemBelow(e) {
@@ -1521,7 +1538,7 @@ export default class Similarity1plus {
       this.last_selection = null;
       return;
     }
-    this.map_elem.tooltip.style('display', 'none');
+    app.map.tooltip.style('display', 'none');
     svg_container.select('.brush').call(this.brush.move, null);
     const self = this;
     const [topleft, bottomright] = event.selection;
@@ -1529,7 +1546,7 @@ export default class Similarity1plus {
     this.highlighted = [];
     this.last_selection = null;
     const rect = new Rect(topleft, bottomright);
-    self.map_elem.target_layer.selectAll('path')
+    app.map.target_layer.selectAll('path')
       .attr('fill', function (d) {
         const id = d.id;
         if (id === app.current_config.my_region) {
@@ -1566,8 +1583,7 @@ export default class Similarity1plus {
 
   remove() {
     this.removeMapClonedFeatures();
-    this.map_elem.unbindBrushClick();
-    this.map_elem = null;
+    app.map.unbindBrushClick();
     this.table_stats.remove();
     this.table_stats = null;
     d3.select('#type_dist').remove();
@@ -1575,10 +1591,10 @@ export default class Similarity1plus {
   }
 
   bindMap(map_elem) {
-    this.map_elem = map_elem;
-    this.map_elem.resetColors(this.current_ids);
-    this.map_elem.displayLegend(4);
-    this.applySelection(1);
+    app.map = map_elem;
+    app.map.resetColors(this.current_ids);
+    app.map.displayLegend(4);
+    this.applySelection(null);
     this.updateCompletude();
   }
 
@@ -1618,7 +1634,7 @@ Les graphiques de ressemblance permettent de visualiser pour un indicateur et pl
 
 L'interface Regioviz propose deux niveaux pour la visualisation de ces ressemblances : la <b>ressemblance globale</b> et la <b>ressemblance détaillée</b> indicateur par indicateur.
 
-L'option de distance globale propose une visualisation synthétique de l'éloignement statistique existant entre « mon territoire » et les autres territoires de l'espace d'étude sur les n indicateurs sélectionnés. Ce module est composé d’un graphique en essaim (beeswarm) qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre mon territoires et les autres territoires de l'espace d'étude. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (territoires les plus ressemblantes) apparaissent dans des tonalités rouges, les 25 % les plus importantes (territoires les moins ressemblants) sont représentées par des tonalités bleues.
+L'option de distance globale propose une visualisation synthétique de l'éloignement statistique existant entre « mon territoire » et les autres territoires de l'espace d'étude sur les n indicateurs sélectionnés. Ce module est composé d’un graphique en essaim (beeswarm) qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre mon territoires et les autres territoires de l'espace d'étude. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (territoires les plus ressemblants) apparaissent dans des tonalités rouges, les 25 % les plus importantes (territoires les moins ressemblants) sont représentées par des tonalités bleues.
 
 Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d'évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l'application décompose cette ressemblance pour l'unité territoriale qui ressemble le plus à « mon territoire » de référence d'après la mesure globale de ressemblance. Libre ensuite à l'utilisateur de choisir plus ou moins d'unités territoriales de comparaison (les n unités les plus ressemblantes) en fonction de ses objectifs d'analyse.
 

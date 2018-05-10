@@ -232,26 +232,26 @@ function updateMyCategorySection() {
 * @param {Object} map_elem -
 * @return {void}
 */
-export function changeChart(type_new_chart, chart, map_elem) {
-  chart.remove();
+export function changeChart(type_new_chart) {
+  app.chart.remove();
   // eslint-disable-next-line no-param-reassign
-  chart = null;
+  app.chart = null;
   unbindUI();
   app.colors = {};
   if (type_new_chart.indexOf('BarChart1') > -1) {
-    chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
+    app.chart = new BarChart1(app.current_data); // eslint-disable-line no-param-reassign
   } else if (type_new_chart.indexOf('ScatterPlot2') > -1) {
-    chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
+    app.chart = new ScatterPlot2(app.current_data); // eslint-disable-line no-param-reassign
   } else if (type_new_chart.indexOf('RadarChart3') > -1) {
-    chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
+    app.chart = new RadarChart3(app.current_data); // eslint-disable-line no-param-reassign
   } else if (type_new_chart.indexOf('Similarity1plus') > -1) {
-    chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
+    app.chart = new Similarity1plus(app.current_data); // eslint-disable-line no-param-reassign
   }
-  bindUI_chart(chart, map_elem); // eslint-disable-line no-use-before-define
-  map_elem.bindBrushClick(chart);
-  chart.bindMap(map_elem);
-  app.chart = chart;
-  app.map = map_elem;
+  bindUI_chart(); // eslint-disable-line no-use-before-define
+  app.map.bindBrushClick(app.chart);
+  app.chart.bindMap(app.map);
+  // app.chart = chart;
+  // app.map = map_elem;
   Tooltipsify('[title-tooltip]');
 }
 
@@ -265,7 +265,7 @@ export function changeChart(type_new_chart, chart, map_elem) {
 *
 */
 // eslint-disable-next-line no-use-before-define
-export function bindUI_chart(chart, map_elem) {
+export function bindUI_chart() {
   // Variable for slight timeout used for
   // some input fields to avoid refreshing as soon as the value is entered:
   let tm;
@@ -295,7 +295,7 @@ export function bindUI_chart(chart, map_elem) {
           const input_elem = document.getElementById('dist_filter');
           input_elem.removeAttribute('disabled');
           const dist = +input_elem.value;
-          const ids = map_elem.getUnitsWithin(dist);
+          const ids = app.map.getUnitsWithin(dist);
           applyFilter(app, ids);
         } else if (filter_type === 'CUSTOM') {
           app.current_config.filter_type = 'CUSTOM';
@@ -306,7 +306,7 @@ export function bindUI_chart(chart, map_elem) {
           document.getElementById('dist_filter').setAttribute('disabled', 'disabled');
           applyFilter(app, filter_type);
         }
-        chart.changeStudyZone();
+        app.chart.changeStudyZone();
         updateMyCategorySection();
       }
     });
@@ -318,9 +318,9 @@ export function bindUI_chart(chart, map_elem) {
         if (+this.value < app.current_config.min_km_closest_unit) {
           this.value = app.current_config.min_km_closest_unit;
         }
-        const ids = map_elem.getUnitsWithin(+this.value);
+        const ids = app.map.getUnitsWithin(+this.value);
         applyFilter(app, ids);
-        chart.changeStudyZone();
+        app.chart.changeStudyZone();
         updateMyCategorySection();
       }, 275);
     });
@@ -346,12 +346,12 @@ export function bindUI_chart(chart, map_elem) {
         // variables after that:
         const new_nb_var = updateAvailableRatios(id_region);
         updateAvailableCharts(new_nb_var);
-        changeRegion(app, id_region, map_elem);
+        changeRegion(app, id_region, app.map);
         updateMenuStudyZones();
         updateMyCategorySection();
         if (new_nb_var >= app.current_config.nb_var) {
           if (old_nb_var === new_nb_var) {
-            chart.updateChangeRegion();
+            app.chart.updateChangeRegion();
           } else {
             d3.select('span.type_chart.selected').dispatch('click');
             alertify.warning('Une variable précédemment sélectionnée n\'est pas disponible pour ce territoire.');
@@ -400,8 +400,7 @@ export function bindUI_chart(chart, map_elem) {
         this.classList.add('checked');
         const code_variable = this.getAttribute('value');
         addVariable(app, code_variable);
-
-        chart.addVariable(code_variable);
+        app.chart.addVariable(code_variable);
         nb_var += 1;
       } else { // Remove a variable from the selection:
         nb_var -= 1;
@@ -414,7 +413,7 @@ export function bindUI_chart(chart, map_elem) {
         const code_variable = this.getAttribute('value');
         this.classList.remove('checked');
         removeVariable(app, code_variable);
-        chart.removeVariable(code_variable);
+        app.chart.removeVariable(code_variable);
       }
       // Update the top menu to display available charts according to the current
       // number of available variables:
@@ -425,9 +424,13 @@ export function bindUI_chart(chart, map_elem) {
     .on('click', function () {
       if (!this.classList.contains('checked') && !this.parentNode.classList.contains('disabled')) {
         // Reset the study zone :
-        d3.select('p[filter-value="DEFAULT"] > span.filter_v').dispatch('click');
+        d3.selectAll('p > span.filter_v').classed('checked', false);
+        app.current_config.filter_type = 'DEFAULT';
+        app.current_config.filter_key = undefined;
+        d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true); /* .dispatch('click'); */
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
         const level_value = this.getAttribute('value');
+        const old_nb_var = app.current_config.ratio.length;
         d3.selectAll('.regioname')
           .style('display', d => (+d[level_value] === 1 ? null : 'none'))
           .selectAll('.square')
@@ -435,22 +438,35 @@ export function bindUI_chart(chart, map_elem) {
         this.classList.add('checked');
         app.current_config.current_level = level_value;
         app.current_config.my_region = getRandom(app.full_dataset
-          .filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1).map(d => d.id));
+          .filter(d => +d.REGIOVIZ === 1 && +d[level_value] === 1).map(d => d.id));
         app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
         document.querySelector('.regio_name > #search').value = app.current_config.my_region_pretty_name;
         document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
         document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`).classList.add('checked');
         // filterLevelVar(app);
         resetColors();
-        d3.selectAll('p > span.filter_v').classed('checked', false);
-        app.current_config.filter_type = 'DEFAULT';
-        app.current_config.filter_key = undefined;
         filterLevelVar(app);
-        map_elem.updateLevelRegion(level_value);
-        const _id = app.chart._id.toString();
-        changeChart(_id, chart, map_elem);
+        app.map.updateLevelRegion(level_value);
+        const new_nb_var = updateAvailableRatios(app.current_config.my_region);
+        updateAvailableCharts(new_nb_var);
+        // changeRegion(app, id_region, app.map);
         updateMenuStudyZones();
         updateMyCategorySection();
+
+        if (new_nb_var >= app.current_config.nb_var) {
+          if (new_nb_var < old_nb_var) {
+            alertify.warning(
+              'Une variable précédemment sélectionnée n\'est pas disponible pour ce territoire.');
+          }
+          changeChart(app.chart._id.toString());
+        } else {
+          // If there fewer selected variables than requested by the current chart,
+          // redraw the first (default) kind of chart:
+          alertify.warning([
+            'Des variables sélectionnées sont indisponibles pour ce territoire. ',
+            'Un changement de représentation est nécessaire.'].join(''));
+          changeChart('BarChart1');
+        }
       }
     });
 
@@ -469,10 +485,10 @@ export function bindUI_chart(chart, map_elem) {
         document.getElementById('img_map_zoom').classList.remove('active');
         document.getElementById('img_map_select').classList.remove('active');
         svg_map.on('.zoom', null);
-        if (map_elem.brush_map) {
+        if (app.map.brush_map) {
           svg_map.select('.brush_map').style('display', null);
         }
-        map_elem.target_layer.selectAll('path').on('click', null);
+        app.map.target_layer.selectAll('path').on('click', null);
       }
     });
 
@@ -482,12 +498,12 @@ export function bindUI_chart(chart, map_elem) {
         this.classList.add('active');
         document.getElementById('img_rect_selec').classList.remove('active');
         document.getElementById('img_map_select').classList.remove('active');
-        svg_map.call(map_elem.zoom_map);
-        if (map_elem.brush_map) {
-          svg_map.select('.brush_map').call(map_elem.brush_map.move, null);
+        svg_map.call(app.map.zoom_map);
+        if (app.map.brush_map) {
+          svg_map.select('.brush_map').call(app.map.brush_map.move, null);
           svg_map.select('.brush_map').style('display', 'none');
         }
-        map_elem.target_layer.selectAll('path').on('click', null);
+        app.map.target_layer.selectAll('path').on('click', null);
       }
     });
 
@@ -498,13 +514,13 @@ export function bindUI_chart(chart, map_elem) {
         document.getElementById('img_rect_selec').classList.remove('active');
         document.getElementById('img_map_zoom').classList.remove('active');
         svg_map.on('.zoom', null);
-        if (map_elem.brush_map) {
-          svg_map.select('.brush_map').call(map_elem.brush_map.move, null);
+        if (app.map.brush_map) {
+          svg_map.select('.brush_map').call(app.map.brush_map.move, null);
           svg_map.select('.brush_map').style('display', 'none');
         }
-        map_elem.target_layer.selectAll('path')
+        app.map.target_layer.selectAll('path')
           .on('click', function (d) {
-            chart.handleClickMap(d, this);
+            app.chart.handleClickMap(d, this);
           });
       }
     });
@@ -515,18 +531,18 @@ export function bindUI_chart(chart, map_elem) {
   header_map_section.select('#zoom_out')
     .on('click', zoomClick);
 
-  if (!map_elem.brush_map) {
-    if (chart.handleClickMap) {
-      map_elem.target_layer.selectAll('path')
+  if (!app.map.brush_map) {
+    if (app.chart.handleClickMap) {
+      app.map.target_layer.selectAll('path')
         .on('click', function (d) {
-          chart.handleClickMap(d, this);
+          app.chart.handleClickMap(d, this);
         });
     } else {
-      map_elem.target_layer.selectAll('path')
+      app.map.target_layer.selectAll('path')
         .on('click', null);
     }
   }
-  bindTopButtons(chart, map_elem); // eslint-disable-line no-use-before-define
+  bindTopButtons(); // eslint-disable-line no-use-before-define
 }
 
 /**
@@ -537,7 +553,7 @@ export function bindUI_chart(chart, map_elem) {
 * @param {Object} map_elem -
 * @return {void}
 */
-function bindTopButtons(chart, map_elem) {
+function bindTopButtons() {
   d3.selectAll('.type_chart')
     .on('click', function () {
       if (this.classList.contains('disabled')) return;
@@ -545,7 +561,7 @@ function bindTopButtons(chart, map_elem) {
       document.querySelector('.type_chart.selected').classList.remove('selected');
       this.classList.add('selected');
       const value = this.getAttribute('value');
-      changeChart(value, chart, map_elem);
+      changeChart(value);
     });
 }
 
@@ -795,7 +811,6 @@ function loadData() {
               makeTopMenu();
               makeHeaderChart();
               makeHeaderMapSection();
-              console.log(start_region, start_variable, start_territorial_mesh);
               setDefaultConfigMenu(start_region, start_variable, start_territorial_mesh);
               filterLevelVar(app);
               const other_layers = new Map();
@@ -809,14 +824,16 @@ function loadData() {
               ].forEach((el) => {
                 other_layers.set(el[0], el[1]);
               });
-              const map_elem = new MapSelect(
-                territoires_france, other_layers, styles_map, start_territorial_mesh);
-              const chart = new BarChart1(app.current_data);
-              bindUI_chart(chart, map_elem);
-              map_elem.bindBrushClick(chart);
-              chart.bindMap(map_elem);
-              app.chart = chart;
-              app.map = map_elem;
+              app.map = new MapSelect(
+                territoires_france,
+                other_layers,
+                styles_map,
+                start_territorial_mesh,
+              );
+              app.chart = new BarChart1(app.current_data);
+              bindUI_chart(app.chart, app.map);
+              app.map.bindBrushClick(app.chart);
+              app.chart.bindMap(app.map);
               Tooltipsify('[title-tooltip]');
               updateMyCategorySection();
               // Fetch the layer in geographic coordinates now in case the user wants to download it later:

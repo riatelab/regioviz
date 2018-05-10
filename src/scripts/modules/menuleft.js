@@ -2,14 +2,22 @@ import { removeDuplicates, toggleVisibilityLeftMenu } from './helpers';
 import { app } from './../main';
 
 
-const handleInputRegioName = (allowed_names) => {
+const handleInputRegioName = (allowed_names, levels) => {
   const ids_names = {};
-  allowed_names.forEach((ft) => { ids_names[ft.name.toLowerCase()] = ft.id; });
-  const names = allowed_names.map(d => d.name.toUpperCase());
-  const names2 = names.map(d => d.toLowerCase());
+  const names_lower = {}; // names.map(d => d.toLowerCase());
+
+  levels.forEach(level => {
+    ids_names[level] = {};
+    names_lower[level] = [];
+  });
+  allowed_names.forEach((ft) => {
+    const ft_level = levels.find(level => +ft[level] === 1);
+    ids_names[ft_level][ft.name.toLowerCase()] = ft.id;
+    names_lower[ft_level].push(ft.name.toLowerCase());
+  });
 
   document.getElementById('search').onblur = function () {
-    if (!ids_names[this.value.toLowerCase()]) {
+    if (!ids_names[app.current_config.current_level][this.value.toLowerCase()]) {
       document.getElementById('autocomplete').value = app.current_config.my_region_pretty_name;
       this.value = app.current_config.my_region_pretty_name;
     }
@@ -19,44 +27,31 @@ const handleInputRegioName = (allowed_names) => {
   document.getElementById('search').onkeyup = function (ev) {
     const value = this.value;
     if (!value || value === '') {
-      // document.getElementById('autocomplete').value = app.current_config.my_region_pretty_name;
-      // this.value = app.current_config.my_region_pretty_name;
       return;
     }
+    const names_lower_current_level = names_lower[app.current_config.current_level];
     document.getElementById('list_regio').classList.remove('hidden');
     const new_value = value.toLowerCase();
     document.getElementById('autocomplete').value = '';
-    for (let i = 0; i < names2.length; i++) {
-      if (+allowed_names[i][app.current_config.current_level] === 1) {
-        if (names2[i].lastIndexOf(new_value, 0) === 0) {
-          if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
-            const t = value + names2[i].substr(new_value.length, names2[i].length);
-            document.getElementById('search').value = t;
-            document.getElementById('autocomplete').value = t;
-          }
-          const str_after = names2[i].substr(new_value.length, names2[i].length);
-          const new_str = value + str_after;
-          document.getElementById('autocomplete').value = new_str;
-          // if (ev && ev.key === 'Tab') {
-          //   document.querySelector('#search').value = names2[i];
-          //   document.querySelector('#autocomplete').value = names2[i];
-          //   return;
-          // }
-          // const str_after = names2[i].substr(new_value.length, names2[i].length);
-          // const new_str = value + str_after;
-          // document.getElementById('autocomplete').value = new_str;
-          // return;
+    for (let i = 0; i < names_lower_current_level.length; i++) {
+      if (names_lower_current_level[i].lastIndexOf(new_value, 0) === 0) {
+        if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
+          const t = value + names_lower_current_level[i].substr(
+            new_value.length, names_lower_current_level[i].length);
+          document.getElementById('search').value = t;
+          document.getElementById('autocomplete').value = t;
         }
+        const str_after = names_lower_current_level[i].substr(
+          new_value.length, names_lower_current_level[i].length);
+        const new_str = value + str_after;
+        document.getElementById('autocomplete').value = new_str;
       }
     }
     const a = document.getElementById('autocomplete').value;
     const b = document.getElementById('search').value;
-    const code = ids_names[a.toLowerCase()];
+    const code = ids_names[app.current_config.current_level][a.toLowerCase()];
     if (a === b && code) {
       document.querySelector(`.target_region.square[value="r_${code}"]`).click();
-      // Array.prototype.slice.call(document.querySelectorAll(`.target_region.square[value="r_${code}"]`))
-      //   .find(d => +d.parentElement.__data__[app.current_config.current_level] === 1)
-      //   .click();
     }
   };
 };
@@ -113,6 +108,7 @@ export default function createMenu(names, variables, study_zones, territorial_me
       d3.select(this).selectAll('span.minibutton').style('display', 'none');
     });
 
+  const levels = [];
   // Fourth section:
   const title_section4 = document.createElement('p');
   title_section4.className = 'title_menu';
@@ -125,6 +121,7 @@ export default function createMenu(names, variables, study_zones, territorial_me
   for (let i = 0, len_i = territorial_mesh.length; i < len_i; i++) {
     const entry = document.createElement('p');
     const territ_level = territorial_mesh[i];
+    levels.push(territ_level.id);
     entry.innerHTML = `<span value="${territ_level.id}" class='territ_level square'></span><span class="label_chk">${territ_level.name}</span><span class="i_info">i</span>`;
     section4.appendChild(entry);
   }
@@ -253,6 +250,6 @@ export default function createMenu(names, variables, study_zones, territorial_me
   menu.appendChild(title_section3);
   menu.appendChild(section3);
   menu.appendChild(section5);
-  handleInputRegioName(names);
+  handleInputRegioName(names, levels);
   makeButtonMenuLeft();
 }

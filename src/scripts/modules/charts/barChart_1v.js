@@ -94,14 +94,14 @@ export default class BarChart1 {
       svg_container.select('.zoom').call(this.zoom.transform, d3.zoomIdentity
         .scale(width / (current_range[1] - current_range[0]))
         .translate(-current_range[0], 0));
-      this.update();
+      this._update();
       this.updateContext(current_range[0], current_range[1]);
       svg_container.select('.brush_top').call(this.brush_top.move, null);
       // this.brushed_top();
     };
 
     this.brushed_top = () => {
-      if (!this._focus || !this.map_elem) return;
+      if (!this._focus) return;
 
       const d3_event = d3.event;
       const my_region = app.current_config.my_region;
@@ -130,7 +130,7 @@ export default class BarChart1 {
       //       && d3_event.sourceEvent.target === document.querySelector(
       //         '.brush_top > rect.overlay')) {
       if (d3_event && d3_event.selection && d3_event.sourceEvent && d3_event.sourceEvent.target) {
-        this.map_elem.removeRectBrush();
+        app.map.removeRectBrush();
         const s = d3_event.selection;
         current_range_brush = [
           current_range[0] + math_round(s[0] / (width / displayed)) - 1,
@@ -160,7 +160,7 @@ export default class BarChart1 {
       } else {
         if (d3_event && !d3_event.selection
             && d3_event.sourceEvent && d3_event.sourceEvent.detail !== undefined) {
-          this.map_elem.removeRectBrush();
+          app.map.removeRectBrush();
           app.colors = {};
           app.colors[my_region] = color_highlight;
           this.updateMapRegio();
@@ -358,9 +358,6 @@ export default class BarChart1 {
         'pointer-events': 'none',
       });
 
-    g_brush_top.call(brush_top.move, null);
-    g_brush_bottom.call(brush_bottom.move, x.range());
-
     this.completude = new CompletudeSection();
     this.completude.update(
       calcCompletudeSubset(app, [this.ratio_to_use], 'array'),
@@ -404,7 +401,7 @@ export default class BarChart1 {
         // this.updateMiniBars();
         self.updateContext(current_range[0], current_range[1]);
         svg_container.select('.brush_top').call(brush_top.move, null);
-        self.map_elem.removeRectBrush();
+        app.map.removeRectBrush();
         svg_container.select('.brush_bottom').call(brush_bottom.move, x.range());
       });
 
@@ -545,7 +542,7 @@ export default class BarChart1 {
 
   update() {
     if (document.getElementById('overlay').style.display === 'none'){
-      execWithWaitingOverlay(() => { this._update.bind(this); });
+      execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();
     }
@@ -715,7 +712,7 @@ export default class BarChart1 {
   }
 
   updateMapRegio() {
-    this.map_elem.target_layer.selectAll('path')
+    app.map.target_layer.selectAll('path')
       .attr('fill-opacity', 1)
       .attr('fill', d => (this.current_ids.indexOf(d.id) > -1
         ? (app.colors[d.id] || color_countries)
@@ -746,7 +743,7 @@ export default class BarChart1 {
     this.update();
     // svg_container.select('.brush_top')
     //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
     this.updateMapRegio();
     this.reset_state_button = true;
   }
@@ -776,7 +773,7 @@ export default class BarChart1 {
     this.update();
     // svg_bar.select('.brush_top')
     //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
     this.updateMapRegio();
     this.reset_state_button = true;
   }
@@ -806,7 +803,7 @@ export default class BarChart1 {
     svg_bar.select('.brush_bottom').call(
       this.brush_bottom.move, this.x2.range());
     this.update();
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
     // svg_bar.select('.brush_top')
     //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
     this.updateMapRegio();
@@ -836,7 +833,7 @@ export default class BarChart1 {
     svg_bar.select('.brush_bottom').call(
       this.brush_bottom.move, this.x2.range());
     this.update();
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
     // svg_bar.select('.brush_top')
     //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
     this.updateMapRegio();
@@ -848,7 +845,7 @@ export default class BarChart1 {
       this.last_map_selection = undefined;
       return;
     }
-    this.map_elem.tooltip.style('display', 'none');
+    app.map.tooltip.style('display', 'none');
     const my_region = app.current_config.my_region;
     const self = this;
     svg_bar.select('.brush_top').call(self.brush_top.move, null);
@@ -862,7 +859,7 @@ export default class BarChart1 {
     const rect = new Rect(topleft, bottomright);
     const ix_ref = this.data.findIndex(d => d.id === my_region);
     app.colors = {};
-    self.map_elem.target_layer.selectAll('path')
+    app.map.target_layer.selectAll('path')
       .attr('fill', function (d) {
         const id = d.id;
         if (id === my_region) {
@@ -935,8 +932,8 @@ export default class BarChart1 {
       this.updateMapRegio();
       this.updateTableStats();
       svg_bar.select('.brush_bottom').call(this.brush_bottom.move, this.x.range());
-      this.map_elem.removeRectBrush();
-      this.map_elem.updateLegend();
+      app.map.removeRectBrush();
+      app.map.updateLegend();
     }
   }
 
@@ -982,7 +979,7 @@ export default class BarChart1 {
     this.y2.domain(this.y.domain());
     this.updateMeanValue();
     svg_bar.select('.brush_bottom').call(this.brush_bottom.move, this.x2.range());
-    this.map_elem.removeRectBrush();
+    app.map.removeRectBrush();
     app.colors = {};
     app.colors[app.current_config.my_region] = color_highlight;
     this.update();
@@ -1050,16 +1047,16 @@ export default class BarChart1 {
     this.title_variable.remove();
     this.table_stats.remove();
     this.table_stats = null;
-    this.map_elem.unbindBrushClick();
-    this.map_elem = null;
+    app.map.unbindBrushClick();
     d3.select('#svg_bar').text('').html('');
   }
 
-  bindMap(map_elem) {
-    this.map_elem = map_elem;
-    this.map_elem.resetColors(this.current_ids);
-    this.map_elem.displayLegend(0);
+  bindMap() {
+    app.map.resetColors(this.current_ids);
+    app.map.displayLegend(0);
     this.updateCompletude();
+    d3.select('.brush_top').call(this.brush_top.move, null);
+    d3.select('.brush_bottom').call(this.brush_bottom.move, this.x.range());
   }
 
   updateTableStats() {

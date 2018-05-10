@@ -413,7 +413,7 @@ export default class RadarChart3 {
       })
       .on('click', (d) => {
         const ft_id = d.name;
-        self.map_elem.target_layer
+        app.map.target_layer
           .selectAll('path')
           .each(function (ft) {
             if (ft.id === ft_id) {
@@ -421,7 +421,7 @@ export default class RadarChart3 {
               cloned.style.stroke = 'yellow';
               cloned.style.strokeWidth = '2.25px';
               cloned.classList.add('cloned');
-              self.map_elem.layers.select('#temp').node().appendChild(cloned);
+              app.map.layers.select('#temp').node().appendChild(cloned);
               setTimeout(() => {
                 cloned.remove();
               }, 5000);
@@ -874,7 +874,7 @@ export default class RadarChart3 {
 
   update() {
     if (document.getElementById('overlay').style.display === 'none'){
-      execWithWaitingOverlay(() => { this._update.bind(this); });
+      execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();
     }
@@ -965,10 +965,9 @@ export default class RadarChart3 {
     return val;
   }
 
-  bindMap(map_elem) {
-    this.map_elem = map_elem;
-    this.map_elem.resetColors(this.current_ids);
-    this.map_elem.displayLegend(2);
+  bindMap() {
+    app.map.resetColors(this.current_ids);
+    app.map.displayLegend(2);
     this.updateMapRegio();
     this.updateCompletude();
   }
@@ -976,9 +975,8 @@ export default class RadarChart3 {
   remove() {
     this.table_stats.remove();
     this.table_stats = null;
-    this.map_elem.layers.selectAll('.cloned').remove();
-    this.map_elem.unbindBrushClick();
-    this.map_elem = null;
+    app.map.layers.selectAll('.cloned').remove();
+    app.map.unbindBrushClick();
     d3.select('#svg_bar').text('').html('');
   }
 
@@ -1111,8 +1109,8 @@ export default class RadarChart3 {
   }
 
   updateMapRegio() {
-    if (!this.map_elem) return;
-    this.map_elem.target_layer.selectAll('path')
+    if (!app.map) return;
+    app.map.target_layer.selectAll('path')
       .attr('fill-opacity', 1)
       .attr('fill', (d) => {
         if (d.id === this.id_my_region) {

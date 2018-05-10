@@ -882,7 +882,7 @@ function createStudyZone(regions) {
 *  current chart in use in the application.
 * @return {Void}
 */
-function svgContextMenu(current_chart, svg_elem, map_elem, colors_selection) {
+function svgContextMenu(current_chart, svg_elem, colors_selection) {
   let items_menu;
   // Remove existing context menu if any:
   if (isContextMenuDisplayed()) {
@@ -928,7 +928,7 @@ function svgContextMenu(current_chart, svg_elem, map_elem, colors_selection) {
     if (elem_id) {
       items_menu.push({
         name: 'Zoomer la carte sur le territoire sélectionné',
-        action: () => { map_elem.zoomOnFeature(elem_id); },
+        action: () => { app.map.zoomOnFeature(elem_id); },
       });
     }
     // If the current chart is zoomable, allow to reset the zoom:
