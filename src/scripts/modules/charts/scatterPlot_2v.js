@@ -535,7 +535,7 @@ export default class ScatterPlot2 {
       .attr('class', 'cont_btn')
       .append('button')
       .attrs({ class: 'button_blue', id: 'btn_above_my_region' })
-      .text('inférieurs à mon territoire')
+      .text('inférieures à mon territoire')
       .on('click', function () {
         menu_selection.selectAll('button').attr('class', 'button_blue');
         this.classList.add('pressed');
@@ -672,11 +672,12 @@ export default class ScatterPlot2 {
       })
       .html(`${this.variable1}  &#x25BE;`)
       .on('click', function () {
+        const { scrollX, scrollY } = getScrollValue();
         const bbox = this.getBoundingClientRect();
         if (self.menuY.displayed) {
           self.menuY.hideMenu();
         }
-        self.menuX.showMenu(d3.event, document.body, self.itemsX, [bbox.left - 20, bbox.top + 20]);
+        self.menuX.showMenu(d3.event, document.body, self.itemsX, [bbox.left - 20, bbox.top + 20 + scrollY]);
       });
 
     svg_container.append('text')
@@ -697,11 +698,12 @@ export default class ScatterPlot2 {
       })
       .html(`${this.variable2}  &#x25BE;`)
       .on('click', function () {
+        const { scrollX, scrollY } = getScrollValue();
         const bbox = this.getBoundingClientRect();
         if (self.menuX.displayed) {
           self.menuX.hideMenu();
         }
-        self.menuY.showMenu(d3.event, document.body, self.itemsY, [bbox.left, bbox.bottom + 10]);
+        self.menuY.showMenu(d3.event, document.body, self.itemsY, [bbox.left, bbox.bottom + 10 + scrollY]);
       });
   }
 

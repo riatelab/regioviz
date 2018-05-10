@@ -1,7 +1,7 @@
 import {
   comp, math_round, math_abs, math_max, Rect, getScrollValue,
-  getMean2, svgPathToCoords, getElementsFromPoint, formatNumber,
-  svgContextMenu, isContextMenuDisplayed,
+  getMean2, svgPathToCoords, getElementsFromPoint, getNameStudyZone,
+  formatNumber, svgContextMenu, isContextMenuDisplayed,
 } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
@@ -459,6 +459,7 @@ export default class BarChart1 {
       })
       .html(`${this.items_menu[0].name.replace(/\(/, '&&&').split('&&&').join('<br>(')}  &#x25BE;`)
       .on('click', function () {
+        const { scrollX, scrollY } = getScrollValue();
         const bbox = this.getBoundingClientRect();
         const items = self.items_menu.filter(el => el.code !== self.ratio_to_use);
         if (items.length > 0) {
@@ -466,7 +467,7 @@ export default class BarChart1 {
             d3.event,
             document.body,
             items,
-            [bbox.left - 5, bbox.bottom + 2.5]);
+            [bbox.left - 5, bbox.bottom + 2.5 + scrollY]);
         }
       });
 
@@ -497,7 +498,7 @@ export default class BarChart1 {
       .attr('class', 'cont_btn')
       .append('button')
       .attrs({ class: 'button_blue', id: 'btn_above_my_region' })
-      .text('inférieurs à mon territoire')
+      .text('inférieures à mon territoire')
       .on('click', function () {
         menu_selection.selectAll('button').attr('class', 'button_blue');
         this.classList.add('pressed');

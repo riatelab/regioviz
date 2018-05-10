@@ -1084,7 +1084,7 @@ export default class RadarChart3 {
     if (this.current_ids.indexOf(id) < 0 || id === this.id_my_region) return;
     if (this.displayed_ids.indexOf(id) < 0) {
       if (this.data.length > 6) {
-        alertify.warning('Le nombre maximal de territoires sélectionnées est atteint.');
+        alertify.warning('Le nombre maximal de territoires sélectionnés est atteint.');
         return;
       }
       const a = prepare_data_radar_ft(this.ref_data, this.variables, id);
