@@ -5,7 +5,7 @@ import {
 } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, resetColors, variables_info, study_zones, territorial_mesh } from './../../main';
+import { app, execWithWaitingOverlay, resetColors, variables_info, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';
@@ -268,7 +268,7 @@ export default class BarChart1 {
 
     this.g_bar = focus.append('g');
 
-    const g_brush_top = focus.append('g')
+    focus.append('g')
       .attr('class', 'brush_top')
       .call(brush_top);
 
@@ -459,7 +459,7 @@ export default class BarChart1 {
       })
       .html(`${this.items_menu[0].name.replace(/\(/, '&&&').split('&&&').join('<br>(')}  &#x25BE;`)
       .on('click', function () {
-        const { scrollX, scrollY } = getScrollValue();
+        const { scrollY } = getScrollValue();
         const bbox = this.getBoundingClientRect();
         const items = self.items_menu.filter(el => el.code !== self.ratio_to_use);
         if (items.length > 0) {
@@ -542,7 +542,7 @@ export default class BarChart1 {
   }
 
   update() {
-    if (document.getElementById('overlay').style.display === 'none'){
+    if (document.getElementById('overlay').style.display === 'none') {
       execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();

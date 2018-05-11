@@ -7,7 +7,7 @@ import {
 import { color_disabled, color_countries, color_default_dissim,
   color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, resetColors, variables_info, territorial_mesh, study_zones } from './../../main';
+import { app, execWithWaitingOverlay, resetColors, variables_info, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import { prepareTooltip, Tooltipsify } from './../tooltip';
@@ -154,7 +154,7 @@ export default class Similarity1plus {
       .attrs({
         type: 'radio',
         name: 'radio_dist',
-        value: 'rank_norm'
+        value: 'rank_norm',
       })
       .property('checked', 'checked');
     dist_norm_rank.append('span')
@@ -258,14 +258,10 @@ export default class Similarity1plus {
         ft.dist = math_sqrt(this.ratios.map(v => `dist_${v}`)
           .map(v => math_pow(ft[v], 2)).reduce((a, b) => a + b));
       });
-      // this.data.sort((a, b) => a.dist - b.dist);
-      // this.data.forEach((el, i) => { el.globalrank = i; }); // eslint-disable-line no-param-reassign
 
       const field_distance = this.type_distance === 'euclidienne'
         ? 'dist' : 'dist2';
       this.data.sort((a, b) => a[field_distance] - b[field_distance]);
-      // eslint-disable-next-line no-param-reassign
-      // this.data.forEach((el, i) => { el.globalrank = i; });
 
       for (let i = 0, nb_features = this.data.length; i < nb_features; i++) {
         this.data[i].globalrank = i;
@@ -282,7 +278,7 @@ export default class Similarity1plus {
   }
 
   update() {
-    if (document.getElementById('overlay').style.display === 'none'){
+    if (document.getElementById('overlay').style.display === 'none') {
       execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();
@@ -688,7 +684,7 @@ export default class Similarity1plus {
       const xAxis = d3.axisBottom(this.x).ticks(10, '');
       const simulation = d3.forceSimulation(data)
         .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
-        .force('y', d3.forceY(height / 2)/*.strength(d => (d.id === app.current_config.my_region ? 1 : 0.06))*/)
+        .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
         .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
         .stop();
 
@@ -1063,7 +1059,7 @@ export default class Similarity1plus {
         circle.style.stroke = 'black';
         circle.style.strokeWidth = '2';
         const content = [];
-        const globalrank = d.data.globalrank
+        const globalrank = d.data.globalrank;
         const field_distance = self.type_distance === 'euclidienne'
           ? 'dist' : 'dist2';
         if (!_isNaN(globalrank)) {
@@ -1341,7 +1337,10 @@ export default class Similarity1plus {
     }
 
     // this.data.forEach((ft) => {
-    //   ft.dist2 = this.ratios.map(_v => `rank_${_v}`).map(_v => ft[_v]).reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
+    //   ft.dist2 = this.ratios
+    //     .map(_v => `rank_${_v}`)
+    //     .map(_v => ft[_v])
+    //     .reduce((pv, cv) => pv + cv, 0) / this.ratios.length;
     //   // eslint-disable-next-line no-param-reassign, no-restricted-properties
     //   ft.dist = math_sqrt(this.ratios.map(_v => `dist_${_v}`)
     //     .map(_v => math_pow(ft[_v], 2)).reduce((a, b) => a + b));
@@ -1360,8 +1359,6 @@ export default class Similarity1plus {
     const field_distance = this.type_distance === 'euclidienne'
       ? 'dist' : 'dist2';
     data.sort((a, b) => a[field_distance] - b[field_distance]);
-    // eslint-disable-next-line no-param-reassign
-    // this.data.forEach((el, i) => { el.globalrank = i; });
 
     for (let i = 0; i < nb_features; i++) {
       data[i].globalrank = i;
@@ -1514,6 +1511,7 @@ export default class Similarity1plus {
     this.draw_group.selectAll('.regio_line').remove();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   removeMapClonedFeatures() {
     app.map.layers.selectAll('.cloned').remove();
   }

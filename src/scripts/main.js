@@ -209,18 +209,20 @@ function updateAvailableCharts(nb_var) {
 }
 
 function updateMyCategorySection() {
+  const content_section = document.querySelector('.filter_info');
   let name_territorial_mesh = territorial_mesh
     .find(d => d.id === app.current_config.current_level).name;
   name_territorial_mesh = name_territorial_mesh.toLowerCase();
   if (app.current_config.my_category) {
-    document.querySelector('.filter_info').innerHTML = app.current_config.my_category;
+    content_section.innerHTML = app.current_config.my_category;
   } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
     name_territorial_mesh = name_territorial_mesh.charAt(0).toUpperCase() + name_territorial_mesh.slice(1);
-    document.querySelector('.filter_info').innerHTML = `${name_territorial_mesh} dans un voisinage de ${+d3.select('#dist_filter').property('value')} km`;
+    const dist_value = +d3.select('#dist_filter').property('value');
+    content_section.innerHTML = `${name_territorial_mesh} dans un voisinage de ${dist_value} km`;
   } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
-    document.querySelector('.filter_info').innerHTML = `Sélection personnalisée de ${name_territorial_mesh}`;
+    content_section.innerHTML = `Sélection personnalisée de ${name_territorial_mesh}`;
   } else {
-    document.querySelector('.filter_info').innerHTML = `Ensemble des ${name_territorial_mesh}`;
+    content_section.innerHTML = `Ensemble des ${name_territorial_mesh}`;
   }
 }
 
@@ -739,32 +741,31 @@ function loadData() {
   const total = 13718521;
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
-  const req = d3.request('data/data.zip')
+
+  d3.request('data/data.zip')
     .responseType('arraybuffer')
-    .on('progress', function(val) {
+    .on('progress', (val) => {
       const i = d3.interpolate(progress, val.loaded / total);
-      d3.transition().tween("progress", function() {
-        return function(t) {
-          progress = i(t);
-          text.text(`Préparation de la page ... ${formatPercent(progress * 0.91)}`);
-        };
+      d3.transition().tween("progress", () => (t) => {
+        progress = i(t);
+        text.text(`Préparation de la page ... ${formatPercent(progress * 0.91)}`);
       });
     })
-    .get(function(error, data) {
+    .get((error, data) => {
       if (error) throw error;
       const p = [];
-      text.text(`Préparation de la page ... 95%`);
+      text.text('Préparation de la page ... 95%');
       setTimeout(() => {
         JSZip.loadAsync(data.response)
-          .then(function(zip) {
+          .then((zip) => {
             zip.forEach((relative_path, entry) => {
               p.push([entry.name, zip.file(entry.name).async('string')]);
             });
             p.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
-            text.text(`Préparation de la page ... 95%`);
+            text.text('Préparation de la page ... 95%');
             return Promise.all(p.map(d => d[1]));
           }).then((res) => {
-            text.text(`Préparation de la page ... 97%`);
+            text.text('Préparation de la page ... 97%');
             const back = JSON.parse(res[0]);
             const back_countries = JSON.parse(res[1]);
             const boundaries = JSON.parse(res[2]);
@@ -775,7 +776,7 @@ function loadData() {
             const full_dataset = d3.csvParse(res[7]);
             const styles_map = JSON.parse(res[8]);
             const territoires_france = JSON.parse(res[9]);
-            text.text(`Préparation de la page ... 99%`);
+            text.text('Préparation de la page ... 98%');
             return Promise.resolve([
               full_dataset, territoires_france, back, back_countries,
               boundaries, boxes, coasts, regions, styles_map, metadata_indicateurs,
@@ -803,7 +804,12 @@ function loadData() {
               prepare_dataset(full_dataset, app);
               setDefaultConfig(start_region, start_variable, start_territorial_mesh);
               prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
-              createMenu(features_menu, variables_info.filter(d => d.group), study_zones, territorial_mesh);
+              createMenu(
+                features_menu,
+                variables_info.filter(d => d.group),
+                study_zones,
+                territorial_mesh,
+              );
 
               bindCreditsSource();
               updateMenuStudyZones();
@@ -836,7 +842,8 @@ function loadData() {
               app.chart.bindMap(app.map);
               Tooltipsify('[title-tooltip]');
               updateMyCategorySection();
-              // Fetch the layer in geographic coordinates now in case the user wants to download it later:
+              // Fetch the layer in geographic coordinates now
+              // in case the user wants to download it later:
               // d3.request('data/CGET_nuts_all.geojson', (err, result) => {
               //   app.geo_layer = result.response;
               // });
@@ -866,12 +873,12 @@ window.onresize = function () {
   d3.select('.cont_svg.clgd').style('padding-top', `${(height_legend / fixed_dimension.legend.width) * width_value_map}px`);
 };
 
-const waitingOverlay = (function() {
+const waitingOverlay = (function () {
   const overlay = document.createElement('div');
   overlay.id = 'overlay';
   overlay.style.display = 'none';
   overlay.innerHTML = `<div class="spinner2"></div>`;
-  overlay.onclick = e => {
+  overlay.onclick = (e) => {
     if (overlay.style.display === 'none') return;
     if (e.preventDefault) e.preventDefault();
     if (e.stopPropagation) e.stopPropagation();
@@ -883,10 +890,10 @@ const waitingOverlay = (function() {
   };
 }());
 
-export const execWithWaitingOverlay = function(func) {
-    waitingOverlay.display();
-    setTimeout(() => {
-      func();
-      waitingOverlay.hide();
-    }, 10);
-}
+export const execWithWaitingOverlay = function (func) {
+  waitingOverlay.display();
+  setTimeout(() => {
+    func();
+    waitingOverlay.hide();
+  }, 10);
+};

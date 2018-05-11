@@ -7,7 +7,7 @@ import {
 } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, variables_info, resetColors, study_zones, territorial_mesh } from './../../main';
+import { app, execWithWaitingOverlay, variables_info, resetColors, territorial_mesh } from './../../main';
 import ContextMenu from './../contextMenu';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
@@ -672,12 +672,17 @@ export default class ScatterPlot2 {
       })
       .html(`${this.variable1}  &#x25BE;`)
       .on('click', function () {
-        const { scrollX, scrollY } = getScrollValue();
+        const { scrollY } = getScrollValue();
         const bbox = this.getBoundingClientRect();
         if (self.menuY.displayed) {
           self.menuY.hideMenu();
         }
-        self.menuX.showMenu(d3.event, document.body, self.itemsX, [bbox.left - 20, bbox.top + 20 + scrollY]);
+        self.menuX.showMenu(
+          d3.event,
+          document.body,
+          self.itemsX,
+          [bbox.left - 20, bbox.top + 20 + scrollY],
+        );
       });
 
     svg_container.append('text')
@@ -698,12 +703,17 @@ export default class ScatterPlot2 {
       })
       .html(`${this.variable2}  &#x25BE;`)
       .on('click', function () {
-        const { scrollX, scrollY } = getScrollValue();
+        const { scrollY } = getScrollValue();
         const bbox = this.getBoundingClientRect();
         if (self.menuX.displayed) {
           self.menuX.hideMenu();
         }
-        self.menuY.showMenu(d3.event, document.body, self.itemsY, [bbox.left, bbox.bottom + 10 + scrollY]);
+        self.menuY.showMenu(
+          d3.event,
+          document.body,
+          self.itemsY,
+          [bbox.left, bbox.bottom + 10 + scrollY],
+        );
       });
   }
 
@@ -722,7 +732,7 @@ export default class ScatterPlot2 {
   }
 
   update() {
-    if (document.getElementById('overlay').style.display === 'none'){
+    if (document.getElementById('overlay').style.display === 'none') {
       execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();
@@ -925,7 +935,8 @@ export default class ScatterPlot2 {
     const size_func = this.proportionnal_symbols
       ? new PropSizer(d3.max(this.data, d => d[num_name]), 30).scale
       : () => 4;
-    // const trans = this.plot.select('#scatterplot').selectAll('circle').transition().duration(125);
+    // const trans = this.plot.select('#scatterplot')
+    //   .selectAll('circle').transition().duration(125);
     this.plot
       .selectAll('circle')
       .attrs(d => ({

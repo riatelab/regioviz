@@ -7,7 +7,7 @@ import {
 } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, variables_info, study_zones, territorial_mesh } from './../../main';
+import { app, execWithWaitingOverlay, variables_info, territorial_mesh } from './../../main';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
 import { prepareTooltip, Tooltipsify } from './../tooltip';
@@ -873,7 +873,7 @@ export default class RadarChart3 {
   }
 
   update() {
-    if (document.getElementById('overlay').style.display === 'none'){
+    if (document.getElementById('overlay').style.display === 'none') {
       execWithWaitingOverlay(() => { this._update(); });
     } else {
       this._update();
