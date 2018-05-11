@@ -176,8 +176,8 @@ export function changeRegion(app, id_region) {
   // Compute the new distance matrix between this feature and each other one:
   app.map.computeDistMat();
   // Set the minimum distance in order to select two regions:
-  app.current_config.min_km_closest_unit = Math.round(
-    app.map.dist_to_my_region[2].dist / 1000) + 1;
+  const dist_second_closest = app.map.dist_to_my_region[2].dist;
+  app.current_config.min_km_closest_unit = Math.round(dist_second_closest / 1000) + 1;
   const input_dist = document.querySelector('#dist_filter');
   input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
   if (input_dist.value < app.current_config.min_km_closest_unit) {

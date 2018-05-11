@@ -25,7 +25,12 @@ const updateDimensions = () => {
     .attr('viewBox', `-5 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
     .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map, Object.keys(app.colors)); })
     .on('wheel', () => { d3.event.preventDefault(); });
-  margin = { top: 20, right: 20, bottom: 40, left: 60 };
+  margin = {
+    top: 20,
+    right: 20,
+    bottom: 40,
+    left: 60,
+  };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
@@ -90,7 +95,8 @@ export default class ScatterPlot2 {
           app.colors[ft.id] = comp2(
             ft[this.variable1], ft[this.variable2],
             this.ref_value1, this.ref_value2,
-            this.xInversed, this.yInversed);
+            this.xInversed, this.yInversed,
+          );
         }
       }
       app.colors[app.current_config.my_region] = color_highlight;
@@ -118,7 +124,9 @@ export default class ScatterPlot2 {
     this.data = ref_data.filter(ft => !!ft[this.variable1] && !!ft[this.variable2]).slice();
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     const tmp_my_region = this.data.splice(
-      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+      this.data.findIndex(d => d.id === app.current_config.my_region),
+      1,
+    )[0];
     this.data.push(tmp_my_region);
     this.current_ids = this.data.map(d => d.id);
     resetColors(this.current_ids);
@@ -251,7 +259,8 @@ export default class ScatterPlot2 {
               '<br>',
               ' (Territoires dans un voisinage de ',
               document.getElementById('dist_filter').value,
-              'km)');
+              'km)',
+            );
             _h += 20;
           }
           self.tooltip.select('.title')
@@ -276,7 +285,8 @@ export default class ScatterPlot2 {
               '<br>',
               ' (Territoires dans un voisinage de ',
               document.getElementById('dist_filter').value,
-              'km)');
+              'km)',
+            );
             _h += 20;
           }
           self.tooltip.select('.title')
@@ -349,7 +359,8 @@ export default class ScatterPlot2 {
               '<br>',
               ' (Territoires dans un voisinage de ',
               document.getElementById('dist_filter').value,
-              'km)');
+              'km)',
+            );
             _h += 20;
           }
           self.tooltip.select('.title')
@@ -374,7 +385,8 @@ export default class ScatterPlot2 {
               '<br>',
               ' (Territoires dans un voisinage de ',
               document.getElementById('dist_filter').value,
-              'km)');
+              'km)',
+            );
             _h += 20;
           }
           self.tooltip.select('.title')
@@ -473,7 +485,8 @@ export default class ScatterPlot2 {
     this.completude = new CompletudeSection();
     this.completude.update(
       calcCompletudeSubset(app, [this.variable1, this.variable2], 'array'),
-      calcPopCompletudeSubset(app, [this.variable1, this.variable2]));
+      calcPopCompletudeSubset(app, [this.variable1, this.variable2]),
+    );
 
     // // Deactivate the rect brush selection on the map
     // // while the user press the Ctrl key:
@@ -997,7 +1010,8 @@ export default class ScatterPlot2 {
   updateCompletude() {
     this.completude.update(
       calcCompletudeSubset(app, [this.variable1, this.variable2], 'array'),
-      calcPopCompletudeSubset(app, [this.variable1, this.variable2]));
+      calcPopCompletudeSubset(app, [this.variable1, this.variable2]),
+    );
   }
 
   /**
@@ -1047,7 +1061,8 @@ export default class ScatterPlot2 {
             const color = comp2(
               value1, value2,
               self.ref_value1, self.ref_value2,
-              self.xInversed, self.yInversed);
+              self.xInversed, self.yInversed,
+            );
             app.colors[id] = color;
             return color;
           }
@@ -1101,7 +1116,8 @@ export default class ScatterPlot2 {
           .styles({
             display: null,
             left: `${d3.event.pageX - scrollX - 5}px`,
-            top: `${d3.event.pageY - scrollY - yoffset}px` });
+            top: `${d3.event.pageY - scrollY - yoffset}px`,
+          });
       })
       .on('mouseout.tooltip', () => {
         clearTimeout(t);
@@ -1128,7 +1144,8 @@ export default class ScatterPlot2 {
       const color = comp2(
         value1, value2,
         this.ref_value1, this.ref_value2,
-        this.xInversed, this.yInversed);
+        this.xInversed, this.yInversed,
+      );
       app.colors[id] = color;
       // Change the color on the map:
       d3.select(parent).attr('fill', color);
@@ -1176,7 +1193,9 @@ export default class ScatterPlot2 {
       // Remove the rect brush from the chart if any:
       svg_container.select('.brush').call(this.brush.move, null);
       const tmp_my_region = this.data.splice(
-        this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+        this.data.findIndex(d => d.id === app.current_config.my_region),
+        1,
+      )[0];
       this.data.push(tmp_my_region);
       this.ref_value1 = tmp_my_region[this.variable1];
       this.ref_value2 = tmp_my_region[this.variable2];
@@ -1197,7 +1216,9 @@ export default class ScatterPlot2 {
     // Put "my region" at the end of the serie so it will be displayed on
     // the top of the chart:
     const tmp_my_region = this.data.splice(
-      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+      this.data.findIndex(d => d.id === app.current_config.my_region),
+      1,
+    )[0];
     this.data.push(tmp_my_region);
 
     this.current_ids = this.data.map(d => d.id);
@@ -1246,7 +1267,9 @@ export default class ScatterPlot2 {
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
-      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+      this.data.findIndex(d => d.id === app.current_config.my_region),
+      1,
+    )[0];
     this.data.push(tmp_my_region);
 
     this.current_ids = this.data.map(d => d.id);
@@ -1285,7 +1308,9 @@ export default class ScatterPlot2 {
     this.data.sort((a, b) => b[pop_field] - a[pop_field]);
     // Append my region at the end of the array:
     const tmp_my_region = this.data.splice(
-      this.data.findIndex(d => d.id === app.current_config.my_region), 1)[0];
+      this.data.findIndex(d => d.id === app.current_config.my_region),
+      1,
+    )[0];
     this.data.push(tmp_my_region);
 
     this.current_ids = this.data.map(d => d.id);
@@ -1437,7 +1462,8 @@ export default class ScatterPlot2 {
         app.colors[ft.id] = comp2(
           ft[v1], ft[v2],
           this.ref_value1, this.ref_value2,
-          this.xInversed, this.yInversed);
+          this.xInversed, this.yInversed,
+        );
       }
     }
     app.colors[app.current_config.my_region] = color_highlight;
@@ -1455,7 +1481,8 @@ export default class ScatterPlot2 {
         app.colors[ft.id] = comp2(
           ft[this.variable1], ft[this.variable2],
           this.ref_value1, this.ref_value2,
-          this.xInversed, this.yInversed);
+          this.xInversed, this.yInversed,
+        );
       }
     }
     app.colors[app.current_config.my_region] = color_highlight;
@@ -1478,7 +1505,8 @@ export default class ScatterPlot2 {
         app.colors[ft.id] = comp2(
           ft[v1], ft[v2],
           this.ref_value1, this.ref_value2,
-          this.xInversed, this.yInversed);
+          this.xInversed, this.yInversed,
+        );
       }
     }
     app.colors[app.current_config.my_region] = color_highlight;
@@ -1496,7 +1524,8 @@ export default class ScatterPlot2 {
         app.colors[ft.id] = comp2(
           ft[this.variable1], ft[this.variable2],
           this.ref_value1, this.ref_value2,
-          this.xInversed, this.yInversed);
+          this.xInversed, this.yInversed,
+        );
       }
     }
     app.colors[app.current_config.my_region] = color_highlight;
@@ -1555,6 +1584,7 @@ Il est possible de situer le territoire au regard de la moyenne (valeurs brutes)
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_2ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
+  /* eslint-disable function-paren-newline */
   getTemplateHelp() {
     const my_region_pretty_name = app.current_config.my_region_pretty_name;
     // const [my_region, my_rank] = this.data.map((d, i) => [d.id, i])
@@ -1648,4 +1678,5 @@ et par des valeurs ${t2 ? 'supérieures' : 'inférieures'} à la ${this.type ===
 <b>Indicateur 2</b> : ${info_var2.source} (Date de téléchargement de la donnée : ${info_var2.last_update})`;
     return { section_selection: help1.join(''), section_help: help2, section_source: source };
   }
+  /* eslint-enable function-paren-newline */
 }

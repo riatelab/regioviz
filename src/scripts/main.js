@@ -109,8 +109,8 @@ export const isIE = (() => (/MSIE/i.test(navigator.userAgent)
 *
 */
 function updateAvailableRatios(my_region) {
-  const data_my_feature = app.full_dataset.filter(
-    ft => ft[app.current_config.id_field] === my_region)[0];
+  const data_my_feature = app.full_dataset
+    .find(ft => ft[app.current_config.id_field] === my_region);
   const menu = document.querySelector('#menu');
   const lines = menu.querySelectorAll('.target_variable');
   for (let i = 0, nb_lines = lines.length; i < nb_lines; i++) {
@@ -132,8 +132,8 @@ function updateAvailableRatios(my_region) {
       const name = selectFirstAvailableVar();
       new_var_names = [name];
     } else {
-      new_var_names = Array.prototype.slice.call(
-        new_var).map(elem => elem.getAttribute('value'));
+      new_var_names = Array.prototype.slice.call(new_var)
+        .map(elem => elem.getAttribute('value'));
     }
     resetVariables(app, new_var_names);
   }
@@ -177,7 +177,8 @@ export function updateMenuStudyZones() {
           label_elem.classList.remove('disabled');
         }
       }
-    });
+    },
+  );
 }
 
 export function resetColors() {
@@ -213,10 +214,15 @@ function updateMyCategorySection() {
   let name_territorial_mesh = territorial_mesh
     .find(d => d.id === app.current_config.current_level).name;
   name_territorial_mesh = name_territorial_mesh.toLowerCase();
-  if (app.current_config.my_category) {
+  if (app.current_config.filter_type === 'REG' || app.current_config.filter_type === 'OLD_REG') {
+    name_territorial_mesh =
+      name_territorial_mesh.charAt(0).toUpperCase() + name_territorial_mesh.slice(1);
+    content_section.innerHTML = `${name_territorial_mesh} de la région ${app.current_config.my_category}`;
+  } else if (app.current_config.my_category) {
     content_section.innerHTML = app.current_config.my_category;
   } else if (app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array) {
-    name_territorial_mesh = name_territorial_mesh.charAt(0).toUpperCase() + name_territorial_mesh.slice(1);
+    name_territorial_mesh =
+      name_territorial_mesh.charAt(0).toUpperCase() + name_territorial_mesh.slice(1);
     const dist_value = +d3.select('#dist_filter').property('value');
     content_section.innerHTML = `${name_territorial_mesh} dans un voisinage de ${dist_value} km`;
   } else if (app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array) {
@@ -388,8 +394,7 @@ export function bindUI_chart() {
   d3.selectAll('span.target_variable')
     .on('click', function () {
       if (this.classList.contains('disabled')) return;
-      let nb_var = Array.prototype.slice.call(
-        document.querySelectorAll('span.target_variable'))
+      let nb_var = Array.prototype.slice.call(document.querySelectorAll('span.target_variable'))
         .filter(elem => !!elem.classList.contains('checked')).length;
       // Select a new variable and trigger the appropriate changes on the current chart:
       if (!this.classList.contains('checked')) {

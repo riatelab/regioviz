@@ -6,7 +6,7 @@ const handleInputRegioName = (allowed_names, levels) => {
   const ids_names = {};
   const names_lower = {}; // names.map(d => d.toLowerCase());
 
-  levels.forEach(level => {
+  levels.forEach((level) => {
     ids_names[level] = {};
     names_lower[level] = [];
   });
@@ -37,12 +37,16 @@ const handleInputRegioName = (allowed_names, levels) => {
       if (names_lower_current_level[i].lastIndexOf(new_value, 0) === 0) {
         if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
           const t = value + names_lower_current_level[i].substr(
-            new_value.length, names_lower_current_level[i].length);
+            new_value.length,
+            names_lower_current_level[i].length,
+          );
           document.getElementById('search').value = t;
           document.getElementById('autocomplete').value = t;
         }
         const str_after = names_lower_current_level[i].substr(
-          new_value.length, names_lower_current_level[i].length);
+          new_value.length,
+          names_lower_current_level[i].length,
+        );
         const new_str = value + str_after;
         document.getElementById('autocomplete').value = new_str;
       }

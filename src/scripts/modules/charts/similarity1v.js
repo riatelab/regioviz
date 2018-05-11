@@ -4,8 +4,11 @@ import {
   formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect,
   svgPathToCoords, getScrollValue,
 } from './../helpers';
-import { color_disabled, color_countries, color_default_dissim,
-  color_highlight, fixed_dimension, color_q1, color_q2, color_q3, color_q4 } from './../options';
+import {
+  color_disabled, color_countries, color_default_dissim,
+  color_highlight, fixed_dimension, color_q1, color_q2,
+  color_q3, color_q4,
+} from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
 import { app, execWithWaitingOverlay, resetColors, variables_info, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
@@ -27,7 +30,12 @@ const updateDimensions = () => {
       svgContextMenu(app.chart, svg_bar, app.map, selec);
     })
     .on('wheel', () => { d3.event.preventDefault(); });
-  margin = { top: 45, right: 20, bottom: 40, left: 50 };
+  margin = {
+    top: 45,
+    right: 20,
+    bottom: 40,
+    left: 50,
+  };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
@@ -72,7 +80,8 @@ export default class Similarity1plus {
     this.completude = new CompletudeSection();
     this.completude.update(
       calcCompletudeSubset(app, this.ratios, 'array'),
-      calcPopCompletudeSubset(app, this.ratios));
+      calcPopCompletudeSubset(app, this.ratios),
+    );
 
     // Brush behavior (only used for beeswarm):
     this.brush = d3.brushX()
@@ -466,7 +475,8 @@ export default class Similarity1plus {
         if (highlight_selection.length > 0) {
           const dist_axis = math_max(
             math_abs(my_region_value - +d3.min(highlight_selection, d => d[ratio_name])),
-            math_abs(+d3.max(highlight_selection, d => d[ratio_name]) - my_region_value));
+            math_abs(+d3.max(highlight_selection, d => d[ratio_name]) - my_region_value),
+          );
           const margin_min_max = math_round(dist_axis) / 8;
           _min = my_region_value - dist_axis - margin_min_max;
           _max = my_region_value + dist_axis + margin_min_max;
@@ -481,14 +491,18 @@ export default class Similarity1plus {
           const ratio_values = this.data.map(d => d[ratio_name]);
           const dist_axis = math_max(
             math_abs(my_region_value - d3.min(ratio_values)),
-            math_abs(d3.max(ratio_values) - my_region_value));
+            math_abs(d3.max(ratio_values) - my_region_value),
+          );
           const margin_min_max = math_round(dist_axis) / 8;
           _min = my_region_value - dist_axis - margin_min_max;
           _max = my_region_value + dist_axis + margin_min_max;
         }
         this.highlight_selection.forEach((elem) => {
           app.colors[elem.id] = comp(
-            elem[ratio_name], my_region_value, !self.inversedAxis.has(ratio_name));
+            elem[ratio_name],
+            my_region_value,
+            !self.inversedAxis.has(ratio_name),
+          );
         });
 
         app.colors[app.current_config.my_region] = color_highlight;
@@ -557,8 +571,10 @@ export default class Similarity1plus {
           // .transition(trans)
           .remove();
 
-        const bubbles2 = layer_highlighted.selectAll('.bubble').data(data.filter(
-          d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined), d => d.id);
+        const bubbles2 = layer_highlighted.selectAll('.bubble').data(
+          data.filter(d => d.id !== app.current_config.my_region && app.colors[d.id] !== undefined),
+          d => d.id,
+        );
 
         bubbles2
           // .transition(trans)
@@ -834,7 +850,8 @@ export default class Similarity1plus {
   updateCompletude() {
     this.completude.update(
       calcCompletudeSubset(app, this.ratios, 'array'),
-      calcPopCompletudeSubset(app, this.ratios));
+      calcPopCompletudeSubset(app, this.ratios),
+    );
   }
 
   updateMapRegio(ix_last_selec) {
@@ -1208,7 +1225,8 @@ export default class Similarity1plus {
         const ty = +el.getAttribute('transform').split('translate(0')[1].replace(',', '').replace(')', '').trim();
         const bubble = el.querySelector(`#b_${id_region}`);
         coords.push([bubble.cx.baseVal.value, bubble.cy.baseVal.value + ty]);
-      });
+      },
+    );
     coords.sort((a, b) => a[1] - b[1]);
     const l = this.draw_group.append('path')
       .datum(coords)
@@ -1247,8 +1265,9 @@ export default class Similarity1plus {
     app.map.updateLegend();
     this.ratios = app.current_config.ratio;
     this.nums = app.current_config.num;
-    this.data = app.current_data.filter(
-      ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
+    this.data = app.current_data
+      .filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true))
+      .slice();
     this.prepareData();
     let temp;
     if (this.type !== 'global'
@@ -1373,8 +1392,9 @@ export default class Similarity1plus {
     this.removeMapClonedFeatures();
     this.ratios = app.current_config.ratio.slice();
     this.nums = app.current_config.num.slice();
-    this.data = app.current_data.filter(
-      ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
+    this.data = app.current_data
+      .filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true))
+      .slice();
     this.prepareData();
     // To keep the same selection :
     // this.highlight_selection = this.highlight_selection.map((d) => {
@@ -1395,8 +1415,9 @@ export default class Similarity1plus {
     this.removeMapClonedFeatures();
     this.ratios = app.current_config.ratio.slice();
     this.nums = app.current_config.num.slice();
-    this.data = app.current_data.filter(
-      ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
+    this.data = app.current_data
+      .filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true))
+      .slice();
     this.prepareData();
 
     this.draw_group.select(`g#l_${code_variable}`).remove();
@@ -1639,7 +1660,7 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_ressemblances.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  /* eslint-disable function-paren-newline */
   getTemplateHelp() {
     const info_var = {};
     this.ratios.forEach((v, i) => {
@@ -1666,8 +1687,7 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
       help1.push(
         `<b>Espace d'étude</b> : Sélection personnalisée de ${app.current_config.filter_key.length} territoires`);
     } else {
-      help1.push( // eslint-disable-next-line quotes
-        `<b>Espace d'étude</b> : France`);
+      help1.push(`<b>Espace d'étude</b> : France`); // eslint-disable-line quotes
     }
     // const my_region = this.my_region;
     let compl = calcCompletudeSubset(app, this.ratios, 'array');
@@ -1724,4 +1744,5 @@ Il s'agit de la ${this.data[n_regio].name} (${app.full_dataset.find(d => d.id ==
       .join('<br>');
     return { section_selection: help1.join(''), section_help: help2.join(''), section_source: source };
   }
+  /* eslint-enable function-paren-newline */
 }

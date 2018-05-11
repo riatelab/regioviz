@@ -24,7 +24,12 @@ const updateDimensions = () => {
   svg_bar = d3.select('svg#svg_bar')
     .attr('viewBox', `-5 -5 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
     .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map); });
-  margin = { top: 60, right: 80, bottom: 60, left: 80 };
+  margin = {
+    top: 60,
+    right: 80,
+    bottom: 60,
+    left: 80,
+  };
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
@@ -173,7 +178,8 @@ export default class RadarChart3 {
     // Compute the "complétude" value for these ratios:
     this.completude.update(
       calcCompletudeSubset(app, this.variables, 'array'),
-      calcPopCompletudeSubset(app, this.variables));
+      calcPopCompletudeSubset(app, this.variables),
+    );
     app.colors[app.current_config.my_region] = color_highlight;
     if (cfg.allowInverseData) {
       this.inverse_data = (field) => {
@@ -202,7 +208,12 @@ export default class RadarChart3 {
     d3.select('#bar_section')
       .append('div')
       .attr('id', 'menu_selection')
-      .styles({ position: 'relative', 'text-align': 'left', 'padding-left': '5em', top: '-2em' });
+      .styles({
+        'padding-left': '5em',
+        position: 'relative',
+        'text-align': 'left',
+        top: '-2em',
+      });
 
     this.updateLegend();
   }
@@ -337,7 +348,9 @@ export default class RadarChart3 {
         const y = +el.getAttribute('y') - 15;
         const _h = 60;
         const _w = bbox.width + 40;
-        return { x, y, height: _h, width: _w };
+        return {
+          x, y, height: _h, width: _w,
+        };
       });
   }
 
@@ -495,8 +508,8 @@ export default class RadarChart3 {
     // Set the minimum number of variables to keep selected for this kind of chart:
     app.current_config.nb_var = 3;
     this.variables = app.current_config.ratio;
-    this.ref_data = data.slice().filter(
-      ft => this.variables.map(v => !!ft[v]).every(d => d === true));
+    this.ref_data = data.slice()
+      .filter(ft => this.variables.map(v => !!ft[v]).every(d => d === true));
     this.rank_variables = this.variables.map(d => `pr_${d}`);
     this.variables.forEach((d, i) => {
       computePercentileRank(this.ref_data, d, this.rank_variables[i]);
@@ -1105,7 +1118,8 @@ export default class RadarChart3 {
   updateCompletude() {
     this.completude.update(
       calcCompletudeSubset(app, this.variables, 'array'),
-      calcPopCompletudeSubset(app, this.variables));
+      calcPopCompletudeSubset(app, this.variables),
+    );
   }
 
   updateMapRegio() {
@@ -1158,6 +1172,7 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_3ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
+  /* eslint-disable function-paren-newline */
   getTemplateHelp() {
     const info_var = {};
     this.variables.forEach((v, i) => {
@@ -1279,4 +1294,5 @@ A partir de ces indices, on peut construire un graphique en radar qui correspond
       extra_css,
     };
   }
+  /* eslint-enable function-paren-newline */
 }

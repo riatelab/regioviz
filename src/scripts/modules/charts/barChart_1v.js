@@ -58,8 +58,8 @@ function updateDimensions() {
 *
 */
 function getMeanRank(mean_value, ratio_to_use) {
-  let mean_rank = app.current_data.map(
-    (d, i) => [d[ratio_to_use], math_abs(mean_value - d[ratio_to_use]), i]);
+  let mean_rank = app.current_data
+    .map((d, i) => [d[ratio_to_use], math_abs(mean_value - d[ratio_to_use]), i]);
   mean_rank.sort((a, b) => a[1] - b[1]);
   mean_rank = mean_rank[0];
   if (mean_rank[1] > mean_value) {
@@ -204,8 +204,8 @@ export default class BarChart1 {
     this.current_ranks = this.data.map((d, i) => i + 1);
     nbFt = this.data.length;
     this.mean_value = getMean2(this.data, ratio_to_use, variables_info);
-    this.ref_value = this.data.filter(
-      ft => ft.id === app.current_config.my_region)[0][ratio_to_use];
+    this.ref_value = this.data
+      .find(ft => ft.id === app.current_config.my_region)[ratio_to_use];
     svg_container.append('defs')
       .append('clipPath')
       .attr('id', 'clip')
@@ -287,16 +287,33 @@ export default class BarChart1 {
       .style('stroke', 'red');
 
     groupe_line_mean.append('line')
-      .attrs({ x1: 0, x2: width, y1: y(this.mean_value), y2: y(this.mean_value), 'stroke-width': '14px', class: 'transp_mean_line' })
+      .attrs({
+        x1: 0,
+        x2: width,
+        y1: y(this.mean_value),
+        y2: y(this.mean_value),
+        'stroke-width': '14px',
+        class: 'transp_mean_line',
+      })
       .style('stroke', 'transparent')
       .on('mouseover', () => {
         clearTimeout(t);
-        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none')
+            .select('.title')
+            .attr('class', 'title')
+            .html('');
+        }, 250);
         // this.tooltip.style('display', null).select('.title').attr('class', 'title red');
       })
       .on('mouseout', () => {
         clearTimeout(t);
-        t = setTimeout(() => { this.tooltip.style('display', 'none').select('.title').attr('class', 'title').html(''); }, 250);
+        t = setTimeout(() => {
+          this.tooltip.style('display', 'none')
+            .select('.title')
+            .attr('class', 'title')
+            .html('');
+        }, 250);
       })
       .on('mousemove mousedown', () => {
         clearTimeout(t);
@@ -311,7 +328,8 @@ export default class BarChart1 {
             '<br>',
             ' (Territoires dans un voisinage de ',
             document.getElementById('dist_filter').value,
-            'km)');
+            'km)',
+          );
           _h += 20;
         }
         // const { scrollX, scrollY } = getScrollValue();
@@ -361,7 +379,8 @@ export default class BarChart1 {
     this.completude = new CompletudeSection();
     this.completude.update(
       calcCompletudeSubset(app, [this.ratio_to_use], 'array'),
-      calcPopCompletudeSubset(app, [this.ratio_to_use]));
+      calcPopCompletudeSubset(app, [this.ratio_to_use]),
+    );
 
     svg_container.append('image')
       .attrs({
@@ -386,8 +405,10 @@ export default class BarChart1 {
           this.setAttributeNS(d3.namespaces.xlink, 'xlink:href', 'img/reverse_plus.png');
           self.title_variable
             .classed('inversed', false)
-            .attr('title-tooltip',
-              `${self.title_variable.attr('title-tooltip')}`.replace(' (axe inversé)', ''));
+            .attr(
+              'title-tooltip',
+              `${self.title_variable.attr('title-tooltip')}`.replace(' (axe inversé)', ''),
+            );
           self.data.sort((a, b) => a[self.ratio_to_use] - b[self.ratio_to_use]);
         }
         self.current_ids = self.data.map(d => d.id);
@@ -467,7 +488,8 @@ export default class BarChart1 {
             d3.event,
             document.body,
             items,
-            [bbox.left - 5, bbox.bottom + 2.5 + scrollY]);
+            [bbox.left - 5, bbox.bottom + 2.5 + scrollY],
+          );
         }
       });
 
@@ -533,7 +555,8 @@ export default class BarChart1 {
   updateCompletude() {
     this.completude.update(
       calcCompletudeSubset(app, [this.ratio_to_use], 'array'),
-      calcPopCompletudeSubset(app, [this.ratio_to_use]));
+      calcPopCompletudeSubset(app, [this.ratio_to_use]),
+    );
   }
 
   updateContext(min, max) {
@@ -739,8 +762,8 @@ export default class BarChart1 {
         .forEach((ft) => { app.colors[ft] = color_inf; });
     }
     this.reset_state_button = false;
-    svg_container.select('.brush_bottom').call(
-      this.brush_bottom.move, this.x2.range());
+    svg_container.select('.brush_bottom')
+      .call(this.brush_bottom.move, this.x2.range());
     this.update();
     // svg_container.select('.brush_top')
     //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
@@ -769,8 +792,8 @@ export default class BarChart1 {
         .forEach((ft) => { app.colors[ft] = color_sup; });
     }
     this.reset_state_button = false;
-    svg_container.select('.brush_bottom').call(
-      this.brush_bottom.move, this.x2.range());
+    svg_container.select('.brush_bottom')
+      .call(this.brush_bottom.move, this.x2.range());
     this.update();
     // svg_bar.select('.brush_top')
     //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
@@ -801,8 +824,8 @@ export default class BarChart1 {
     }
     app.colors[app.current_config.my_region] = color_highlight;
     this.reset_state_button = false;
-    svg_bar.select('.brush_bottom').call(
-      this.brush_bottom.move, this.x2.range());
+    svg_bar.select('.brush_bottom')
+      .call(this.brush_bottom.move, this.x2.range());
     this.update();
     app.map.removeRectBrush();
     // svg_bar.select('.brush_top')
@@ -831,8 +854,8 @@ export default class BarChart1 {
     }
     app.colors[app.current_config.my_region] = color_highlight;
     this.reset_state_button = false;
-    svg_bar.select('.brush_bottom').call(
-      this.brush_bottom.move, this.x2.range());
+    svg_bar.select('.brush_bottom')
+      .call(this.brush_bottom.move, this.x2.range());
     this.update();
     app.map.removeRectBrush();
     // svg_bar.select('.brush_top')
@@ -897,12 +920,13 @@ export default class BarChart1 {
         ];
         svg_bar.select('.brush_bottom').call(
           self.brush_bottom.move,
-          [current_range[0] * (width / nbFt), current_range[1] * (width / nbFt)]);
+          [current_range[0] * (width / nbFt), current_range[1] * (width / nbFt)],
+        );
       }
     } else {
       current_range = [0, this.data.length];
-      svg_bar.select('.brush_bottom').call(
-        self.brush_bottom.move, self.x.range());
+      svg_bar.select('.brush_bottom')
+        .call(self.brush_bottom.move, self.x.range());
     }
   }
 
@@ -926,8 +950,8 @@ export default class BarChart1 {
     if (app.current_config.filter_key !== undefined) {
       this.changeStudyZone();
     } else {
-      this.ref_value = this.data.find(
-        ft => ft.id === app.current_config.my_region)[this.ratio_to_use];
+      this.ref_value = this.data
+        .find(ft => ft.id === app.current_config.my_region)[this.ratio_to_use];
       this.update();
       this.updateContext(0, this.data.length);
       this.updateMapRegio();
@@ -955,8 +979,8 @@ export default class BarChart1 {
   changeStudyZone() {
     const ratio_to_use = this.ratio_to_use;
     this.data = app.current_data.filter(ft => !!ft[ratio_to_use]);
-    this.ref_value = this.data.find(
-      ft => ft.id === app.current_config.my_region)[ratio_to_use];
+    this.ref_value = this.data
+      .find(ft => ft.id === app.current_config.my_region)[ratio_to_use];
     this.current_ranks = this.data.map((d, i) => i + 1);
     if (this.serie_inversed) {
       this.data.sort((a, b) => b[ratio_to_use] - a[ratio_to_use]);
@@ -965,8 +989,8 @@ export default class BarChart1 {
     }
     this.current_ids = this.data.map(d => d.id);
     nbFt = this.data.length;
-    this.ref_value = this.data.find(
-      ft => ft.id === app.current_config.my_region)[ratio_to_use];
+    this.ref_value = this.data
+      .find(ft => ft.id === app.current_config.my_region)[ratio_to_use];
     this.x.domain(this.current_ids);
     let min_serie = d3.min(this.data, d => d[ratio_to_use]);
     min_serie = min_serie >= 0 ? 0 : min_serie + min_serie / 10;
@@ -1031,8 +1055,7 @@ export default class BarChart1 {
       : name_variable;
     this.title_variable
       .attr('title-tooltip', content_tooltip)
-      .html(
-        `${name_variable.replace(/\(/, '&&&').split('&&&').join('<br>(')} &#x25BE;`);
+      .html(`${name_variable.replace(/\(/, '&&&').split('&&&').join('<br>(')} &#x25BE;`);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -1100,6 +1123,7 @@ Ce graphique rend également possible le positionnement des territoires au regar
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_1ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
+  /* eslint-disable function-paren-newline */
   getTemplateHelp() {
     const my_region_pretty_name = app.current_config.my_region_pretty_name;
     const [, my_rank] = this.data.map((d, i) => [d.id, i])
@@ -1151,4 +1175,5 @@ La moyenne de l'espace d'étude <b>${name_study_zone}</b> s'élève à <b>${form
     const source = `<b>Indicateur 1</b> : ${info_var.source} (Date de téléchargement de la donnée : ${info_var.last_update})`;
     return { section_selection: help1.join(''), section_help: help2, section_source: source };
   }
+  /* eslint-enable function-paren-newline */
 }

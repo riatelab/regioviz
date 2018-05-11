@@ -1,7 +1,9 @@
 import centroid from '@turf/centroid';
 import { app } from './../main';
-import { color_disabled, color_countries, color_sup, color_inf, color_highlight,
-  fixed_dimension, color_default_dissim, color_q1, color_q2, color_q3, color_q4 } from './options';
+import {
+  color_disabled, color_countries, color_sup, color_inf, color_highlight,
+  fixed_dimension, color_default_dissim, color_q1, color_q2, color_q3, color_q4,
+} from './options';
 import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, getElementsFromPoint, svgContextMenu, isContextMenuDisplayed } from './helpers';
 import { filterLevelGeom } from './prepare_data';
 import { prepareTooltip } from './tooltip';
@@ -465,14 +467,13 @@ class MapSelect {
     const features = Array.prototype.slice
       .call(this.target_layer.node().querySelectorAll('path'));
     const nb_ft = features.length;
-    const my_region_geom = features.find(
-      d => d.__data__.id === app.current_config.my_region).__data__.geometry;
-    const my_region_centroid = centroid(my_region_geom);
+    const my_region_geom = features
+      .find(d => d.__data__.id === app.current_config.my_region).__data__.geometry;
+    const my_reg_centroid = centroid(my_region_geom);
     const result_dist = [];
     for (let i = 0; i < nb_ft; i++) {
       const id = features[i].__data__.id;
-      const dist = euclidian_distance(
-        my_region_centroid, centroid(features[i].__data__.geometry));
+      const dist = euclidian_distance(my_reg_centroid, centroid(features[i].__data__.geometry));
       result_dist.push({ id, dist });
     }
     result_dist.sort((a, b) => a.dist - b.dist);
@@ -496,7 +497,8 @@ class MapSelect {
           _cloned
             .attrs({
               class: 'cloned',
-              fill: d3.color(ref_fill_value).brighter(0.75) })
+              fill: d3.color(ref_fill_value).brighter(0.75),
+            })
             .styles({
               stroke: 'orange',
               'stroke-width': '1.25px',

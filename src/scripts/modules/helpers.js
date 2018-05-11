@@ -3,7 +3,7 @@ import tingle from 'tingle.js';
 import { color_inf, color_sup, fixed_dimension, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
-import { isIE, app, bindUI_chart, bindHelpMenu } from './../main';
+import { isIE, app, bindUI_chart, bindHelpMenu, study_zones } from './../main';
 
 const array_slice = Array.prototype.slice;
 
@@ -210,7 +210,8 @@ no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return 
         eventType, params.bubbles, params.cancelable, params.view,
         params.detail, params.screenX, params.screenY, params.clientX, params.clientY,
         params.ctrlKey, params.altKey, params.shiftKey, params.metaKey,
-        params.button, params.relatedTarget);
+        params.button, params.relatedTarget,
+      );
       return mouseEvent;
     };
     MouseEvent.prototype = Event.prototype;
@@ -994,6 +995,19 @@ function clickDlPdf(event) {
   return false;
 }
 
+/**
+* Returns the name of the current study zone with a nice formatting.
+*
+* @return {String} - The name of the current study zone.
+*
+*/
+const getNameStudyZone = () => (!app.current_config.filter_key
+  ? 'France' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
+    ? ['France (Territoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+    : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
+      ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
+      : study_zones.find(d => d.id === app.current_config.filter_key).name);
+
 let tm_leftmenu;
 
 /* eslint-disable no-param-reassign */
@@ -1064,7 +1078,7 @@ function toggleVisibilityLeftMenu() {
           'line-height': '1.5em',
           margin: 'auto',
           'text-align': 'center',
-          'width': '60%',
+          width: '60%',
         })
         .html(`
           Unités territoriales : <b>${app.current_config.current_level}</b> -
@@ -1075,13 +1089,6 @@ function toggleVisibilityLeftMenu() {
   }
 }
 /* eslint-enable no-param-reassign */
-
-const getNameStudyZone = () => !app.current_config.filter_key
-  ? 'France' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
-    ? ['France (Territoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
-    : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
-      ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
-      : study_zones.find(d => d.id === app.current_config.filter_key).name;
 
 export {
   comp,
