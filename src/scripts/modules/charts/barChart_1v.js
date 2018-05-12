@@ -627,7 +627,6 @@ export default class BarChart1 {
         };
       });
 
-
     bar.exit().remove();
 
     this._focus.select('.axis--y')
@@ -695,12 +694,22 @@ export default class BarChart1 {
           elem.dispatchEvent(new_event);
         } else {
           clearTimeout(t);
-          t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
+          t = setTimeout(() => {
+            self.tooltip
+              .style('display', 'none')
+              .selectAll('p')
+              .html('');
+          }, 250);
         }
       })
       .on('mouseout', () => {
         clearTimeout(t);
-        t = setTimeout(() => { self.tooltip.style('display', 'none').selectAll('p').html(''); }, 250);
+        t = setTimeout(() => {
+          self.tooltip
+            .style('display', 'none')
+            .selectAll('p')
+            .html('');
+        }, 250);
       });
 
     this.updateMiniBars();
@@ -708,6 +717,7 @@ export default class BarChart1 {
 
 
   updateMiniBars() {
+    const id_my_region = app.current_config.my_region;
     const ratio_to_use = this.ratio_to_use;
     const mini_bars = this.context.selectAll('.bar')
       .data(this.data);
@@ -719,7 +729,7 @@ export default class BarChart1 {
         width: this.x2.bandwidth(),
         height: height2 - this.y2(d[ratio_to_use]),
       }))
-      .style('fill', d => (d.id !== app.current_config.my_region ? color_countries : color_highlight));
+      .style('fill', d => (d.id !== id_my_region ? color_countries : color_highlight));
 
     mini_bars
       .enter()
@@ -731,7 +741,7 @@ export default class BarChart1 {
         width: this.x2.bandwidth(),
         height: height2 - this.y2(d[ratio_to_use]),
       }))
-      .style('fill', d => (d.id !== app.current_config.my_region ? color_countries : color_highlight));
+      .style('fill', d => (d.id !== id_my_region ? color_countries : color_highlight));
     mini_bars.exit().remove();
   }
 
@@ -744,8 +754,9 @@ export default class BarChart1 {
   }
 
   selectAboveMyRegion() {
-    const my_rank = this.data.map((d, i) => [d.id, i])
-      .filter(d => d[0] === app.current_config.my_region)[0][1];
+    const my_rank = this.data
+      .map((d, i) => [d.id, i])
+      .find(d => d[0] === app.current_config.my_region)[1];
     app.colors = {};
     app.colors[app.current_config.my_region] = color_highlight;
     if (!this.serie_inversed) {
@@ -773,8 +784,9 @@ export default class BarChart1 {
   }
 
   selectBelowMyRegion() {
-    const my_rank = this.data.map((d, i) => [d.id, i])
-      .filter(d => d[0] === app.current_config.my_region)[0][1];
+    const my_rank = this.data
+      .map((d, i) => [d.id, i])
+      .find(d => d[0] === app.current_config.my_region)[1];
 
     app.colors = {};
     app.colors[app.current_config.my_region] = color_highlight;
@@ -824,7 +836,7 @@ export default class BarChart1 {
     }
     app.colors[app.current_config.my_region] = color_highlight;
     this.reset_state_button = false;
-    svg_bar.select('.brush_bottom')
+    svg_container.select('.brush_bottom')
       .call(this.brush_bottom.move, this.x2.range());
     this.update();
     app.map.removeRectBrush();
@@ -854,7 +866,7 @@ export default class BarChart1 {
     }
     app.colors[app.current_config.my_region] = color_highlight;
     this.reset_state_button = false;
-    svg_bar.select('.brush_bottom')
+    svg_container.select('.brush_bottom')
       .call(this.brush_bottom.move, this.x2.range());
     this.update();
     app.map.removeRectBrush();
@@ -862,6 +874,19 @@ export default class BarChart1 {
     //   .call(this.brush_top.move, current_range_brush.map(d => d * (width / nbFt)));
     this.updateMapRegio();
     this.reset_state_button = true;
+  }
+
+  getRangeHundredAround() {
+    const my_rank = this.data
+      .map((d, i) => [d.id, i])
+      .find(d => d[0] === app.current_config.my_region)[1];
+    const _min = my_rank - 50 >= 0
+      ? (my_rank - 50) * (width / nbFt)
+      : 0;
+    const _max = (my_rank + 50) <= (this.data.length - 1)
+      ? (my_rank + 50) * (width / nbFt)
+      : (this.data.length - 1) * (width / nbFt);
+    return [_min, _max];
   }
 
   handle_brush_map(event) {
@@ -872,7 +897,7 @@ export default class BarChart1 {
     app.map.tooltip.style('display', 'none');
     const my_region = app.current_config.my_region;
     const self = this;
-    svg_bar.select('.brush_top').call(self.brush_top.move, null);
+    svg_container.select('.brush_top').call(self.brush_top.move, null);
     const [topleft, bottomright] = event.selection;
     this.last_map_selection = [topleft, bottomright];
     // const transform = svg_map.node().__zoom;
@@ -909,7 +934,8 @@ export default class BarChart1 {
     self._focus.selectAll('.bar')
       .style('fill', d => app.colors[d.id] || color_countries);
     const ids = Object.keys(app.colors);
-    const ranks = ids.map(d => this.current_ids.indexOf(d.id) > -1).map(d => this.current_ranks[d]);
+    const ranks = ids.map(d => this.current_ids.indexOf(d.id) > -1)
+      .map(d => this.current_ranks[d]);
     if (ranks.length > 1) {
       const c1 = ranks[0] - 1;
       const c2 = ranks[ranks.length - 1];
@@ -918,14 +944,14 @@ export default class BarChart1 {
           ranks[0] - 1,
           ranks[ranks.length - 1],
         ];
-        svg_bar.select('.brush_bottom').call(
+        svg_container.select('.brush_bottom').call(
           self.brush_bottom.move,
           [current_range[0] * (width / nbFt), current_range[1] * (width / nbFt)],
         );
       }
     } else {
       current_range = [0, this.data.length];
-      svg_bar.select('.brush_bottom')
+      svg_container.select('.brush_bottom')
         .call(self.brush_bottom.move, self.x.range());
     }
   }
@@ -956,7 +982,12 @@ export default class BarChart1 {
       this.updateContext(0, this.data.length);
       this.updateMapRegio();
       this.updateTableStats();
-      svg_bar.select('.brush_bottom').call(this.brush_bottom.move, this.x.range());
+      // svg_bar.select('.brush_bottom').call(this.brush_bottom.move, this.x.range());
+      svg_container.select('.brush_bottom')
+        .call(
+          this.brush_bottom.move,
+          this.data.length > 350 ? this.getRangeHundredAround() : this.x.range(),
+        );
       app.map.removeRectBrush();
       app.map.updateLegend();
     }
@@ -1003,7 +1034,11 @@ export default class BarChart1 {
     this.x2.domain(this.x.domain());
     this.y2.domain(this.y.domain());
     this.updateMeanValue();
-    svg_bar.select('.brush_bottom').call(this.brush_bottom.move, this.x2.range());
+    svg_container.select('.brush_bottom')
+      .call(
+        this.brush_bottom.move,
+        this.data.length > 350 ? this.getRangeHundredAround() : this.x.range(),
+      );
     app.map.removeRectBrush();
     app.colors = {};
     app.colors[app.current_config.my_region] = color_highlight;
@@ -1079,8 +1114,13 @@ export default class BarChart1 {
     app.map.resetColors(this.current_ids);
     app.map.displayLegend(0);
     this.updateCompletude();
-    d3.select('.brush_top').call(this.brush_top.move, null);
-    d3.select('.brush_bottom').call(this.brush_bottom.move, this.x.range());
+    svg_container.select('.brush_top')
+      .call(this.brush_top.move, null);
+    svg_container.select('.brush_bottom')
+      .call(
+        this.brush_bottom.move,
+        this.data.length > 350 ? this.getRangeHundredAround() : this.x.range(),
+      );
   }
 
   updateTableStats() {

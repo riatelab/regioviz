@@ -33,7 +33,10 @@ const updateDimensions = () => {
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
-  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
+  d3.select('.cont_svg.cchart').style(
+    'padding-top',
+    `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`,
+  );
 };
 
 /**
@@ -164,8 +167,10 @@ export default class RadarChart3 {
     }
     this.inversedAxis = new Set();
     this.g = svg_bar.append('g')
-      .attr('id', 'RadarGrp')
-      .attr('transform', `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`);
+      .attrs({
+        id: 'RadarGrp',
+        transform: `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`,
+      });
 
     // Prepare the tooltip displayed on mouseover:
     this.tooltip = prepareTooltip(d3.select(svg_bar.node().parentNode), null);
@@ -231,7 +236,10 @@ export default class RadarChart3 {
       if (ix1 > nb_var - 1) {
         ix1 = 0;
       }
-      self.g.select(`g#gp${ix1}`).select('text').style('fill', 'darkblue').style('font-weight', '800');
+      self.g.select(`g#gp${ix1}`)
+        .select('text')
+        .style('fill', 'darkblue')
+        .style('font-weight', '800');
     };
 
     const unColorLabel = function unColorLabel(label) {
@@ -248,7 +256,10 @@ export default class RadarChart3 {
         ix1 = 0;
       }
       const label1 = self.g.select(`g#gp${ix1}`).data()[0];
-      self.g.select(`g#gp${ix1}`).select('text').style('fill', self.inversedAxis.has(label1) ? 'red' : 'black').style('font-weight', null);
+      self.g.select(`g#gp${ix1}`)
+        .select('text')
+        .style('fill', self.inversedAxis.has(label1) ? 'red' : 'black')
+        .style('font-weight', null);
     };
 
     const swapAxis = function swapAxis() {
@@ -370,8 +381,9 @@ export default class RadarChart3 {
     const colors_in_use = Object.keys(app.colors).map(k => app.colors[k]);
     for (let j = 0; j < this.data.length; j++) {
       const on_axes = [];
-      if (this.id_my_region === this.data[j].name) app.colors[this.data[j].name] = color_highlight;
-      else if (!app.colors[this.data[j].name]) {
+      if (this.id_my_region === this.data[j].name) {
+        app.colors[this.data[j].name] = color_highlight;
+      } else if (!app.colors[this.data[j].name]) {
         let ii = 0;
         while (ii < 21) {
           ii += 1;
@@ -528,8 +540,11 @@ export default class RadarChart3 {
     // If the supplied maxValue is smaller than the actual one, replace by the max in the data
     let maxValue = 0;
     for (let j = 0; j < this.data.length; j++) {
-      if (this.id_my_region === this.data[j].name) app.colors[this.data[j].name] = color_highlight;
-      else app.colors[this.data[j].name] = this.cfg.color(j + 1);
+      if (this.id_my_region === this.data[j].name) {
+        app.colors[this.data[j].name] = color_highlight;
+      } else {
+        app.colors[this.data[j].name] = this.cfg.color(j + 1);
+      }
       for (let i = 0; i < this.data[j].axes.length; i++) {
         this.data[j].axes[i].id = this.data[j].name;
         if (this.data[j].axes[i].value > maxValue) {
@@ -1008,10 +1023,13 @@ export default class RadarChart3 {
   changeStudyZone() {
     const old_my_region = this.id_my_region;
     const other_features = this.displayed_ids.filter(d => d !== old_my_region);
+    const cfg = this.cfg;
     this.g.remove();
     this.g = svg_bar.append('g')
-      .attr('id', 'RadarGrp')
-      .attr('transform', `translate(${this.cfg.w / 2 + this.cfg.margin.left},${this.cfg.h / 2 + this.cfg.margin.top})`);
+      .attrs({
+        id: 'RadarGrp',
+        transform: `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`,
+      });
 
     this.id_my_region = app.current_config.my_region;
     this.prepareData(app.current_data);
@@ -1033,10 +1051,13 @@ export default class RadarChart3 {
   // eslint-disable-next-line no-unused-vars
   addVariable(code_variable) {
     const other_features = this.displayed_ids.filter(d => d !== this.id_my_region);
+    const cfg = this.cfg;
     this.g.remove();
     this.g = svg_bar.append('g')
-      .attr('id', 'RadarGrp')
-      .attr('transform', `translate(${this.cfg.w / 2 + this.cfg.margin.left},${this.cfg.h / 2 + this.cfg.margin.top})`);
+      .attrs({
+        id: 'RadarGrp',
+        transform: `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`,
+      });
 
     this.prepareData(app.current_data);
     Array.prototype.slice.call(this.inversedAxis).forEach((v) => { this.inverse_data(v); });
@@ -1058,10 +1079,13 @@ export default class RadarChart3 {
   // eslint-disable-next-line no-unused-vars
   removeVariable(code_variable) {
     const other_features = this.displayed_ids.filter(d => d !== this.id_my_region);
+    const cfg = this.cfg;
     this.g.remove();
     this.g = svg_bar.append('g')
-      .attr('id', 'RadarGrp')
-      .attr('transform', `translate(${this.cfg.w / 2 + this.cfg.margin.left},${this.cfg.h / 2 + this.cfg.margin.top})`);
+      .attrs({
+        id: 'RadarGrp',
+        transform: `translate(${cfg.w / 2 + cfg.margin.left},${cfg.h / 2 + cfg.margin.top})`,
+      });
 
     this.prepareData(app.current_data);
     Array.prototype.slice.call(this.inversedAxis).forEach((v) => { this.inverse_data(v); });

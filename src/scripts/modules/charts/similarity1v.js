@@ -301,7 +301,7 @@ export default class Similarity1plus {
     const field_distance = this.type_distance === 'euclidienne'
       ? 'dist' : 'dist2';
     this.draw_group.select('.brush').remove();
-    this.draw_group.select('#axis-title-global-dist').remove();
+    this.draw_group.selectAll('.axis-title-global-dist').remove();
     this.draw_group.selectAll('.overlayrect').remove();
     if (self.type === 'detailled') {
       let ratios;
@@ -697,7 +697,7 @@ export default class Similarity1plus {
         : () => (data.length < 400 ? 4 : data.length < 800 ? 2.8 : 1.8);
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
       this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
-      const xAxis = d3.axisBottom(this.x).ticks(10, '');
+      // const xAxis = d3.axisBottom(this.x).ticks(10, '');
       const simulation = d3.forceSimulation(data)
         .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
         .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
@@ -722,19 +722,18 @@ export default class Similarity1plus {
         .x(d => d.x)
         .y(d => d.y)
         .polygons(data);
-      this.draw_group.append('text')
-        .attrs({
-          x: width / 2,
-          y: height + 40,
-          id: 'axis-title-global-dist',
-        })
-        .styles({
-          'text-anchor': 'middle',
-          'font-size': '14px',
-          'font-family': '"Signika",sans-serif',
-        })
-        .text('Indice de similarité');
-
+      // this.draw_group.append('text')
+      //   .attrs({
+      //     x: width / 2,
+      //     y: height + 40,
+      //     id: 'axis-title-global-dist',
+      //   })
+      //   .styles({
+      //     'text-anchor': 'middle',
+      //     'font-size': '14px',
+      //     'font-family': '"Signika",sans-serif',
+      //   })
+      //   .text('Indice de similarité');
       let g = this.draw_group.select('#global_dist');
       if (!g.node()) {
         g = this.draw_group
@@ -744,12 +743,14 @@ export default class Similarity1plus {
             class: 'global_dist',
           });
 
-        g.append('g')
-          .attrs({
-            class: 'axis-top-v axis--x',
-            transform: `translate(0,${height})`,
-          })
-          .call(xAxis);
+        // const _axis = g.append('g')
+        //   .attrs({
+        //     class: 'axis-top-v axis--x',
+        //     transform: `translate(0,${height})`,
+        //   })
+        //   .call(xAxis);
+        // _axis.selectAll('text')
+        //   .style('display', 'none');
 
         const cell = g.append('g')
           .attr('class', 'cells')
@@ -779,10 +780,10 @@ export default class Similarity1plus {
           .attr('d', d => `M${d.join('L')}Z`)
           .style('fill', 'none');
       } else {
-        g.selectAll('.axis-top-v')
-          // .transition()
-          // .duration(125)
-          .call(xAxis);
+        // g.selectAll('.axis-top-v')
+        //   // .transition()
+        //   // .duration(125)
+        //   .call(xAxis);
 
         const cells = g.select('.cells')
           .selectAll('g.cell')
@@ -841,7 +842,8 @@ export default class Similarity1plus {
       setTimeout(() => {
         self.makeTooltips();
         self.appendOverlayRect();
-      }, 200);
+        self.drawAxisTitle();
+      }, 75);
     }
     this.data.sort((a, b) => a[field_distance] - b[field_distance]);
   }
@@ -1185,7 +1187,7 @@ export default class Similarity1plus {
     miny -= 20;
     maxy += 20;
     if (miny > 0) {
-      this.draw_group.append('rect')
+      this.draw_group.insert('rect')
         .attrs({
           class: 'overlayrect',
           x: -60,
@@ -1202,7 +1204,7 @@ export default class Similarity1plus {
           x: -60,
           y: maxy,
           width: width + 120,
-          height: height - maxy,
+          height: height + 50 - maxy,
           fill: 'white',
         });
     }
@@ -1214,6 +1216,57 @@ export default class Similarity1plus {
       .on('click dblclick', () => {
         this.draw_group.select('.brush').call(this.brush.move, [[0, 0], [0, 0]]);
       });
+  }
+
+  drawAxisTitle() {
+    const _axis = this.draw_group.append('g')
+      .attrs({
+        class: 'axis-top-v axis--x',
+        transform: `translate(0,${height})`,
+      })
+      .call(d3.axisBottom(this.x).ticks(10, ''));
+
+    _axis.selectAll('text')
+      .style('display', 'none');
+
+    const axis_title_g = this.draw_group.append('g')
+      .styles({ 'font-family': '"Signika",sans-serif', 'font-size': '13px' });
+
+    axis_title_g.append('text')
+      .attrs({
+        x: 0,
+        y: height + 20,
+        class: 'axis-title-global-dist',
+      })
+      .style('text-anchor', 'start')
+      .text('Forte');
+
+    axis_title_g.append('text')
+      .attrs({
+        x: 0,
+        y: height + 32,
+        class: 'axis-title-global-dist',
+      })
+      .style('text-anchor', 'start')
+      .text('similarité');
+
+    axis_title_g.append('text')
+      .attrs({
+        x: width,
+        y: height + 20,
+        class: 'axis-title-global-dist',
+      })
+      .style('text-anchor', 'end')
+      .text('Faible');
+
+    axis_title_g.append('text')
+      .attrs({
+        x: width,
+        y: height + 32,
+        class: 'axis-title-global-dist',
+      })
+      .style('text-anchor', 'end')
+      .text('similarité');
   }
 
   displayLine(id_region) {
