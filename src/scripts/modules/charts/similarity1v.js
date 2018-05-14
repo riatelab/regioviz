@@ -1585,8 +1585,10 @@ export default class Similarity1plus {
         } else if (this.checked && this.value === 'rank_norm') {
           self.type_distance = 'rank_norm';
         }
-        self.update();
-        // self.updateMapRegio();
+        const ix_last_selec = this.type !== 'global'
+          ? +d3.select('#menu_selection').select('.nb_select').property('value')
+          : null;
+        self.applySelection(ix_last_selec);
       });
   }
 
@@ -1675,8 +1677,9 @@ export default class Similarity1plus {
     app.map = map_elem;
     app.map.resetColors(this.current_ids);
     app.map.displayLegend(4);
-    this.applySelection(null);
+    this.applySelection();
     this.updateCompletude();
+    this.updateMapRegio();
   }
 
   prepareTableStat() {

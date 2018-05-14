@@ -258,9 +258,8 @@ class MapSelect {
       if (style_layer.target === true) {
         this.target_layer = layers.append('g')
           .attrs(style_layer);
-        const filtered = filterLevelGeom(this.territ_layer.features, filter);
         this.target_layer.selectAll('path')
-          .data(filtered, d => d.id)
+          .data(filterLevelGeom(this.territ_layer.features, filter), d => d.id)
           .enter()
           .append('path')
           .attrs(fn_attrs_target_layer);
