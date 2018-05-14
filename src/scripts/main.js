@@ -33,6 +33,10 @@ export const variables_info = [];
 export const study_zones = [];
 export const territorial_mesh = [];
 
+// This variable contains information about the current state of the application
+// (id of the selected region, number of selected variables, their names, etc.).
+// It will also references the variables 'map' and 'chart' (once created)
+// respectively corresponding to the current map and the current chart.
 export const app = {
   // A mapping id -> color, containing the color to use for each
   // feature not using the default color or the disabled color
@@ -52,48 +56,50 @@ export const app = {
   // The user is now allowed to create its custom study zones, this is where
   // we are storing a mapping "name_study_zone" -> [id_x, id_y, id_z, id_a, ...]:
   custom_studyzones: {},
-};
-
-function setDefaultConfig(code = '249100546', variable = 'MED', level = 'EPCI') { // }, level = 'NUTS1') {
-  const var_info = variables_info.find(ft => ft.id === variable);
-  app.current_config = {
+  //
+  current_config: {
     // The name of the field of the dataset containing the ID of each feature:
     id_field: 'id',
     // The name of the field of the dataset containing the name of each feature:
     name_field: 'name',
-    // The name of the field of the dataset containing the population of each feature:
+    // The name of the field of the dataset containing the population of each feature
+    // TODO: should now be read from metadata
     pop_field: 'P14_POP',
     // The name of the field of the geojson layer containing the ID of each feature
     // (these values should match with the values of the "id_field" in the
     // tabular dataset)
     id_field_geom: 'id',
     // An Array containing the id of one or more variables (currently selected in the UI)
-    ratio: [variable],
-    // Array containing the corresponding 'pretty names' (same order).
-    ratio_pretty_name: [var_info.name],
+    ratio: [],
+    // Array containing the corresponding ratios 'pretty names' (same order).
+    ratio_pretty_name: [],
     // Array containing the corresponding units (same order).
-    ratio_unit: [var_info.unit],
+    ratio_unit: [],
     // Array containing the corresponding numerator id.
-    num: [var_info.id1],
+    num: [],
     // Array containing the corresponding denominator id.
-    denum: [var_info.id2],
-    // The level currently in use:
-    current_level: level,
+    denum: [],
+    // The territorial mesh currently in use:
+    current_level: null,
     // The ID of the region currently in use:
-    my_region: code,
+    my_region: null,
     // The name of the region currently in use:
-    my_region_pretty_name: app.feature_names[code],
-    // How many ratio on the current chart:
+    my_region_pretty_name: null,
+    // How many ratio are required for the current chart:
     nb_var: 1,
-    // Filter/category type:
+    // The kind of study zone between:
+    // - null/undefined : no study zone
+    //                  OR study zone defined by a key in the filter_key below,
+    // - CUSTOM : a custom study zone created by the user,
+    // - SPAT : filter by distance.
     filter_type: null,
-  };
-  app.colors[app.current_config.my_region] = color_highlight;
-}
-
-export const isIE = (() => (/MSIE/i.test(navigator.userAgent)
-    || /Trident\/\d./i.test(navigator.userAgent)
-    || /Edge\/\d./i.test(navigator.userAgent)))();
+    // If 'filter_type' above is CUSTOM or SPAT, the 'filter_key' should be
+    // an Array containing the id of the various features of this study zone.
+    // Otherwise 'null/undefined' if no study zone.
+    // Or a key (as defined in the metadata/dataset) corresponding to a study zone.
+    filter_key: null,
+  },
+};
 
 /**
 * Function to update the availables ratios in the left menu (after changing region)
@@ -140,6 +146,21 @@ function updateAvailableRatios(my_region) {
   return new_var.length;
 }
 
+function setDefaultConfig(code = '249100546', variable = 'MED', level = 'EPCI') { // }, level = 'NUTS1') {
+  const var_info = variables_info.find(ft => ft.id === variable);
+
+  app.colors[app.current_config.my_region] = color_highlight;
+
+  app.current_config.ratio = [variable];
+  app.current_config.ratio_pretty_name = [var_info.name];
+  app.current_config.ratio_unit = [var_info.unit];
+  app.current_config.num = [var_info.id1];
+  app.current_config.denum = [var_info.id2];
+  app.current_config.current_level = level;
+  app.current_config.my_region = code;
+  app.current_config.my_region_pretty_name = app.feature_names[code];
+}
+
 
 function setDefaultConfigMenu(code = '249100546', variable = 'MED', level = 'EPCI') {
   document.querySelector(`.target_region.square[value="r_${code}"]`).classList.add('checked');
@@ -152,6 +173,14 @@ function setDefaultConfigMenu(code = '249100546', variable = 'MED', level = 'EPC
 }
 
 
+/**
+* Updates the "study zone" ("Espaces d'études") section in the left menu
+* notably after the user changed its territorial mesh ('Unité territoriale')
+* as the study zones can be different for each territorial mesh.
+*
+* @return {void}
+*
+*/
 export function updateMenuStudyZones() {
   Array.prototype.forEach.call(
     document.querySelectorAll('#menu_studyzone > p'),
@@ -181,11 +210,14 @@ export function updateMenuStudyZones() {
   );
 }
 
+/**
+* Reset the 'app.colors' variable (so its only hold informations
+* about the color to use for my regions)
+*
+* @return {void}
+*/
 export function resetColors() {
   app.colors = {};
-  // for (let i = 0, len_i = current_ids.length; i < len_i; i++) {
-  //   app.colors[current_ids[i]] = color_countries;
-  // }
   app.colors[app.current_config.my_region] = color_highlight;
 }
 
@@ -209,12 +241,20 @@ function updateAvailableCharts(nb_var) {
   }
 }
 
+/**
+* Updates the section (located on the top of the map, just above the completude section)
+* with informations about the name of the current territorial mesh and study zone.
+*
+*
+* @return {void}
+*
+*/
 function updateMyCategorySection() {
   const content_section = document.querySelector('.filter_info');
   let name_territorial_mesh = territorial_mesh
     .find(d => d.id === app.current_config.current_level).name;
   name_territorial_mesh = name_territorial_mesh.toLowerCase();
-  if (app.current_config.filter_type === 'REG' || app.current_config.filter_type === 'OLD_REG') {
+  if (app.current_config.filter_key === 'REG' || app.current_config.filter_key === 'OLD_REG') {
     name_territorial_mesh =
       name_territorial_mesh.charAt(0).toUpperCase() + name_territorial_mesh.slice(1);
     content_section.innerHTML = `${name_territorial_mesh} de la région ${app.current_config.my_category}`;
@@ -264,11 +304,9 @@ export function changeChart(type_new_chart) {
 }
 
 /**
-* Create handlers for user event on the left menu and on the map for charts only
-* allowing to use 1 variable.
+* Create handlers for user events on the left menu and on the header of the map.
+* This function is called each time the user changes the kind of chart.
 *
-* @param {Object} chart - The chart object.
-* @param {Object} map_elem - The map object.
 * @return {void}
 *
 */
@@ -319,6 +357,7 @@ export function bindUI_chart() {
       }
     });
 
+  // User change the 'distance' value in the "study zone" section:
   d3.select('#dist_filter')
     .on('change keyup', function () {
       clearTimeout(tm);
@@ -427,6 +466,7 @@ export function bindUI_chart() {
       updateAvailableCharts(nb_var);
     });
 
+  // User click on a territorial mesh to change it:
   d3.selectAll('span.territ_level')
     .on('click', function () {
       if (!this.classList.contains('checked') && !this.parentNode.classList.contains('disabled')) {
@@ -444,12 +484,15 @@ export function bindUI_chart() {
           .classed('checked', false);
         this.classList.add('checked');
         app.current_config.current_level = level_value;
+        // TODO: don't select a random feature but the nearest, in our new
+        // territorial mesh, to the old 'my_region':
         app.current_config.my_region = getRandom(app.full_dataset
           .filter(d => +d.REGIOVIZ === 1 && +d[level_value] === 1).map(d => d.id));
         app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
         document.querySelector('.regio_name > #search').value = app.current_config.my_region_pretty_name;
         document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
-        document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`).classList.add('checked');
+        document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`)
+          .classList.add('checked');
         // filterLevelVar(app);
         resetColors();
         filterLevelVar(app);
@@ -485,6 +528,8 @@ export function bindUI_chart() {
 
   const header_map_section = d3.select('#map_section > #header_map');
 
+  // User click on the selection rectangle on the top of the map
+  // (to activate brushing on the map)
   header_map_section.select('#img_rect_selec')
     .on('click', function () {
       if (!this.classList.contains('active')) {
@@ -499,6 +544,8 @@ export function bindUI_chart() {
       }
     });
 
+  // User click on the magnifying glass on the top of the map
+  // (to activate zooming with the mouse)
   header_map_section.select('#img_map_zoom')
     .on('click', function () {
       if (!this.classList.contains('active')) {
@@ -514,6 +561,8 @@ export function bindUI_chart() {
       }
     });
 
+  // User click on the arrow button on the top of the map
+  // (to activate selection of individual feature on the map)
   header_map_section.select('#img_map_select')
     .on('click', function () {
       if (!this.classList.contains('active')) {
@@ -532,12 +581,14 @@ export function bindUI_chart() {
       }
     });
 
+  // Zoom in and zoom out buttons on the top of the map:
   header_map_section.select('#zoom_in')
     .on('click', zoomClick);
 
   header_map_section.select('#zoom_out')
     .on('click', zoomClick);
 
+  // Can we brush and/or click to select regions on this map/chart combination:
   if (!app.map.brush_map) {
     if (app.chart.handleClickMap) {
       app.map.target_layer.selectAll('path')
@@ -572,6 +623,13 @@ function bindTopButtons() {
     });
 }
 
+/**
+* Binds the various 'i' icons to the appropriate modal boxes
+* (the function is exported because we need to call it again after creation/deletion
+* of custom study zones).
+*
+* @return {void}
+*/
 export function bindHelpMenu() {
   const help_buttons_var = document.querySelector('#menu_variables').querySelectorAll('span.i_info');
   Array.prototype.slice.call(help_buttons_var).forEach((btn_i) => {
@@ -713,6 +771,12 @@ export function bindHelpMenu() {
   });
 }
 
+/**
+* User click on the 'crédits & informations supplémentaires' link
+*
+* @return {void}
+*
+*/
 function bindCreditsSource() {
   const credits_btn = document.querySelector('#link_credits_source');
   credits_btn.onclick = function () {
@@ -796,34 +860,77 @@ function loadData() {
                 full_dataset, territoires_france, back, back_countries, boundaries, boxes,
                 coasts, regions, styles_map, metadata_indicateurs,
               ] = results;
+              // Alertifty will be use to notify 'warning' to the user
+              // (such as the selection of a feature needing a change of chart)
               alertify.set('notifier', 'position', 'bottom-left');
+              // Fill the 3 variables defined on the top of this file
+              // 'study_zones', 'territorial_mesh' and 'variables_info'
+              // with the appropriate metadata extracted from
+              // the 'indicateurs_meta.csv' file
               prepareVariablesInfo(metadata_indicateurs);
+
+              // Notably extract the feature names from the dataset:
+              prepare_dataset(full_dataset, app);
+
+              // Info regarding the state on which the application will be initialized
+              // We are reading the 'territorial_mesh' variable to randomly chose one :
+              const start_territorial_mesh = getRandom(territorial_mesh.map(d => d.id));
+
+              // Then we are picking a feature from this trritorial_mesh:
+              const start_region = getRandom(full_dataset
+                .filter(d => d.REGIOVIZ === '1' && +d[start_territorial_mesh] === 1)
+                .map(d => d.id));
+              // And a first variable to draw the bar chart:
+              const start_variable = 'MED';
+
+              // Lets store these info on the global 'app' variable:
+              setDefaultConfig(start_region, start_variable, start_territorial_mesh);
+
+              // Prepare the targeted geometry layer:
+              prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
+
+              // Extract the features (regions) to be displayed for selection
+              // in the left menu:
               const features_menu = full_dataset.filter(ft => ft.REGIOVIZ === '1');
               // eslint-disable-next-line no-param-reassign
               features_menu.forEach((ft) => { ft.name = ft.name.replace(' — ', ' - '); });
+              // Sort them alphabetically:
               features_menu.sort((a, b) => a.name.localeCompare(b.name));
-              const start_territorial_mesh = 'EPCI';
-              const start_region = getRandom(full_dataset
-                .filter(d => d.REGIOVIZ === '1' && +d[start_territorial_mesh] === 1).map(d => d.id));
-              const start_variable = 'MED';
-              prepare_dataset(full_dataset, app);
-              setDefaultConfig(start_region, start_variable, start_territorial_mesh);
-              prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
+
+              // Create the left menu:
               createMenu(
                 features_menu,
                 variables_info.filter(d => d.group),
                 study_zones,
                 territorial_mesh,
               );
-
+              // Binds various interactions on the left menu
+              // (only done once at its creation)
               bindCreditsSource();
               updateMenuStudyZones();
               bindHelpMenu();
+
+              // Set, in this menu, the various parameters we defined above:
+              setDefaultConfigMenu(start_region, start_variable, start_territorial_mesh);
+
+              // Create the menu located on the top of the page:
               makeTopMenu();
+
+              // Prepare the header for the chart and for the map:
               makeHeaderChart();
               makeHeaderMapSection();
-              setDefaultConfigMenu(start_region, start_variable, start_territorial_mesh);
+
+              // Filter the 'full_dataset' according to our parameters defined above
+              // (will only extract the feature within our territorial mesh and study zone)
+              // (basically this will be done on each change of : region, study zone,
+              // territorial mesh, variable addition/removing, and change of chart)
               filterLevelVar(app);
+
+              // Update the section about the current study zone
+              // (located on the header of the map)
+              updateMyCategorySection();
+
+              // Reference our various layer and create the SVG map:
               const other_layers = new Map();
               [
                 ['boxes', boxes],
@@ -841,17 +948,25 @@ function loadData() {
                 styles_map,
                 start_territorial_mesh,
               );
+
+              // Create the first chart (displayed by default):
               app.chart = new BarChart1(app.current_data);
+
+              // Binds the various interactions between the chart and the map
+              // (and their respecting headers):
               bindUI_chart(app.chart, app.map);
               app.map.bindBrushClick(app.chart);
               app.chart.bindMap(app.map);
+
+              // Create the tooltips:
               Tooltipsify('[title-tooltip]');
-              updateMyCategorySection();
+
               // Fetch the layer in geographic coordinates now
               // in case the user wants to download it later:
               // d3.request('data/CGET_nuts_all.geojson', (err, result) => {
               //   app.geo_layer = result.response;
               // });
+
               // Load/configure mathjax to render some math formulas in help dialogs:
               MathJax.Hub.Config({
                 tex2jax: {
@@ -876,29 +991,4 @@ window.onresize = function () {
   d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value_map}px`);
   d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value_chart}px`);
   d3.select('.cont_svg.clgd').style('padding-top', `${(height_legend / fixed_dimension.legend.width) * width_value_map}px`);
-};
-
-const waitingOverlay = (function () {
-  const overlay = document.createElement('div');
-  overlay.id = 'overlay';
-  overlay.style.display = 'none';
-  overlay.innerHTML = `<div class="spinner2"></div>`;
-  overlay.onclick = (e) => {
-    if (overlay.style.display === 'none') return;
-    if (e.preventDefault) e.preventDefault();
-    if (e.stopPropagation) e.stopPropagation();
-  };
-  document.body.insertBefore(overlay, document.getElementById('menutop'));
-  return {
-    display: () => { overlay.style.display = null; },
-    hide: () => { overlay.style.display = 'none'; },
-  };
-}());
-
-export const execWithWaitingOverlay = function (func) {
-  waitingOverlay.display();
-  setTimeout(() => {
-    func();
-    waitingOverlay.hide();
-  }, 10);
 };

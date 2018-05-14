@@ -2,10 +2,11 @@ import {
   comp, math_round, math_abs, math_max, Rect, getScrollValue,
   getMean2, svgPathToCoords, getElementsFromPoint, getNameStudyZone,
   formatNumber, svgContextMenu, isContextMenuDisplayed,
+  execWithWaitingOverlay,
 } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, resetColors, variables_info, territorial_mesh } from './../../main';
+import { app, resetColors, variables_info, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import ContextMenu from './../contextMenu';

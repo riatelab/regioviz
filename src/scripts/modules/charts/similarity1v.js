@@ -1,6 +1,6 @@
 import {
   comp, math_round, math_abs, math_sqrt, math_pow, math_max, PropSizer, getMean2,
-  getNameStudyZone, getStdDev, _isNaN,
+  getNameStudyZone, getStdDev, _isNaN, execWithWaitingOverlay,
   formatNumber, svgContextMenu, getElementsFromPoint, isContextMenuDisplayed, Rect,
   svgPathToCoords, getScrollValue,
 } from './../helpers';
@@ -10,7 +10,7 @@ import {
   color_q3, color_q4,
 } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, resetColors, variables_info, territorial_mesh } from './../../main';
+import { app, resetColors, variables_info, territorial_mesh } from './../../main';
 import TableResumeStat from './../tableResumeStat';
 import CompletudeSection from './../completude';
 import { prepareTooltip, Tooltipsify } from './../tooltip';
@@ -39,7 +39,11 @@ const updateDimensions = () => {
   width = fixed_dimension.chart.width - margin.left - margin.right;
   height = fixed_dimension.chart.height - margin.top - margin.bottom;
   const width_value = document.getElementById('bar_section').getBoundingClientRect().width * 0.98;
-  d3.select('.cont_svg.cchart').style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`);
+  d3.select('.cont_svg.cchart')
+    .style(
+      'padding-top',
+      `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * width_value}px`,
+    );
   svg_bar.append('defs')
     .append('svg:clipPath')
     .attr('id', 'clip')
@@ -62,7 +66,9 @@ export default class Similarity1plus {
     app.current_config.nb_var = 1;
     this.ratios = app.current_config.ratio;
     this.nums = app.current_config.num;
-    this.data = ref_data.filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true)).slice();
+    this.data = ref_data
+      .filter(ft => this.ratios.map(v => !!ft[v]).every(v => v === true))
+      .slice();
     this.prepareData();
     this.type = 'global';
     resetColors();

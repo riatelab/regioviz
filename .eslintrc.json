@@ -6,11 +6,12 @@
   "globals": {
     "ENV": true,
     "d3": false,
-    "MathJax": true,
-    "JSZip": true
+    "MathJax": false,
+    "JSZip": false
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "es6": true
   },
   "rules": {
     "camelcase": 0,

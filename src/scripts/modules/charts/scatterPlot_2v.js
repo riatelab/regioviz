@@ -1,13 +1,13 @@
 import {
   Rect, comp2, svgPathToCoords, computePercentileRank, getMean2,
-  getNameStudyZone, getScrollValue,
+  getNameStudyZone, getScrollValue, execWithWaitingOverlay,
   formatNumber, svgContextMenu, PropSizer,
   isContextMenuDisplayed, math_min, math_max,
   getElementsFromPoint,
 } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, variables_info, resetColors, territorial_mesh } from './../../main';
+import { app, variables_info, resetColors, territorial_mesh } from './../../main';
 import ContextMenu from './../contextMenu';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';

@@ -1,13 +1,13 @@
 import alertify from 'alertifyjs';
 import {
   math_max, math_min, math_sin, math_cos, HALF_PI, computePercentileRank, getMean2,
-  getNameStudyZone,
+  getNameStudyZone, execWithWaitingOverlay,
   formatNumber, svgContextMenu, isContextMenuDisplayed,
   getElementsFromPoint, getScrollValue,
 } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
 import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
-import { app, execWithWaitingOverlay, variables_info, territorial_mesh } from './../../main';
+import { app, variables_info, territorial_mesh } from './../../main';
 import CompletudeSection from './../completude';
 import TableResumeStat from './../tableResumeStat';
 import { prepareTooltip, Tooltipsify } from './../tooltip';

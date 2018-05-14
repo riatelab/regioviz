@@ -3,7 +3,7 @@ import tingle from 'tingle.js';
 import { color_inf, color_sup, fixed_dimension, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
-import { isIE, app, bindUI_chart, bindHelpMenu, study_zones } from './../main';
+import { app, bindUI_chart, bindHelpMenu, study_zones } from './../main';
 
 const array_slice = Array.prototype.slice;
 
@@ -221,6 +221,11 @@ no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return 
 /* eslint-enable wrap-iife, object-shorthand, no-bitwise, strict,
 no-extend-native, prefer-rest-params, no-prototype-builtins, no-param-reassign,
 no-restricted-syntax, lines-around-directive, no-unused-vars, consistent-return  */
+
+const isIE = (() => (/MSIE/i.test(navigator.userAgent)
+    || /Trident\/\d./i.test(navigator.userAgent)
+    || /Edge\/\d./i.test(navigator.userAgent)))();
+
 
 // eslint-disable-next-line no-restricted-properties
 const math_pow = Math.pow;
@@ -665,7 +670,7 @@ function prepareGeomLayerId(layer, id_field) {
 *
 */
 function getRandom(arr, false_length) {
-  return arr[Math.round(Math.random() * (false_length || arr.length))];
+  return arr[Math.round(Math.random() * (false_length || arr.length - 1))];
 }
 
 function addThousandsSeparator(value) {
@@ -1090,6 +1095,33 @@ function toggleVisibilityLeftMenu() {
 }
 /* eslint-enable no-param-reassign */
 
+
+const waitingOverlay = (function () {
+  const overlay = document.createElement('div');
+  overlay.id = 'overlay';
+  overlay.style.display = 'none';
+  overlay.innerHTML = '<div class="spinner2"></div>';
+  overlay.onclick = (e) => {
+    if (overlay.style.display === 'none') return;
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+  };
+  document.body.insertBefore(overlay, document.getElementById('menutop'));
+  return {
+    display: () => { overlay.style.display = null; },
+    hide: () => { overlay.style.display = 'none'; },
+  };
+}());
+
+const execWithWaitingOverlay = function execWithWaitingOverlay(func) {
+  waitingOverlay.display();
+  setTimeout(() => {
+    func();
+    waitingOverlay.hide();
+  }, 10);
+};
+
+
 export {
   comp,
   comp2,
@@ -1132,4 +1164,5 @@ export {
   getScrollValue,
   toggleVisibilityLeftMenu,
   getNameStudyZone,
+  execWithWaitingOverlay,
 };
