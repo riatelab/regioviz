@@ -1056,8 +1056,9 @@ export default class ScatterPlot2 {
         const pts = this._pts;
         for (let ix = 0, nb_pts = pts.length; ix < nb_pts; ix++) {
           if (rect.contains(pts[ix])) {
-            const value1 = d.properties[self.variable1];
-            const value2 = d.properties[self.variable2];
+            const feature = app.full_dataset[d._ix_dataset];
+            const value1 = feature[self.variable1];
+            const value2 = feature[self.variable2];
             const color = comp2(
               value1, value2,
               self.ref_value1, self.ref_value2,

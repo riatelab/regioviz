@@ -15,16 +15,16 @@ import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/me
 import { MapSelect, svg_map, zoomClick } from './modules/map';
 import { color_highlight, MAX_VARIABLES, fixed_dimension } from './modules/options';
 import { Tooltipsify } from './modules/tooltip';
-import { unbindUI, selectFirstAvailableVar, prepareGeomLayerId, getRandom, clickDlPdf, removeAll } from './modules/helpers';
+import { unbindUI, selectFirstAvailableVar, getRandom, clickDlPdf, prepareGeomLayerId, removeAll } from './modules/helpers';
 import {
-  prepare_dataset,
-  filterLevelVar,
+  addVariable,
   applyFilter,
   changeRegion,
-  addVariable,
+  filterLevelVar,
+  prepareDataset,
+  prepareVariablesInfo,
   removeVariable,
   resetVariables,
-  prepareVariablesInfo,
 } from './modules/prepare_data';
 // import { makeTour } from './modules/guide_tour';
 
@@ -805,6 +805,37 @@ function bindCreditsSource() {
   };
 }
 
+function getRandomStartingState() {
+  const first_var_group = variables_info[0].group;
+  // Variable codes from the first group of variables displayed:
+  const var_first_group = variables_info
+    .filter(d => d.group === first_var_group)
+    .map(d => d.id);
+  // Code of existing territorial mesh:
+  const available_territ_mesh = territorial_mesh.map(d => d.id);
+  // Randomly chose a territorial mesh:
+  const start_territorial_mesh = getRandom(available_territ_mesh);
+
+  // Then we are picking a region from this territorial mesh:
+  const start_region = getRandom(app.full_dataset
+    .filter(d => d.REGIOVIZ === '1' && +d[start_territorial_mesh] === 1)
+    .map(d => d.id));
+
+  const obj_my_region = app.full_dataset.find(d => d.id === start_region);
+  // Which are the variables from the first group also available for
+  // this region:
+  const available_var_first_group = [];
+  var_first_group.forEach((v) => {
+    // eslint-disable-next-line no-restricted-globals
+    if (!isNaN(+obj_my_region[v])) {
+      available_var_first_group.push(v);
+    }
+  });
+  // Randomly chose a variable among them:
+  const start_variable = getRandom(available_var_first_group);
+  return { start_territorial_mesh, start_region, start_variable };
+}
+
 function loadData() {
   let progress = 0;
   const total = 13718521;
@@ -868,26 +899,21 @@ function loadData() {
               // with the appropriate metadata extracted from
               // the 'indicateurs_meta.csv' file
               prepareVariablesInfo(metadata_indicateurs);
-
               // Notably extract the feature names from the dataset:
-              prepare_dataset(full_dataset, app);
+              prepareDataset(full_dataset, app);
 
               // Info regarding the state on which the application will be initialized
-              // We are reading the 'territorial_mesh' variable to randomly chose one :
-              const start_territorial_mesh = getRandom(territorial_mesh.map(d => d.id));
-
-              // Then we are picking a feature from this trritorial_mesh:
-              const start_region = getRandom(full_dataset
-                .filter(d => d.REGIOVIZ === '1' && +d[start_territorial_mesh] === 1)
-                .map(d => d.id));
-              // And a first variable to draw the bar chart:
-              const start_variable = 'MED';
+              const {
+                start_territorial_mesh,
+                start_region,
+                start_variable,
+              } = getRandomStartingState();
 
               // Lets store these info on the global 'app' variable:
               setDefaultConfig(start_region, start_variable, start_territorial_mesh);
 
               // Prepare the targeted geometry layer:
-              prepareGeomLayerId(territoires_france, app.current_config.id_field_geom);
+              prepareGeomLayerId(territoires_france);
 
               // Extract the features (regions) to be displayed for selection
               // in the left menu:

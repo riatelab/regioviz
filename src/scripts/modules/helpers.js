@@ -3,7 +3,7 @@ import tingle from 'tingle.js';
 import { color_inf, color_sup, fixed_dimension, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
 import ContextMenu from './contextMenu';
-import { app, bindUI_chart, bindHelpMenu, study_zones } from './../main';
+import { app, bindUI_chart, bindHelpMenu, study_zones, territorial_mesh } from './../main';
 
 const array_slice = Array.prototype.slice;
 
@@ -648,15 +648,25 @@ function selectFirstAvailableVar() {
 * to 'id_field' value) on the target layer properties
 * and assign its value directly on the field name 'id'.
 *
-* @param {Object} layer - A geojson collection of features
-* @param {String} id_field - The name of the field containing
-*                           the id values.
+* @param {Object} layer - A geojson collection of features.
+*
 * @return {Void}
 */
-function prepareGeomLayerId(layer, id_field) {
+function prepareGeomLayerId(layer) {
+  const available_territ_mesh = territorial_mesh.map(d => d.id);
+  const { id_field, id_field_geom } = app.current_config;
   layer.features.forEach((ft) => {
     // eslint-disable-next-line no-param-reassign
-    ft.id = ft.properties[id_field];
+    ft.id = ft.properties[id_field_geom];
+    // eslint-disable-next-line no-param-reassign
+    ft._ix_dataset = app.full_dataset.findIndex(d => d[id_field] === ft.id);
+    const other = app.full_dataset[ft._ix_dataset];
+    available_territ_mesh.forEach((t) => {
+      // eslint-disable-next-line no-param-reassign
+      ft.properties[t] = +other[t];
+    });
+    // eslint-disable-next-line no-param-reassign
+    ft.properties.name = other.name;
   });
 }
 

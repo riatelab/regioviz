@@ -14,7 +14,7 @@ import { _isNaN } from './helpers';
 * @return {void}
 *
 */
-export function prepare_dataset(full_dataset, app) {
+export function prepareDataset(full_dataset, app) {
   app.full_dataset = full_dataset;
   // Create an Object feature_id ->  feature_name for easier lookup:
   app.feature_names = {};

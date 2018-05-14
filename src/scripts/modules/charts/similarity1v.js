@@ -288,20 +288,20 @@ export default class Similarity1plus {
     }
     this.removeLines();
     this.removeMapClonedFeatures();
-    this.update();
-    this.updateMapRegio(nb);
+    this.update(nb);
+    // this.updateMapRegio(nb);
   }
 
-  update() {
+  update(nb) {
     if (document.getElementById('overlay').style.display === 'none') {
-      execWithWaitingOverlay(() => { this._update(); });
+      execWithWaitingOverlay(() => { this._update(nb); });
     } else {
-      this._update();
+      this._update(nb);
     }
   }
 
   /* eslint-disable no-loop-func */
-  _update() {
+  _update(nb) {
     const self = this;
     const data = self.data;
     const field_distance = this.type_distance === 'euclidienne'
@@ -852,6 +852,7 @@ export default class Similarity1plus {
       }, 75);
     }
     this.data.sort((a, b) => a[field_distance] - b[field_distance]);
+    this.updateMapRegio(nb);
   }
   /* eslint-enable no-loop-func */
 
@@ -874,8 +875,11 @@ export default class Similarity1plus {
         if (_id === app.current_config.my_region) {
           return color_highlight;
         } else if (this.current_ids.indexOf(_id) > -1) {
-          if (app.colors[_id] && this.type === 'detailled') return color_default_dissim;
-          else if (app.colors[_id] && this.type === 'global') return app.colors[_id];
+          if (app.colors[_id] && this.type === 'detailled') {
+            return color_default_dissim;
+          } else if (app.colors[_id] && this.type === 'global') {
+            return app.colors[_id];
+          }
           return color_countries;
         }
         return color_disabled;
@@ -1313,7 +1317,6 @@ export default class Similarity1plus {
       this.prepareData();
       this.updateCompletude();
       this.updateTableStat();
-      // this.updateMapRegio();
       this.applySelection(+d3.select('#menu_selection').select('.nb_select').property('value'));
     }
   }
@@ -1553,7 +1556,7 @@ export default class Similarity1plus {
         app.map.unbindBrushClick();
         app.map.bindBrushClick(self);
         self.update();
-        self.updateMapRegio();
+        // self.updateMapRegio();
         app.map.displayLegend(4);
       });
 
@@ -1583,7 +1586,7 @@ export default class Similarity1plus {
           self.type_distance = 'rank_norm';
         }
         self.update();
-        self.updateMapRegio();
+        // self.updateMapRegio();
       });
   }
 
