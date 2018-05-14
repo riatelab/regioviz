@@ -32,11 +32,11 @@ function updateDimensions() {
   margin = {
     top: 10,
     right: 20,
-    bottom: 100,
+    bottom: 120,
     left: 60,
   };
   margin2 = {
-    top: math_round(fixed_dimension.chart.height - margin.top - margin.bottom + 45),
+    top: math_round(fixed_dimension.chart.height - margin.top - margin.bottom + 65),
     right: 20,
     bottom: 12.5,
     left: 60,
@@ -634,16 +634,54 @@ export default class BarChart1 {
       .call(this.yAxis);
 
     const axis_x = this._focus.select('.axis--x')
-      .attr('font-size', '10px')
       .call(this.xAxis);
+
     axis_x
       .selectAll('text')
-      .attrs(() => ({ dx: '0', dy: '0.71em', transform: null }))
-      .styles(() => ({
-        'text-anchor': 'middle',
-        'font-size': '11px',
-        display: (displayed > 20) ? 'none' : null,
-      }));
+      .attrs(() => {
+        if (displayed > 12) {
+          return { dx: '-0.8em', dy: '0.15em', transform: 'rotate(-65)' };
+        }
+        return { dx: '0', dy: '0.71em', transform: null };
+      })
+      .styles((d) => {
+        if (displayed > 90) {
+          return {
+            'text-anchor': 'end',
+            'font-size': '6px',
+            display: d === app.current_config.my_region ? null : 'none',
+          };
+        } else if (displayed > 50) {
+          return {
+            'text-anchor': 'end',
+            'font-size': '6px',
+            display: null,
+          };
+        } else if (displayed > 20) {
+          return {
+            'text-anchor': 'end',
+            'font-size': '7px',
+            display: null,
+          };
+        } else if (displayed > 12) {
+          return {
+            'text-anchor': 'end',
+            'font-size': '7.5px',
+            display: null,
+          };
+        } else if (displayed > 8) {
+          return {
+            'text-anchor': 'middle',
+            'font-size': '7.5px',
+            display: null,
+          };
+        }
+        return {
+          'text-anchor': 'middle',
+          'font-size': '8px',
+          display: null,
+        };
+      });
 
     this.g_bar.selectAll('.bar')
       .on('mouseover', () => {
