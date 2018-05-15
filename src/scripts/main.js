@@ -15,7 +15,14 @@ import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/me
 import { MapSelect, svg_map, zoomClick } from './modules/map';
 import { color_highlight, MAX_VARIABLES, fixed_dimension } from './modules/options';
 import { Tooltipsify } from './modules/tooltip';
-import { unbindUI, selectFirstAvailableVar, getRandom, clickDlPdf, prepareGeomLayerId, removeAll } from './modules/helpers';
+import {
+  clickDlPdf,
+  getRandom,
+  prepareGeomLayerId,
+  removeAll,
+  selectFirstAvailableVar,
+  unbindUI,
+} from './modules/helpers';
 import {
   addVariable,
   applyFilter,
@@ -52,7 +59,8 @@ export const app = {
   // to not contain feature with empty ratio values within the ratios in use).
   current_ids: [],
   // The current version number (not used for now, except for displaying it):
-  version: '0.1.0',
+  // (the 'REGIOVIZ_VERSION' string is remplaced at build time)
+  version: 'REGIOVIZ_VERSION',
   // The user is now allowed to create its custom study zones, this is where
   // we are storing a mapping "name_study_zone" -> [id_x, id_y, id_z, id_a, ...]:
   custom_studyzones: {},
@@ -476,26 +484,34 @@ export function bindUI_chart() {
         app.current_config.filter_key = undefined;
         d3.select('p[filter-value="DEFAULT"] > span.filter_v').classed('checked', true); /* .dispatch('click'); */
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
+        // Store the new level value:
         const level_value = this.getAttribute('value');
+        // How many variables are currently selected ?
+        // (maybe the new regions dont have all theses ratios available)
         const old_nb_var = app.current_config.ratio.length;
+        // Id of the current region (before changing level):
         const old_my_region = app.current_config.my_region;
         const obj_old_region = app.full_dataset.find(d => d.id === old_my_region);
+        // For each feature we precomputed the nearest feature in each
+        // territorial level:
         const nearest_new_region = obj_old_region[`nearest_${level_value}`];
+        // Update the menu displaying region names:
         d3.selectAll('.regioname')
           .style('display', d => (+d[level_value] === 1 ? null : 'none'))
           .selectAll('.square')
           .classed('checked', false);
         this.classList.add('checked');
+        // Update to our new parameters (new territorial level, new region id, no study zone)
         app.current_config.current_level = level_value;
-        // TODO: don't select a random feature but the nearest, in our new
-        // territorial mesh, to the old 'my_region':
         app.current_config.my_region = nearest_new_region;
         app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
+        // Reflect theses changes in the left menu:
         document.querySelector('.regio_name > #search').value = app.current_config.my_region_pretty_name;
         document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
         document.querySelector(`.target_region.square[value="r_${app.current_config.my_region}"]`)
           .classList.add('checked');
-        // filterLevelVar(app);
+
+        // Update the dataset extract in use for our charts:
         resetColors();
         filterLevelVar(app);
         app.map.updateLevelRegion(level_value);
@@ -505,6 +521,8 @@ export function bindUI_chart() {
         updateMenuStudyZones();
         updateMyCategorySection();
 
+        // We may need to change the kind of chart if all the ratios previously
+        // selected aren't available for this region:
         if (new_nb_var >= app.current_config.nb_var) {
           if (new_nb_var < old_nb_var) {
             alertify.warning(
@@ -838,9 +856,17 @@ function getRandomStartingState() {
   return { start_territorial_mesh, start_region, start_variable };
 }
 
+/**
+* Main function, fetching the data.zip archive, reading it and prepaaring
+* the dataset and the page to display the first chart.
+*
+* @return {void}
+*
+*/
 function loadData() {
   let progress = 0;
-  const total = 11474185;
+  // Will be replaced by the appropriate value at build time:
+  const total = 'ZIP_SIZE';
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
 
@@ -907,7 +933,6 @@ function loadData() {
             text.text('Préparation de la page ... 97%');
             setTimeout(() => {
               text.text(`Préparation de la page ... 98%`);
-
               // Alertifty will be use to notify 'warning' to the user
               // (such as the selection of a feature needing a change of chart)
               alertify.set('notifier', 'position', 'bottom-left');

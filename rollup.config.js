@@ -7,6 +7,9 @@ import uglify from 'rollup-plugin-uglify';
 import serve from 'rollup-plugin-serve';
 import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
+const version = require('./package.json').version;
+const fs = require("fs");
+const archive_size = fs.statSync("./src/data/data.zip").size;
 
 export default {
   input: 'src/scripts/main.js',
@@ -39,6 +42,8 @@ export default {
     replace({
       exclude: 'node_modules/**',
       ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+      REGIOVIZ_VERSION: version,
+      ZIP_SIZE: JSON.stringify(archive_size)
     }),
     (process.env.SERVE !== undefined && serve({
       port: 11111,
