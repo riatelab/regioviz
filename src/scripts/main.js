@@ -838,7 +838,7 @@ function getRandomStartingState() {
 
 function loadData() {
   let progress = 0;
-  const total = 13718521;
+  const total = 21142916;
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
 
@@ -875,10 +875,11 @@ function loadData() {
             const regions = JSON.parse(res[6]);
             const full_dataset = d3.csvParse(res[7]);
             const styles_map = JSON.parse(res[8]);
-            const territoires_france = JSON.parse(res[9]);
+            const geo_layer = res[9];
+            const territoires_france = JSON.parse(res[10]);
             text.text('Préparation de la page ... 98%');
             return Promise.resolve([
-              full_dataset, territoires_france, back, back_countries,
+              full_dataset, geo_layer, territoires_france, back, back_countries,
               boundaries, boxes, coasts, regions, styles_map, metadata_indicateurs,
             ]);
           })
@@ -888,8 +889,9 @@ function loadData() {
               document.body.classList.remove('loading');
               removeAll(document.querySelectorAll('.spinner, .top-spinner'));
               const [
-                full_dataset, territoires_france, back, back_countries, boundaries, boxes,
-                coasts, regions, styles_map, metadata_indicateurs,
+                full_dataset, geo_layer, territoires_france,
+                back, back_countries, boundaries, boxes, coasts, regions,
+                styles_map, metadata_indicateurs,
               ] = results;
               // Alertifty will be use to notify 'warning' to the user
               // (such as the selection of a feature needing a change of chart)
@@ -989,6 +991,7 @@ function loadData() {
 
               // Fetch the layer in geographic coordinates now
               // in case the user wants to download it later:
+              app.geo_layer = geo_layer;
               // d3.request('data/CGET_nuts_all.geojson', (err, result) => {
               //   app.geo_layer = result.response;
               // });
