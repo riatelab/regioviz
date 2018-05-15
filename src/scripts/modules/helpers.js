@@ -664,6 +664,7 @@ function prepareGeomLayerId(layer) {
     available_territ_mesh.forEach((t) => {
       // eslint-disable-next-line no-param-reassign
       ft.properties[t] = +other[t];
+      other[`nearest_${t}`] = ft.properties[`nearest_${t}`];
     });
     // eslint-disable-next-line no-param-reassign
     ft.properties.name = other.name;

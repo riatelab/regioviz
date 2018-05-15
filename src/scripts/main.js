@@ -478,6 +478,9 @@ export function bindUI_chart() {
         d3.selectAll('span.territ_level').attr('class', 'territ_level square');
         const level_value = this.getAttribute('value');
         const old_nb_var = app.current_config.ratio.length;
+        const old_my_region = app.current_config.my_region;
+        const obj_old_region = app.full_dataset.find(d => d.id === old_my_region);
+        const nearest_new_region = obj_old_region[`nearest_${level_value}`];
         d3.selectAll('.regioname')
           .style('display', d => (+d[level_value] === 1 ? null : 'none'))
           .selectAll('.square')
@@ -486,8 +489,7 @@ export function bindUI_chart() {
         app.current_config.current_level = level_value;
         // TODO: don't select a random feature but the nearest, in our new
         // territorial mesh, to the old 'my_region':
-        app.current_config.my_region = getRandom(app.full_dataset
-          .filter(d => +d.REGIOVIZ === 1 && +d[level_value] === 1).map(d => d.id));
+        app.current_config.my_region = nearest_new_region;
         app.current_config.my_region_pretty_name = app.feature_names[app.current_config.my_region];
         document.querySelector('.regio_name > #search').value = app.current_config.my_region_pretty_name;
         document.querySelector('.regio_name > #autocomplete').value = app.current_config.my_region_pretty_name;
@@ -838,7 +840,7 @@ function getRandomStartingState() {
 
 function loadData() {
   let progress = 0;
-  const total = 21142916;
+  const total = 11474185;
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
 
@@ -853,46 +855,59 @@ function loadData() {
     })
     .get((error, data) => {
       if (error) throw error;
-      const p = [];
+      const other_layers = new Map();
+      const p_layers = [];
+      let territoires_layer;
+      let metadata_indicateurs;
+      let full_dataset;
+      let styles_map;
       text.text('Préparation de la page ... 95%');
       setTimeout(() => {
+        // Extract the content of the data.zip archive:
         JSZip.loadAsync(data.response)
           .then((zip) => {
+            const p1 = [];
+            // Store separatly the files for which we know the name
+            // (indicateurs_meta.csv, styles.json and REGIOVIZ_DATA.csv)
+            // and the other files (which are GeoJSON layer)
             zip.forEach((relative_path, entry) => {
-              p.push([entry.name, zip.file(entry.name).async('string')]);
+              const n = entry.name;
+              if (n.indexOf('styles') > -1
+                  || n.indexOf('REGIOVIZ_DATA') > -1
+                  || n.indexOf('indicateurs_meta') > -1) {
+                p1.push([entry.name, zip.file(entry.name).async('string')]);
+              } else {
+                p_layers.push([entry.name, zip.file(entry.name).async('string')]);
+              }
             });
-            p.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
+            p1.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
+            p_layers.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
             text.text('Préparation de la page ... 95%');
-            return Promise.all(p.map(d => d[1]));
-          }).then((res) => {
+            return Promise.all(p1.map(d => d[1]));
+          }).then((res_data1) => {
+            // Extract the 3 mandatory files (metadata, full dataset and styles
+            // for the map)
+            text.text('Préparation de la page ... 96%');
+            metadata_indicateurs = d3.csvParse(res_data1[0]);
+            full_dataset = d3.csvParse(res_data1[1]);
+            styles_map = JSON.parse(res_data1[2]);
+            return Promise.all(p_layers.map(d => d[1]));
+          }).then((res_layers) => {
+            // Use the 'styles' info to fetch the name of the various layers to use:
+            const layer_names = Object.keys(styles_map);
+            layer_names.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
+            // Reference our various layer and the target layer:
+            layer_names.forEach((name, i) => {
+              if (styles_map[name].target) {
+                territoires_layer = JSON.parse(res_layers[i]);
+              } else {
+                other_layers.set(name, JSON.parse(res_layers[i]));
+              }
+            });
             text.text('Préparation de la page ... 97%');
-            const back = JSON.parse(res[0]);
-            const back_countries = JSON.parse(res[1]);
-            const boundaries = JSON.parse(res[2]);
-            const boxes = JSON.parse(res[3]);
-            const coasts = JSON.parse(res[4]);
-            const metadata_indicateurs = d3.csvParse(res[5]);
-            const regions = JSON.parse(res[6]);
-            const full_dataset = d3.csvParse(res[7]);
-            const styles_map = JSON.parse(res[8]);
-            const geo_layer = res[9];
-            const territoires_france = JSON.parse(res[10]);
-            text.text('Préparation de la page ... 98%');
-            return Promise.resolve([
-              full_dataset, geo_layer, territoires_france, back, back_countries,
-              boundaries, boxes, coasts, regions, styles_map, metadata_indicateurs,
-            ]);
-          })
-          .then((results) => {
-            text.text(`Préparation de la page ... 99%`);
             setTimeout(() => {
-              document.body.classList.remove('loading');
-              removeAll(document.querySelectorAll('.spinner, .top-spinner'));
-              const [
-                full_dataset, geo_layer, territoires_france,
-                back, back_countries, boundaries, boxes, coasts, regions,
-                styles_map, metadata_indicateurs,
-              ] = results;
+              text.text(`Préparation de la page ... 98%`);
+
               // Alertifty will be use to notify 'warning' to the user
               // (such as the selection of a feature needing a change of chart)
               alertify.set('notifier', 'position', 'bottom-left');
@@ -915,7 +930,7 @@ function loadData() {
               setDefaultConfig(start_region, start_variable, start_territorial_mesh);
 
               // Prepare the targeted geometry layer:
-              prepareGeomLayerId(territoires_france);
+              prepareGeomLayerId(territoires_layer);
 
               // Extract the features (regions) to be displayed for selection
               // in the left menu:
@@ -924,6 +939,11 @@ function loadData() {
               features_menu.forEach((ft) => { ft.name = ft.name.replace(' — ', ' - '); });
               // Sort them alphabetically:
               features_menu.sort((a, b) => a.name.localeCompare(b.name));
+
+              // Remove the loading spinner displayed until now:
+              text.text(`Préparation de la page ... 99%`);
+              document.body.classList.remove('loading');
+              removeAll(document.querySelectorAll('.spinner, .top-spinner'));
 
               // Create the left menu:
               createMenu(
@@ -958,20 +978,9 @@ function loadData() {
               // (located on the header of the map)
               updateMyCategorySection();
 
-              // Reference our various layer and create the SVG map:
-              const other_layers = new Map();
-              [
-                ['boxes', boxes],
-                ['back', back],
-                ['back_countries', back_countries],
-                ['boundaries', boundaries],
-                ['coasts', coasts],
-                ['regions', regions],
-              ].forEach((el) => {
-                other_layers.set(el[0], el[1]);
-              });
+              // Create the SVG map:
               app.map = new MapSelect(
-                territoires_france,
+                territoires_layer,
                 other_layers,
                 styles_map,
                 start_territorial_mesh,
@@ -991,10 +1000,10 @@ function loadData() {
 
               // Fetch the layer in geographic coordinates now
               // in case the user wants to download it later:
-              app.geo_layer = geo_layer;
-              // d3.request('data/CGET_nuts_all.geojson', (err, result) => {
-              //   app.geo_layer = result.response;
-              // });
+              d3.request('data/territoires_france.geojson', (err, result) => {
+                if (err) throw err;
+                app.geo_layer = result.response;
+              });
 
               // Load/configure mathjax to render some math formulas in help dialogs:
               MathJax.Hub.Config({
