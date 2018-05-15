@@ -530,7 +530,7 @@ export default class ScatterPlot2 {
 
     menu_selection.append('p')
       .attr('id', 'selection_subtitle')
-      .styles({ margin: '10px 0px 2px 0px' })
+      .styles({ margin: '0px 0px 2px 0px' })
       .html('Sur les deux indicateurs, sélection des territoires ayant des valeurs...');
 
     menu_selection.append('div')

@@ -411,14 +411,18 @@ span.i_regio {
 /* End on styles for left menu */
 
 /* Styles for top menu */
+.top_section.zoomed {
+  font-size: 0.85em;
+}
+
 .title_section {
   color: #4f81bd;
   font-size: 1.3em;
   text-align: center;
 }
 
-.top_section.zoomed, .title_section.zoomed {
-  font-size: 75%;
+.title_section.zoomed {
+  font-size: 1.1em;
 }
 
 .type_comparaison {
