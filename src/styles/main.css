@@ -149,7 +149,7 @@ svg {
   position: relative;
 }
 .zoomed > .clgd {
-  width: 82.5%;
+  width: 80%;
 }
 /* End of styles for svg elements and svg container elements */
 
@@ -415,6 +415,10 @@ span.i_regio {
   color: #4f81bd;
   font-size: 1.3em;
   text-align: center;
+}
+
+.top_section.zoomed, .title_section.zoomed {
+  font-size: 75%;
 }
 
 .type_comparaison {
@@ -828,7 +832,7 @@ tr {
   padding-left: 1% !important;
  }
 .t2.zoomed {
- width:46.8%;
+ width:43%;
 }
 .t3 {
   width:31%;
@@ -836,7 +840,7 @@ tr {
   height:100%;
 }
 .t3.zoomed {
-  width: 37.2%;
+  width: 35%;
 }
 .t1, .t2, .t3 {
   padding-left: 0.5%;
