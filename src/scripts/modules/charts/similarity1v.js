@@ -1524,6 +1524,9 @@ export default class Similarity1plus {
           menu.select('.scprop > .label').attr('class', 'label noselect not_selected');
           self.proportionnal_symbols = false;
         }
+        if (self.type === 'global') {
+          app.map.removeRectBrush();
+        }
         self.update();
       });
 
@@ -1588,6 +1591,9 @@ export default class Similarity1plus {
         const ix_last_selec = this.type !== 'global'
           ? +d3.select('#menu_selection').select('.nb_select').property('value')
           : null;
+        if (self.type === 'global') {
+          app.map.removeRectBrush();
+        }
         self.applySelection(ix_last_selec);
       });
   }

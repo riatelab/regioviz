@@ -512,7 +512,8 @@ export default class ScatterPlot2 {
       .attr('id', 'menu_selection')
       .styles({ padding: '0 10px 10px 10px', 'text-align': 'center', color: '#4f81bd' });
 
-    const chart_type = menu_selection.append('p');
+    const chart_type = menu_selection.append('p')
+      .style('margin', '4px 0 7px 0');
 
     chart_type.append('span')
       .attrs({
