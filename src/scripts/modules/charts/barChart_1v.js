@@ -83,53 +83,28 @@ export default class BarChart1 {
 
   constructor(ref_data) {
     this.brushed = () => {
-      if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
-      if (!this.x) {
+      const s = d3.event.selection;
+      if (!s) {
+        svg_container.select('.brush_bottom')
+          .call(this.brush_bottom.move, this.x2.range());
         return;
       }
-      const s = d3.event.selection || this.x2.range();
       this.context_left_handle.attr('x', s[0] - 12);
       this.context_right_handle.attr('x', s[1] - 7);
       current_range = [math_round(s[0] / (width / nbFt)), math_round(s[1] / (width / nbFt))];
       this.x.domain(this.data.slice(current_range[0], current_range[1]).map(ft => ft.id));
-      svg_container.select('.zoom').call(this.zoom.transform, d3.zoomIdentity
-        .scale(width / (current_range[1] - current_range[0]))
-        .translate(-current_range[0], 0));
       this._update();
       this.updateContext(current_range[0], current_range[1]);
       svg_container.select('.brush_top').call(this.brush_top.move, null);
-      // this.brushed_top();
     };
 
     this.brushed_top = () => {
-      if (!this._focus) return;
-
       const d3_event = d3.event;
       const my_region = app.current_config.my_region;
 
-      // const elems = document.elementsFromPoint(
-      //   d3_event.sourceEvent.pageX, d3_event.sourceEvent.pageY);
-      // const elem = elems.find(e => e.className.baseVal === 'bar');
-      // if (elem) {
-      //   const new_click_event = new MouseEvent('mousedown', {
-      //     pageX: d3_event.sourceEvent.pageX,
-      //     pageY: d3_event.sourceEvent.pageY,
-      //     clientX: d3_event.sourceEvent.clientX,
-      //     clientY: d3_event.sourceEvent.clientY,
-      //     bubbles: true,
-      //     cancelable: true,
-      //     view: window
-      //   });
-      //   elem.dispatchEvent(new_click_event);
-      // } else {
       clearTimeout(t);
       t = setTimeout(() => { this.tooltip.style('display', 'none').selectAll('p').html(''); }, 5);
-      // }
 
-      // if (d3_event && d3_event.selection
-      //       && d3_event.sourceEvent
-      //       && d3_event.sourceEvent.target === document.querySelector(
-      //         '.brush_top > rect.overlay')) {
       if (d3_event && d3_event.selection && d3_event.sourceEvent && d3_event.sourceEvent.target) {
         app.map.removeRectBrush();
         const s = d3_event.selection;
@@ -155,7 +130,9 @@ export default class BarChart1 {
           });
         // this.update();
         if (this.reset_state_button === true) {
-          d3.select('#menu_selection').selectAll('button').attr('class', 'button_blue');
+          d3.select('#menu_selection')
+            .selectAll('button')
+            .attr('class', 'button_blue');
         }
         this.updateMapRegio();
       } else {
@@ -245,14 +222,8 @@ export default class BarChart1 {
       .extent([[0, 0], [width, height]])
       .on('brush end', this.brushed_top);
 
-    const zoom = d3.zoom()
-      .scaleExtent([1, Infinity])
-      .translateExtent([[0, 0], [width, height]])
-      .extent([[0, 0], [width, height]]);
-      // .on("zoom", zoomed);
     this.brush_top = brush_top;
     this.brush_bottom = brush_bottom;
-    this.zoom = zoom;
 
     focus.append('g')
       .attrs({ class: 'axis axis--x', transform: `translate(0, ${height})` })
@@ -347,7 +318,7 @@ export default class BarChart1 {
           });
       });
 
-    this.updateMiniBars();
+    this.g_mini_bar = context.append('g');
 
     const g_brush_bottom = context.append('g')
       .attr('class', 'brush_bottom')
@@ -416,11 +387,7 @@ export default class BarChart1 {
         self.serie_inversed = !self.serie_inversed;
         x.domain(self.data.slice(current_range[0], current_range[1]).map(ft => ft.id));
         x2.domain(self.data.map(ft => ft.id));
-        // svg_container.select(".zoom").call(zoom.transform, d3.zoomIdentity
-        //     .scale(width / (current_range[1] - current_range[0]))
-        //     .translate(-current_range[0], 0));
         self.update();
-        // this.updateMiniBars();
         self.updateContext(current_range[0], current_range[1]);
         svg_container.select('.brush_top').call(brush_top.move, null);
         app.map.removeRectBrush();
@@ -758,7 +725,7 @@ export default class BarChart1 {
   updateMiniBars() {
     const id_my_region = app.current_config.my_region;
     const ratio_to_use = this.ratio_to_use;
-    const mini_bars = this.context.selectAll('.bar')
+    const mini_bars = this.g_mini_bar.selectAll('.bar')
       .data(this.data);
 
     mini_bars

@@ -8,7 +8,7 @@ import { _isNaN } from './helpers';
 * Attach the full_dataset Array to the app Object and create a dictionnary
 * allowing to obtain territorial units name from their Id.
 *
-* @param {Array} full_dataset - The dataset as an Array of Object
+* @param {Array} full_dataset - The dataset as an Array of Objects.
 * @param {Object} app - The variable containing the global parameters about
 *   the current state of the application.
 * @return {void}
