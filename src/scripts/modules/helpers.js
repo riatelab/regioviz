@@ -1079,8 +1079,8 @@ function toggleVisibilityLeftMenu() {
       d3.select('.cont_svg.cchart')
         .style('padding-top', `${(fixed_dimension.chart.height / fixed_dimension.chart.width) * w_bar - 15}px`);
       d3.select('.cont_svg.cmap')
-        .style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * w_map}px`);
-      d3.select('.cont_svg.clgd').style('padding-top', `${(h_lgd / fixed_dimension.legend.width) * w_map}px`);
+        .style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * w_map - 10}px`);
+      d3.select('.cont_svg.clgd').style('padding-top', `${(h_lgd / fixed_dimension.legend.width) * w_map - 20}px`);
       d3.select('body')
         .insert('div', '#menutop')
         .attr('id', 'selected_summary')

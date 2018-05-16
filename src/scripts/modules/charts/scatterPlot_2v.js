@@ -741,6 +741,8 @@ export default class ScatterPlot2 {
       .styles(d => ({
         fill: app.colors[d.id] || default_color,
         stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+        'fill-opacity': 0.8,
+        'stroke-opacity': 0.8,
       }));
   }
 
@@ -819,6 +821,9 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
+
         }))
         .on('end', () => {
           self.bindTooltips(true);
@@ -831,6 +836,8 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
         }))
         .attrs(d => ({
           'stroke-width': 1 / this.k,
@@ -878,6 +885,8 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
         }))
         .on('end', () => {
           self.bindTooltips(false);
@@ -890,6 +899,8 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
         }))
         .attrs(d => ({
           r: size_func(d[num_name]) / this.k,
