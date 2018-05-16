@@ -1245,7 +1245,7 @@ h3 {
 
 /* Styles for spinner while recalculating chart */
 #overlay {
-  background: #d3d3d380 none repeat scroll 0% 0%;
+  background: rgba(211, 211, 211, 0.8) none repeat scroll 0% 0%;
   width: 100%;
   height: 100%;
   margin: auto;
