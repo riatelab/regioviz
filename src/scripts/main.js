@@ -11,6 +11,7 @@ import ScatterPlot2 from './modules/charts/scatterPlot_2v';
 import RadarChart3 from './modules/charts/radarChart_3v';
 import Similarity1plus from './modules/charts/similarity1v';
 import createMenu from './modules/menuleft';
+import makeTour from './modules/guide_tour';
 import { makeTopMenu, makeHeaderChart, makeHeaderMapSection } from './modules/menutop';
 import { MapSelect, svg_map, zoomClick } from './modules/map';
 import { color_highlight, MAX_VARIABLES, fixed_dimension } from './modules/options';
@@ -33,14 +34,13 @@ import {
   removeVariable,
   resetVariables,
 } from './modules/prepare_data';
-// import { makeTour } from './modules/guide_tour';
 
 // Variables filled after reading the metadata file:
 export const variables_info = [];
 export const study_zones = [];
 export const territorial_mesh = [];
 
-// This variable contains information about the current state of the application
+// This variable contains informations about the current state of the application
 // (id of the selected region, number of selected variables, their names, etc.).
 // It will also references the variables 'map' and 'chart' (once created)
 // respectively corresponding to the current map and the current chart.
@@ -59,7 +59,7 @@ export const app = {
   // to not contain feature with empty ratio values within the ratios in use).
   current_ids: [],
   // The current version number (not used for now, except for displaying it):
-  // (the 'REGIOVIZ_VERSION' string is remplaced at build time)
+  // (the 'REGIOVIZ_VERSION' string is replaced at build time)
   version: 'REGIOVIZ_VERSION',
   // The user is now allowed to create its custom study zones, this is where
   // we are storing a mapping "name_study_zone" -> [id_x, id_y, id_z, id_a, ...]:
@@ -110,7 +110,7 @@ export const app = {
 };
 
 /**
-* Function to update the availables ratios in the left menu (after changing region)
+* Function to update the availables ratios in the left menu (after changing region).
 * If a selected variable is not available anymore it will be deselected.
 * If there selected variable (all the previously selected variables are unavailable for this region)
 * the first variable on the menu will be selected.
@@ -154,7 +154,7 @@ function updateAvailableRatios(my_region) {
   return new_var.length;
 }
 
-function setDefaultConfig(code = '249100546', variable = 'MED', level = 'EPCI') { // }, level = 'NUTS1') {
+function setDefaultConfig(code, variable, level) {
   const var_info = variables_info.find(ft => ft.id === variable);
 
   app.colors[app.current_config.my_region] = color_highlight;
@@ -170,7 +170,7 @@ function setDefaultConfig(code = '249100546', variable = 'MED', level = 'EPCI') 
 }
 
 
-function setDefaultConfigMenu(code = '249100546', variable = 'MED', level = 'EPCI') {
+function setDefaultConfigMenu(code, variable, level) {
   document.querySelector(`.target_region.square[value="r_${code}"]`).classList.add('checked');
   document.querySelector(`.target_variable.small_square[value="${variable}"]`).classList.add('checked');
   document.querySelector('p[filter-value="DEFAULT"] > .filter_v.square').classList.add('checked');
@@ -1037,9 +1037,11 @@ function loadData() {
                   processEscapes: true,
                 },
               });
+              d3.select('#tour_link')
+                .on('click', () => {
+                  makeTour().start();
+                });
             }, 15);
-            // const tour = makeTour();
-            // d3.select('#tour_link').on('click', () => { tour.start(); });
           });
       }, 15);
     });

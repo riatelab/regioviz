@@ -1,10 +1,9 @@
 ![Logo_regioviz](https://raw.githubusercontent.com/riatelab/regioviz/master/src/img/logo_regioviz.png)
 
-_**Work in progress:**_  
-**tests and modifications of [Regioviz](https://github.com/riatelab/regioviz) to use data for France (according to various territorial meshes such as EPCI) in replacement of UE28 (and its NUTS1/2).**
+**Modifications of [Regioviz](https://github.com/riatelab/regioviz) to use data for France (according to various territorial meshes such as EPCI, "zone d'emploi", "bassin de vie", etc.) in replacement of UE28 (and its NUTS1/2) in the original version.**
 
 
-**[Accéder à l'application (version France) ...](https://mthh.github.io/rgvzfra/build/)**   
-  
-[Accéder à l'application (version UE28) ...](https://riatelab.github.io/regioviz/)   
+**[Go to Regioviz (France version)](https://mthh.github.io/rgvzfra/build/)**   
 
+
+[Go to Regioviz (UE28 version)](https://riatelab.github.io/regioviz/)   
