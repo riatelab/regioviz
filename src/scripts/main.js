@@ -874,7 +874,7 @@ function loadData() {
     .responseType('arraybuffer')
     .on('progress', (val) => {
       const i = d3.interpolate(progress, val.loaded / total);
-      d3.transition().tween("progress", () => (t) => {
+      d3.transition().tween('progress', () => (t) => {
         progress = i(t);
         text.text(`Préparation de la page ... ${formatPercent(progress * 0.91)}`);
       });
@@ -883,6 +883,7 @@ function loadData() {
       if (error) throw error;
       const other_layers = new Map();
       const p_layers = [];
+      const name_layers = [];
       let territoires_layer;
       let metadata_indicateurs;
       let full_dataset;
@@ -898,18 +899,19 @@ function loadData() {
             // and the other files (which are GeoJSON layer)
             zip.forEach((relative_path, entry) => {
               const n = entry.name;
-              if (n.indexOf('styles') > -1
-                  || n.indexOf('REGIOVIZ_DATA') > -1
-                  || n.indexOf('indicateurs_meta') > -1) {
-                p1.push([entry.name, zip.file(entry.name).async('string')]);
+              if (n.indexOf('indicateurs_meta') > -1) {
+                p1[0] = zip.file(n).async('string');
+              } else if (n.indexOf('REGIOVIZ_DATA') > -1) {
+                p1[1] = zip.file(n).async('string');
+              } else if (n.indexOf('styles') > -1) {
+                p1[2] = zip.file(n).async('string');
               } else {
-                p_layers.push([entry.name, zip.file(entry.name).async('string')]);
+                name_layers.push(n);
+                p_layers.push(zip.file(n).async('string'));
               }
             });
-            p1.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
-            p_layers.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
             text.text('Préparation de la page ... 95%');
-            return Promise.all(p1.map(d => d[1]));
+            return Promise.all(p1);
           }).then((res_data1) => {
             // Extract the 3 mandatory files (metadata, full dataset and styles
             // for the map)
@@ -917,22 +919,22 @@ function loadData() {
             metadata_indicateurs = d3.csvParse(res_data1[0]);
             full_dataset = d3.csvParse(res_data1[1]);
             styles_map = JSON.parse(res_data1[2]);
-            return Promise.all(p_layers.map(d => d[1]));
+            return Promise.all(p_layers);
           }).then((res_layers) => {
             // Use the 'styles' info to fetch the name of the various layers to use:
             const layer_names = Object.keys(styles_map);
-            layer_names.sort((a, b) => a[0].toUpperCase() > b[0].toUpperCase());
             // Reference our various layer and the target layer:
-            layer_names.forEach((name, i) => {
+            layer_names.forEach((name) => {
+              const ix = name_layers.findIndex(d => d.indexOf(name) > -1);
               if (styles_map[name].target) {
-                territoires_layer = JSON.parse(res_layers[i]);
+                territoires_layer = JSON.parse(res_layers[ix]);
               } else {
-                other_layers.set(name, JSON.parse(res_layers[i]));
+                other_layers.set(name, JSON.parse(res_layers[ix]));
               }
             });
             text.text('Préparation de la page ... 97%');
             setTimeout(() => {
-              text.text(`Préparation de la page ... 98%`);
+              text.text('Préparation de la page ... 98%');
               // Alertifty will be use to notify 'warning' to the user
               // (such as the selection of a feature needing a change of chart)
               alertify.set('notifier', 'position', 'bottom-left');
@@ -966,7 +968,7 @@ function loadData() {
               features_menu.sort((a, b) => a.name.localeCompare(b.name));
 
               // Remove the loading spinner displayed until now:
-              text.text(`Préparation de la page ... 99%`);
+              text.text('Préparation de la page ... 99%');
               document.body.classList.remove('loading');
               removeAll(document.querySelectorAll('.spinner, .top-spinner'));
 

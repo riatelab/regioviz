@@ -512,7 +512,8 @@ export default class ScatterPlot2 {
       .attr('id', 'menu_selection')
       .styles({ padding: '0 10px 10px 10px', 'text-align': 'center', color: '#4f81bd' });
 
-    const chart_type = menu_selection.append('p');
+    const chart_type = menu_selection.append('p')
+      .style('margin', '4px 0 7px 0');
 
     chart_type.append('span')
       .attrs({
@@ -741,6 +742,8 @@ export default class ScatterPlot2 {
       .styles(d => ({
         fill: app.colors[d.id] || default_color,
         stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+        'fill-opacity': 0.8,
+        'stroke-opacity': 0.8,
       }));
   }
 
@@ -819,6 +822,9 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
+
         }))
         .on('end', () => {
           self.bindTooltips(true);
@@ -831,6 +837,8 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
         }))
         .attrs(d => ({
           'stroke-width': 1 / this.k,
@@ -878,6 +886,8 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
         }))
         .on('end', () => {
           self.bindTooltips(false);
@@ -890,6 +900,8 @@ export default class ScatterPlot2 {
         .styles(d => ({
           fill: app.colors[d.id] || default_color,
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
+          'fill-opacity': 0.8,
+          'stroke-opacity': 0.8,
         }))
         .attrs(d => ({
           r: size_func(d[num_name]) / this.k,

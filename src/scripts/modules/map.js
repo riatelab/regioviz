@@ -381,11 +381,15 @@ class MapSelect {
   }
 
   removeRectBrush() {
-    svg_map.select('.brush_map').call(this.brush_map.move, null);
+    if (this.brush_map) {
+      svg_map.select('.brush_map').call(this.brush_map.move, null);
+    }
   }
 
   callBrush(selection) {
-    svg_map.select('.brush_map').call(this.brush_map.move, selection);
+    if (this.brush_map) {
+      svg_map.select('.brush_map').call(this.brush_map.move, selection);
+    }
   }
 
   brushToTooltip() {
