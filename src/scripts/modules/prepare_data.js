@@ -98,9 +98,14 @@ export function filterLevelGeom(target_features, filter = 'N1') {
 * @return {void} - Nothing as these 3 objects are globals and modified in place.
 *
 */
-export function prepareVariablesInfo(metadata_indicateurs) {
+export function prepareVariablesInfo(metadata_indicateurs, app) {
+  // The name of the field of the dataset containing the population of each feature
+  // in order to draw proportionnal symboles on some chart:
+  app.current_config.pop_field = metadata_indicateurs
+    .find(ft => ft.Regioviz_item === 'Poids').id;
+
   // Fill the 'variables_info' variable with relevant informations:
-  const type_var = ['Indicateur', 'Stock', 'Poids'];
+  const type_var = ['Indicateur', 'Stock'];
   metadata_indicateurs
     .filter(ft => type_var.indexOf(ft.Regioviz_item) > -1)
     .forEach((ft) => {

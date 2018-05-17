@@ -71,8 +71,7 @@ export const app = {
     // The name of the field of the dataset containing the name of each feature:
     name_field: 'name',
     // The name of the field of the dataset containing the population of each feature
-    // TODO: should now be read from metadata
-    pop_field: 'P14_POP',
+    pop_field: null,
     // The name of the field of the geojson layer containing the ID of each feature
     // (these values should match with the values of the "id_field" in the
     // tabular dataset)
@@ -938,11 +937,13 @@ function loadData() {
               // Alertifty will be use to notify 'warning' to the user
               // (such as the selection of a feature needing a change of chart)
               alertify.set('notifier', 'position', 'bottom-left');
-              // Fill the 3 variables defined on the top of this file
+
+              // Notably fill the 3 variables defined on the top of this file
               // 'study_zones', 'territorial_mesh' and 'variables_info'
               // with the appropriate metadata extracted from
               // the 'indicateurs_meta.csv' file
-              prepareVariablesInfo(metadata_indicateurs);
+              prepareVariablesInfo(metadata_indicateurs, app);
+
               // Notably extract the feature names from the dataset:
               prepareDataset(full_dataset, app);
 
