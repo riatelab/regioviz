@@ -135,6 +135,7 @@ export function prepareVariablesInfo(metadata_indicateurs, app) {
         url: ft.URL,
       });
     });
+
   // Fill the 'territorial_mesh' variable with relevant informations:
   metadata_indicateurs
     .filter(ft => ft.Regioviz_item === 'Territorial division')

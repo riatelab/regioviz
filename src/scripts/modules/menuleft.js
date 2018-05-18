@@ -7,55 +7,68 @@ const handleInputRegioName = (allowed_names, levels) => {
   const names_lower = {}; // names.map(d => d.toLowerCase());
 
   levels.forEach((level) => {
-    ids_names[level] = {};
+    ids_names[level] = [];
     names_lower[level] = [];
   });
   allowed_names.forEach((ft) => {
     const ft_level = levels.find(level => +ft[level] === 1);
-    ids_names[ft_level][ft.name.toLowerCase()] = ft.id;
+    ids_names[ft_level].push(ft.id);
     names_lower[ft_level].push(ft.name.toLowerCase());
   });
-
-  document.getElementById('search').onblur = function () {
+  const autocomplete = document.getElementById('autocomplete');
+  const search = document.getElementById('search');
+  const list_regio = document.getElementById('list_regio');
+  search.onblur = function () {
     if (!ids_names[app.current_config.current_level][this.value.toLowerCase()]) {
-      document.getElementById('autocomplete').value = app.current_config.my_region_pretty_name;
+      autocomplete.value = app.current_config.my_region_pretty_name;
       this.value = app.current_config.my_region_pretty_name;
     }
-    document.getElementById('list_regio').classList.add('hidden');
+    list_regio.classList.add('hidden');
   };
 
-  document.getElementById('search').onkeyup = function (ev) {
+  search.onkeyup = function (ev) {
     const value = this.value;
+    const codes_level = ids_names[app.current_config.current_level];
     if (!value || value === '') {
+      for (let i = 0, n_i = codes_level.length; i < n_i; i++) {
+        document.querySelector(`.target_region.square[value="r_${codes_level[i]}"]`)
+          .parentElement.style.display = null;
+      }
       return;
     }
     const names_lower_current_level = names_lower[app.current_config.current_level];
-    document.getElementById('list_regio').classList.remove('hidden');
-    const new_value = value.toLowerCase();
-    document.getElementById('autocomplete').value = '';
+    list_regio.classList.remove('hidden');
+    autocomplete.value = '';
+    let ix = null;
     for (let i = 0; i < names_lower_current_level.length; i++) {
-      if (names_lower_current_level[i].lastIndexOf(new_value, 0) === 0) {
-        if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
-          const t = value + names_lower_current_level[i].substr(
-            new_value.length,
-            names_lower_current_level[i].length,
-          );
-          document.getElementById('search').value = t;
-          document.getElementById('autocomplete').value = t;
-        }
+      if (names_lower_current_level[i].lastIndexOf(value.toLowerCase(), 0) === 0) {
         const str_after = names_lower_current_level[i].substr(
-          new_value.length,
+          value.length,
           names_lower_current_level[i].length,
         );
         const new_str = value + str_after;
-        document.getElementById('autocomplete').value = new_str;
+        autocomplete.value = new_str;
+        document.querySelector(`.target_region.square[value="r_${codes_level[i]}"]`)
+          .parentElement.style.display = null;
+        if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
+          search.value = new_str;
+          ix = i;
+        }
+      } else {
+        document.querySelector(`.target_region.square[value="r_${codes_level[i]}"]`)
+          .parentElement.style.display = 'none';
       }
     }
-    const a = document.getElementById('autocomplete').value;
-    const b = document.getElementById('search').value;
-    const code = ids_names[app.current_config.current_level][a.toLowerCase()];
-    if (a === b && code) {
-      document.querySelector(`.target_region.square[value="r_${code}"]`).click();
+    const a = autocomplete.value;
+    const b = search.value;
+    if (a === b) {
+      ix = ix !== null
+        ? ix
+        : names_lower_current_level.findIndex(d => d === a.toLowerCase());
+      const code = codes_level[ix];
+      if (code) {
+        document.querySelector(`.target_region.square[value="r_${code}"]`).click();
+      }
     }
   };
 };
