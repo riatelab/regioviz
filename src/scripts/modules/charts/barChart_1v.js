@@ -90,7 +90,7 @@ export default class BarChart1 {
         return;
       }
       this.context_left_handle.attr('x', s[0] - 12);
-      this.context_right_handle.attr('x', s[1] - 7);
+      this.context_right_handle.attr('x', s[1] - 13);
       current_range = [math_round(s[0] / (width / nbFt)), math_round(s[1] / (width / nbFt))];
       this.x.domain(this.data.slice(current_range[0], current_range[1]).map(ft => ft.id));
       this._update();
@@ -326,9 +326,10 @@ export default class BarChart1 {
 
     this.context_left_handle = g_brush_bottom.insert('image', '.handle')
       .attrs({
-        width: 20,
-        height: height2,
+        width: 22,
+        height: height2 + 5,
         x: x2(this.current_ids[0]) - 12,
+        y: -2.5,
         'xlink:href': 'img/left-handle2.png',
       })
       .styles({
@@ -338,9 +339,10 @@ export default class BarChart1 {
 
     this.context_right_handle = g_brush_bottom.insert('image', '.handle')
       .attrs({
-        width: 20,
-        height: height2,
-        x: x2(this.current_ids[this.current_ids.length - 1]) - 7,
+        width: 22,
+        height: height2 + 5,
+        x: x2(this.current_ids[this.current_ids.length - 1]) - 13,
+        y: -2.5,
         'xlink:href': 'img/right-handle2.png',
       })
       .styles({

@@ -175,7 +175,7 @@ export default class Similarity1plus {
     dist_norm_rank.append('span')
       .attr('class', 'checkmark');
     dist_norm_rank.append('span')
-      .html('Rangs normalisés');
+      .html('Écart de rang moyen');
 
     dist_eucl.append('input')
       .attrs({
