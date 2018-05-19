@@ -18,7 +18,7 @@ function getBbox(elements) {
 }
 
 function makeDivSizeElements(elements, padding) {
-  let {
+  const {
     xmin, xmax, ymin, ymax,
   } = getBbox(elements);
   const elem = document.createElement('div');
@@ -33,10 +33,8 @@ function makeDivSizeElements(elements, padding) {
 }
 
 export default function makeTour() {
-  const elem_top_chart = makeDivSizeElements(
-    document.querySelectorAll('#header_chart > img'), 10);
-  const elem_top_map = makeDivSizeElements(
-    document.querySelectorAll('#header_map > img'), 10);
+  const elem_top_chart = makeDivSizeElements(document.querySelectorAll('#header_chart > img'), 10);
+  const elem_top_map = makeDivSizeElements(document.querySelectorAll('#header_map > img'), 10);
 
   const tour = introJs.introJs();
   tour.setOption('scrollToElement', false);

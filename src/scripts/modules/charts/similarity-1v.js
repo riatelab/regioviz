@@ -9,9 +9,9 @@ import {
   color_highlight, fixed_dimension, color_q1, color_q2,
   color_q3, color_q4,
 } from './../options';
-import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
+import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare-data';
 import { app, resetColors, variables_info, territorial_mesh } from './../../main';
-import TableResumeStat from './../tableResumeStat';
+import TableResumeStat from './../table-resume-stat';
 import CompletudeSection from './../completude';
 import { prepareTooltip, Tooltipsify } from './../tooltip';
 import Beeswarm from './beeswarm';
@@ -72,6 +72,7 @@ export default class Similarity1plus {
       .slice();
     this.prepareData();
     this.type = 'global';
+    this.type_beeswarm = 1;
     resetColors();
     this.highlight_selection = [];
     this.highlighted = [];
@@ -292,7 +293,15 @@ export default class Similarity1plus {
     this.update(nb);
     // this.updateMapRegio(nb);
   }
-
+  changeTypeBeeswarm() {
+    if (this.type_beeswarm === 1) {
+      this.type_beeswarm = 2;
+      this.update(1);
+    } else {
+      this.type_beeswarm = 1;
+      this.update(1);
+    }
+  }
   update(nb) {
     if (document.getElementById('overlay').style.display === 'none') {
       execWithWaitingOverlay(() => { this._update(nb); });
@@ -693,6 +702,7 @@ export default class Similarity1plus {
       }
       setTimeout(() => { this.makeTooltips(); }, 200);
     } else if (self.type === 'global') {
+
       this.draw_group.attr('clip-path', null);
       data.sort((a, b) => a[field_distance] - b[field_distance]);
       const values = data.map(ft => ft[field_distance]);
@@ -703,46 +713,46 @@ export default class Similarity1plus {
         ? new PropSizer(d3.max(data, d => +d[num_name]), 40).scale
         : () => (data.length < 400 ? 4 : data.length < 800 ? 2.8 : 1.8);
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
-      this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
+      if (self.type_beeswarm === 1) {
+        this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
+        // const xAxis = d3.axisBottom(this.x).ticks(10, '');
+        const simulation = d3.forceSimulation(data)
+          .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
+          .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
+          .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
+          .stop();
 
-      const data2 = this.data.map(d => ({
-        x: this.x(d[field_distance]),
-        y: undefined,
-        radius: size_func(+d[num_name]) + collide_margin,
-      }));
-      const swarm = new Beeswarm(data2, height / 2);
-      const res_swarm = swarm.swarm();
-      res_swarm.forEach((elem, i) => {
-        elem[field_distance] = data[i][field_distance];
-        elem.radius = data2[i].radius;
-        elem.id = data[i].id;
-      });
-      // const xAxis = d3.axisBottom(this.x).ticks(10, '');
-      // const simulation = d3.forceSimulation(data)
-      //   .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
-      //   .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
-      //   .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
-      //   .stop();
-      //
-      // let _vt;
-      // if (values.length <= 300) {
-      //   _vt = 125;
-      // } else if (values.length > 300 && values.length < 100) {
-      //   _vt = Math.round(values.length * 0.33);
-      // } else {
-      //   _vt = 350;
-      // }
-      // for (let i = 0; i < _vt; ++i) {
-      //   simulation.tick();
-      // }
+        let _vt;
+        if (values.length <= 300) {
+          _vt = 125;
+        } else if (values.length > 300 && values.length < 100) {
+          _vt = Math.round(values.length * 0.33);
+        } else {
+          _vt = 350;
+        }
+        for (let i = 0; i < _vt; ++i) {
+          simulation.tick();
+        }
+      } else {
+
+        this.x = d3.scaleLinear()
+          .rangeRound([0, width])
+          .domain(d3.extent(data.map(ft => ft[field_distance])));
+        data.forEach((d) => {
+          d.x = this.x(d[field_distance]);
+          d.y = undefined;
+          d.radius = size_func(+d[num_name]);
+        });
+        // const swarm = new Beeswarm(data, height / 2);
+        Beeswarm(data, height / 2);
+      }
       const voro = d3.voronoi()
         .extent([
           [-margin.left, -margin.top * 2],
           [width + margin.right, height + margin.top * 2 - 50]])
         .x(d => d.x)
         .y(d => d.y)
-        .polygons(res_swarm);
-
+        .polygons(data);
       // this.draw_group.append('text')
       //   .attrs({
       //     x: width / 2,
@@ -779,18 +789,18 @@ export default class Similarity1plus {
           .data(voro, d => d.data.id)
           .enter()
           .append('g')
-          .attrs((d,i) => ({
+          .attrs(d => ({
             class: 'cell',
             id: `c_${d.data.id}`,
           }));
         cell.append('circle')
-          .attrs((d,i) => ({
+          .attrs(d => ({
             class: 'circle',
-            r: d.data.radius,
-            cx: d.data.x + d.data.radius,
+            r: size_func(+d.data[num_name]),
+            cx: d.data.x,
             cy: d.data.y,
           }))
-          .styles((d,i) => ({
+          .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
             stroke: 'darkgray',
@@ -813,13 +823,13 @@ export default class Similarity1plus {
         cells.select('.circle')
           // .transition()
           // .duration(125)
-          .attrs((d,i) => ({
+          .attrs(d => ({
             class: 'circle',
-            r: d.data.radius,
-            cx: d.data.x + d.data.radius,
+            r: size_func(+d.data[num_name]),
+            cx: d.data.x,
             cy: d.data.y,
           }))
-          .styles((d,i) => ({
+          .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
             stroke: 'darkgray',
@@ -833,19 +843,19 @@ export default class Similarity1plus {
 
         const a = cells.enter()
           .insert('g')
-          .attrs((d,i) => ({
+          .attrs(d => ({
             class: 'cell',
             id: `c_${d.data.id}`,
           }));
 
         a.append('circle')
-          .attrs((d,i) => ({
+          .attrs(d => ({
             class: 'circle',
-            r: d.data.radius,
-            cx: d.data.x + d.data.radius,
+            r: size_func(+d.data[num_name]),
+            cx: d.data.x,
             cy: d.data.y,
           }))
-          .styles((d,i) => ({
+          .styles(d => ({
             fill: app.colors[d.data.id] || 'black',
             'stroke-width': 0.45,
             stroke: 'darkgray',

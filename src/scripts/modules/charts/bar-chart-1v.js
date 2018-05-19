@@ -5,11 +5,11 @@ import {
   execWithWaitingOverlay,
 } from './../helpers';
 import { color_disabled, color_countries, color_sup, color_inf, color_highlight, fixed_dimension } from './../options';
-import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
+import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare-data';
 import { app, resetColors, variables_info, territorial_mesh } from './../../main';
-import TableResumeStat from './../tableResumeStat';
+import TableResumeStat from './../table-resume-stat';
 import CompletudeSection from './../completude';
-import ContextMenu from './../contextMenu';
+import ContextMenu from './../context-menu';
 import { prepareTooltip } from './../tooltip';
 
 let svg_bar;

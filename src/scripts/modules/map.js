@@ -5,7 +5,7 @@ import {
   fixed_dimension, color_default_dissim, color_q1, color_q2, color_q3, color_q4,
 } from './options';
 import { math_max, getSvgPathType, svgPathToCoords, euclidian_distance, getElementsFromPoint, svgContextMenu, isContextMenuDisplayed } from './helpers';
-import { filterLevelGeom } from './prepare_data';
+import { filterLevelGeom } from './prepare-data';
 import { prepareTooltip } from './tooltip';
 
 

@@ -6,11 +6,11 @@ import {
   getElementsFromPoint,
 } from './../helpers';
 import { color_disabled, color_countries, color_highlight, fixed_dimension } from './../options';
-import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare_data';
+import { calcPopCompletudeSubset, calcCompletudeSubset } from './../prepare-data';
 import { app, variables_info, resetColors, territorial_mesh } from './../../main';
-import ContextMenu from './../contextMenu';
+import ContextMenu from './../context-menu';
 import CompletudeSection from './../completude';
-import TableResumeStat from './../tableResumeStat';
+import TableResumeStat from './../table-resume-stat';
 import { prepareTooltip } from './../tooltip';
 
 let svg_bar;

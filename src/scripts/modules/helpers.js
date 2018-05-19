@@ -2,7 +2,7 @@ import jsep from 'jsep';
 import tingle from 'tingle.js';
 import { color_inf, color_sup, fixed_dimension, formatnb_decimal_sep, formatnb_thousands_sep } from './options';
 import { makeModalReport } from './report';
-import ContextMenu from './contextMenu';
+import ContextMenu from './context-menu';
 import { app, bindUI_chart, bindHelpMenu, study_zones, territorial_mesh } from './../main';
 
 const array_slice = Array.prototype.slice;
