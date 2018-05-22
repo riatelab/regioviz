@@ -1,7 +1,7 @@
 import {
   Rect, comp2, svgPathToCoords, computePercentileRank, getMean2,
   getNameStudyZone, getScrollValue, execWithWaitingOverlay,
-  formatNumber, svgContextMenu, PropSizer,
+  formatNumber, svgContextMenu, PropSizer, _isNaN,
   isContextMenuDisplayed, math_min, math_max,
   getElementsFromPoint,
 } from './../helpers';
@@ -822,7 +822,7 @@ export default class ScatterPlot2 {
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
         }))
         .on('end', () => {
-          self.bindTooltips(true);
+          self.bindTooltips();
           dots.exit().remove();
           dots.order();
         });
@@ -881,7 +881,7 @@ export default class ScatterPlot2 {
           stroke: app.colors[d.id] ? 'rgb(97, 97, 97)' : 'rgb(110, 110, 110)',
         }))
         .on('end', () => {
-          self.bindTooltips(false);
+          self.bindTooltips();
           dots.exit().remove();
           dots.order();
         });
@@ -900,7 +900,7 @@ export default class ScatterPlot2 {
           transform,
         }));
     }
-    self.bindTooltips(false);
+    self.bindTooltips();
     dots.exit()
       // .transition(_trans)
       .remove();
@@ -1077,7 +1077,7 @@ export default class ScatterPlot2 {
   /**
   * Binds the tooltip on the new/updated dots.
   */
-  bindTooltips(with_rank) {
+  bindTooltips() {
     const self = this;
     this.scatter.selectAll('.dot')
       .on('mouseover.tooltip', () => {
@@ -1092,34 +1092,50 @@ export default class ScatterPlot2 {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
         const { scrollX, scrollY } = getScrollValue();
+        const content = [];
+        let yoffset;
+        // Update the tooltip title:
         self.tooltip.select('.title')
           .attr('class', d.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html([d.name, ' (', d.id, ')'].join(''));
-        let yoffset;
-        if (with_rank) {
-          self.tooltip.select('.content')
-            .html([
-              `${self.variable1} (rang) : ${formatNumber(d[self.rank_variable1], 1)}/100`,
-              `${self.variable1} (valeur) : ${formatNumber(d[self.variable1], 1)} ${self.unit1}`,
-              `${self.variable2} (rang) : ${formatNumber(d[self.rank_variable2], 1)}/100`,
-              `${self.variable2} (valeur) : ${formatNumber(d[self.variable2], 1)} ${self.unit2}`,
-            ].join('<br>'));
+
+        // Prepare tooltip content:
+        if (self.type === 'rank') {
+          content.push(
+            `${self.variable1} (rang) : ${formatNumber(d[self.rank_variable1], 1)}/100`,
+            `${self.variable1} (valeur) : ${formatNumber(d[self.variable1], 1)} ${self.unit1}`,
+            `${self.variable2} (rang) : ${formatNumber(d[self.rank_variable2], 1)}/100`,
+            `${self.variable2} (valeur) : ${formatNumber(d[self.variable2], 1)} ${self.unit2}`,
+          );
           yoffset = 120;
         } else {
-          self.tooltip.select('.content')
-            .html([
-              `${self.variable1} (valeur) : ${formatNumber(d[self.variable1], 1)} ${self.unit1}`,
-              `${self.variable2} (valeur) : ${formatNumber(d[self.variable2], 1)} ${self.unit2}`,
-            ].join('<br>'));
+          content.push(
+            `${self.variable1} (valeur) : ${formatNumber(d[self.variable1], 1)} ${self.unit1}`,
+            `${self.variable2} (valeur) : ${formatNumber(d[self.variable2], 1)} ${self.unit2}`,
+          );
           yoffset = 85;
         }
-        // const b = self.tooltip.node().getBoundingClientRect();
+
+        // Add information about the numerator value
+        // if proportionnal symbols options is enabled:
+        if (self.proportionnal_symbols) {
+          const pop_field = app.current_config.pop_field;
+          const o = variables_info.find(ft => ft.id === pop_field);
+          let coef = +o.formula;
+          coef = (_isNaN(coef) || coef === 0) ? 1 : coef;
+          content.push(`${pop_field} (numérateur) : ${formatNumber(d[pop_field] * coef, 1)} ${o.unit}`);
+          yoffset += 25;
+        }
+
+        // Update the tooltip content:
         self.tooltip
           .styles({
             display: null,
             left: `${d3.event.pageX - scrollX - 5}px`,
             top: `${d3.event.pageY - scrollY - yoffset}px`,
-          });
+          })
+          .select('.content')
+          .html(content.join('<br>'));
       })
       .on('mouseout.tooltip', () => {
         clearTimeout(t);

@@ -105,7 +105,7 @@ export function prepareVariablesInfo(metadata_indicateurs, app) {
     .find(ft => ft.Regioviz_item === 'Poids').id;
 
   // Fill the 'variables_info' variable with relevant informations:
-  const type_var = ['Indicateur', 'Stock'];
+  const type_var = ['Indicateur', 'Stock', 'Poids'];
   metadata_indicateurs
     .filter(ft => type_var.indexOf(ft.Regioviz_item) > -1)
     .forEach((ft) => {

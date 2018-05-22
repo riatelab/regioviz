@@ -324,7 +324,7 @@ export default class Similarity1plus {
       if (self.sorted_axis) {
         const highlighted_region = +d3.select('#menu_selection').select('.nb_select').property('value');
         ratios = self.ratios.slice();
-        ratios.sort((a, b) => data[highlighted_region][`rank_${b}`] - data[highlighted_region][`rank_${a}`]);
+        ratios.sort((a, b) => data[highlighted_region][`rank_${a}`] - data[highlighted_region][`rank_${b}`]);
       } else {
         ratios = self.ratios;
       }
@@ -702,7 +702,6 @@ export default class Similarity1plus {
       }
       setTimeout(() => { this.makeTooltips(); }, 200);
     } else if (self.type === 'global') {
-
       this.draw_group.attr('clip-path', null);
       data.sort((a, b) => a[field_distance] - b[field_distance]);
       const values = data.map(ft => ft[field_distance]);
@@ -734,17 +733,29 @@ export default class Similarity1plus {
           simulation.tick();
         }
       } else {
-
         this.x = d3.scaleLinear()
           .rangeRound([0, width])
           .domain(d3.extent(data.map(ft => ft[field_distance])));
-        data.forEach((d) => {
+        data.forEach((d) => { /* eslint-disable no-param-reassign */
           d.x = this.x(d[field_distance]);
           d.y = undefined;
           d.radius = size_func(+d[num_name]);
-        });
+        }); /* eslint-enable no-param-reassign */
         // const swarm = new Beeswarm(data, height / 2);
         Beeswarm(data, height / 2);
+        // data.forEach((d) => {
+        //   d.x += d.radius; // eslint-disable-line no-param-reassign
+        // });
+        // const simulation = d3.forceSimulation(data)
+        //   .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
+        //   .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
+        //   .force('collide', d3.forceCollide(d => d.radius + collide_margin))
+        //   .stop();
+        //
+        // for (let i = 0; i < 100; ++i) {
+        //   simulation.tick();
+        // }
+
       }
       const voro = d3.voronoi()
         .extent([
@@ -1011,8 +1022,9 @@ export default class Similarity1plus {
         const ratio_n = this.parentNode.parentNode.id.replace('l_', '');
         const unit_ratio = variables_info.find(ft => ft.id === ratio_n).unit;
         const globalrank = +this.getAttribute('globalrank');
-        let indic_rank = self.current_ids.length - +d[`rank_${ratio_n}`];
-        indic_rank = indic_rank === 0 ? 1 : indic_rank;
+        const indic_rank = +d[`rank_${ratio_n}`] + 1;
+        // let indic_rank = self.current_ids.length - +d[`rank_${ratio_n}`];
+        // indic_rank = indic_rank === 0 ? 1 : indic_rank;
         content.push(`${ratio_n} : ${formatNumber(d[ratio_n], 1)} ${unit_ratio}`);
         if (self.proportionnal_symbols) {
           _h += 25;

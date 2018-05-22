@@ -19,14 +19,14 @@ function find_intersections(circle, width) {
       isEnd: false,
       isValid: true,
       y: cy + y,
-      x: width,
+      x: width+ circle.radius,
     },
     p2: {
       index: index,
       isEnd: false,
       isValid: true,
       y: cy - y,
-      x: width,
+      x: width + circle.radius,
     }
   };
 }
