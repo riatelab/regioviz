@@ -25,51 +25,74 @@ const handleInputRegioName = (allowed_names, levels) => {
     }
     list_regio.classList.add('hidden');
   };
-
+  let tm;
   search.onkeyup = function (ev) {
     const value = this.value;
-    const codes_level = ids_names[app.current_config.current_level];
-    if (!value || value === '') {
-      for (let i = 0, n_i = codes_level.length; i < n_i; i++) {
-        document.querySelector(`.target_region.square[value="r_${codes_level[i]}"]`)
-          .parentElement.style.display = null;
-      }
-      return;
-    }
-    const names_lower_current_level = names_lower[app.current_config.current_level];
-    list_regio.classList.remove('hidden');
-    autocomplete.value = '';
-    let ix = null;
-    for (let i = 0; i < names_lower_current_level.length; i++) {
-      if (names_lower_current_level[i].lastIndexOf(value.toLowerCase(), 0) === 0) {
-        const str_after = names_lower_current_level[i].substr(
-          value.length,
-          names_lower_current_level[i].length,
-        );
-        const new_str = value + str_after;
-        autocomplete.value = new_str;
-        document.querySelector(`.target_region.square[value="r_${codes_level[i]}"]`)
-          .parentElement.style.display = null;
-        if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
-          search.value = new_str;
-          ix = i;
+    clearTimeout(tm);
+    tm = setTimeout(() => {
+      const codes_level = ids_names[app.current_config.current_level];
+      if (!value || value === '') {
+        for (let i = 0, n_i = codes_level.length; i < n_i; i++) {
+          document.querySelector(`span[value="r_${codes_level[i]}"]`)
+            .parentElement.style.display = null;
         }
-      } else {
-        document.querySelector(`.target_region.square[value="r_${codes_level[i]}"]`)
-          .parentElement.style.display = 'none';
+        return;
       }
-    }
-    const a = autocomplete.value;
-    const b = search.value;
-    if (a === b) {
-      ix = ix !== null
-        ? ix
-        : names_lower_current_level.findIndex(d => d === a.toLowerCase());
-      const code = codes_level[ix];
-      if (code) {
-        document.querySelector(`.target_region.square[value="r_${code}"]`).click();
+      const names_lower_current_level = names_lower[app.current_config.current_level];
+      list_regio.classList.remove('hidden');
+      autocomplete.value = '';
+      let ix = null;
+      let maybe_ix = null;
+      const _false = [];
+      let fast_path = false;
+      for (let i = 0; i < names_lower_current_level.length; i++) {
+        if (fast_path) {
+          document.querySelector(`span[value="r_${codes_level[i]}"]`)
+            .parentElement.style.display = 'none';
+        } else if (names_lower_current_level[i].lastIndexOf(value.toLowerCase(), 0) === 0) {
+          maybe_ix = i;
+          const str_after = names_lower_current_level[i].substr(
+            value.length,
+            names_lower_current_level[i].length,
+          );
+          const new_str = value + str_after;
+          autocomplete.value = new_str;
+          document.querySelector(`span[value="r_${codes_level[i]}"]`)
+            .parentElement.style.display = null;
+          if (ev && (ev.key === 'Tab' || ev.key === 'Enter')) {
+            search.value = new_str;
+            ix = i;
+          }
+        } else {
+          document.querySelector(`span[value="r_${codes_level[i]}"]`)
+            .parentElement.style.display = 'none';
+          if (maybe_ix || value.charAt(0) > names_lower_current_level[i].charAt(0)) {
+            if (_false.length > 2) {
+              fast_path = true;
+            }
+            _false.push(1);
+          }
+        }
       }
-    }
+      if (!maybe_ix) {
+        for (let i = 0, n_i = codes_level.length; i < n_i; i++) {
+          document.querySelector(`span[value="r_${codes_level[i]}"]`)
+            .parentElement.style.display = null;
+        }
+        return;
+      }
+      const a = autocomplete.value;
+      const b = search.value;
+      if (a === b) {
+        ix = ix !== null
+          ? ix
+          : names_lower_current_level.findIndex(d => d === a.toLowerCase());
+        const code = codes_level[ix];
+        if (code) {
+          document.querySelector(`.target_region.square[value="r_${code}"]`).click();
+        }
+      }
+    }, 100);
   };
 };
 
