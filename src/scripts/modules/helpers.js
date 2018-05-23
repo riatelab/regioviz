@@ -900,7 +900,6 @@ function createStudyZone(regions) {
 * @return {Void}
 */
 function svgContextMenu(current_chart, svg_elem, colors_selection) {
-  console.log(colors_selection);
   let items_menu;
   // Remove existing context menu if any:
   if (isContextMenuDisplayed()) {
