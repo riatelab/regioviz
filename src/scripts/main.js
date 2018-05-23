@@ -523,9 +523,9 @@ export function bindUI_chart() {
     .on('click', function () {
       if (!this.classList.contains('active')) {
         this.classList.add('active');
-        document.getElementById('img_map_zoom').classList.remove('active');
+        // document.getElementById('img_map_zoom').classList.remove('active');
         document.getElementById('img_map_select').classList.remove('active');
-        svg_map.on('.zoom', null);
+        // svg_map.on('.zoom', null);
         if (app.map.brush_map) {
           svg_map.select('.brush_map').style('display', null);
         }
@@ -533,22 +533,22 @@ export function bindUI_chart() {
       }
     });
 
-  // User click on the magnifying glass on the top of the map
-  // (to activate zooming with the mouse)
-  header_map_section.select('#img_map_zoom')
-    .on('click', function () {
-      if (!this.classList.contains('active')) {
-        this.classList.add('active');
-        document.getElementById('img_rect_selec').classList.remove('active');
-        document.getElementById('img_map_select').classList.remove('active');
-        svg_map.call(app.map.zoom_map);
-        if (app.map.brush_map) {
-          svg_map.select('.brush_map').call(app.map.brush_map.move, null);
-          svg_map.select('.brush_map').style('display', 'none');
-        }
-        app.map.target_layer.selectAll('path').on('click', null);
-      }
-    });
+  // // User click on the magnifying glass on the top of the map
+  // // (to activate zooming with the mouse)
+  // header_map_section.select('#img_map_zoom')
+  //   .on('click', function () {
+  //     if (!this.classList.contains('active')) {
+  //       this.classList.add('active');
+  //       document.getElementById('img_rect_selec').classList.remove('active');
+  //       document.getElementById('img_map_select').classList.remove('active');
+  //       svg_map.call(app.map.zoom_map);
+  //       if (app.map.brush_map) {
+  //         svg_map.select('.brush_map').call(app.map.brush_map.move, null);
+  //         svg_map.select('.brush_map').style('display', 'none');
+  //       }
+  //       app.map.target_layer.selectAll('path').on('click', null);
+  //     }
+  //   });
 
   // User click on the arrow button on the top of the map
   // (to activate selection of individual feature on the map)
@@ -557,8 +557,8 @@ export function bindUI_chart() {
       if (!this.classList.contains('active')) {
         this.classList.add('active');
         document.getElementById('img_rect_selec').classList.remove('active');
-        document.getElementById('img_map_zoom').classList.remove('active');
-        svg_map.on('.zoom', null);
+        // document.getElementById('img_map_zoom').classList.remove('active');
+        // svg_map.on('.zoom', null);
         if (app.map.brush_map) {
           svg_map.select('.brush_map').call(app.map.brush_map.move, null);
           svg_map.select('.brush_map').style('display', 'none');

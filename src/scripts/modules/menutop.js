@@ -94,15 +94,15 @@ export function makeHeaderMapSection() {
       title: 'Rectangle de sélection',
     });
 
-  header_map_section.insert('img')
-    .attrs({
-      class: 'map_button img_scale',
-      width: 20,
-      height: 20,
-      src: 'img/gimp-tool-zoom.png',
-      id: 'img_map_zoom',
-      title: 'Zoom',
-    });
+  // header_map_section.insert('img')
+  //   .attrs({
+  //     class: 'map_button img_scale',
+  //     width: 20,
+  //     height: 20,
+  //     src: 'img/gimp-tool-zoom.png',
+  //     id: 'img_map_zoom',
+  //     title: 'Zoom',
+  //   });
 
   header_map_section.insert('img')
     .attrs({

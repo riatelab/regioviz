@@ -59,6 +59,7 @@ function map_zoomed() {
     transform.x = 0;
     transform.y = 0;
   }
+
   const layers = svg_map.select('#layers');
   const t = layers
     .selectAll('g')
@@ -100,16 +101,11 @@ function zoomClick() {
   const factor = 0.1;
   const center = [width_map / 2, height_map / 2];
   const transform = d3.zoomTransform(svg_map.node());
-  const translate = [transform.x, transform.y];
-  const view = { x: translate[0], y: translate[1], k: transform.k };
-  let target_zoom = 1;
-  let translate0 = [];
-  let l = [];
+  const view = { x: transform.x, y: transform.y, k: transform.k };
   d3.event.preventDefault();
-  target_zoom = transform.k * (1 + factor * direction);
-  translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
-  view.k = target_zoom;
-  l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+  const translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+  view.k = transform.k * (1 + factor * direction);
+  const l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
   view.x += center[0] - l[0];
   view.y += center[1] - l[1];
   interpolateZoom([view.x, view.y], view.k);
@@ -234,7 +230,7 @@ class MapSelect {
       });
     this.territ_layer = territ_layer;
     this.zoom_map = d3.zoom()
-      .scaleExtent([1, 5])
+      .scaleExtent([1, 6])
       .translateExtent([[0, 0], [width_map, height_map]])
       .on('zoom', map_zoomed);
 
@@ -419,7 +415,7 @@ class MapSelect {
   }
 
   bindBrushClick(chart) {
-    svg_map.on('.zoom', null);
+    // svg_map.on('.zoom', null);
     this.resetZoom();
     if (chart.handleClickMap) {
       document.getElementById('img_map_select').classList.remove('disabled');
@@ -431,7 +427,7 @@ class MapSelect {
       const self = this;
       document.getElementById('img_rect_selec').classList.remove('disabled');
       document.getElementById('img_rect_selec').classList.add('active');
-      document.getElementById('img_map_zoom').classList.remove('active');
+      // document.getElementById('img_map_zoom').classList.remove('active');
       document.getElementById('img_map_select').classList.remove('active');
       this.brush_map = d3.brush()
         .extent([[0, 0], [width_map, height_map]])
@@ -446,7 +442,7 @@ class MapSelect {
     } else {
       document.getElementById('img_rect_selec').classList.remove('active');
       document.getElementById('img_rect_selec').classList.add('disabled');
-      document.getElementById('img_map_zoom').classList.remove('active');
+      // document.getElementById('img_map_zoom').classList.remove('active');
       document.getElementById('img_map_select').classList.add('active');
     }
     if (chart.handleClickMap && !chart.handle_brush_map) {
