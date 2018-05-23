@@ -264,7 +264,7 @@ export default function createMenu(names, variables, study_zones, territorial_me
   const tour_link = document.createElement('span');
   tour_link.id = 'tour_link';
   tour_link.className = 'link';
-  tour_link.style.margin = '1.4em 0.5em';
+  tour_link.style.margin = '1.4em 0.5em 0em 0.5em';
   tour_link.style.fontSize = '0.65em';
   tour_link.style.float = 'right';
   tour_link.style.cursor = 'pointer';
