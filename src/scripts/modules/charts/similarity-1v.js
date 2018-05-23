@@ -712,7 +712,7 @@ export default class Similarity1plus {
         ? new PropSizer(d3.max(data, d => +d[num_name]), 40).scale
         : () => (data.length < 400 ? 4 : data.length < 800 ? 2.8 : 1.8);
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
-      if (self.type_beeswarm === 1) {
+      if (self.proportionnal_symbols) {
         this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
         // const xAxis = d3.axisBottom(this.x).ticks(10, '');
         const simulation = d3.forceSimulation(data)
@@ -734,12 +734,12 @@ export default class Similarity1plus {
         }
       } else {
         this.x = d3.scaleLinear()
-          .rangeRound([0, width])
+          .range([0, width])
           .domain(d3.extent(data.map(ft => ft[field_distance])));
         data.forEach((d) => { /* eslint-disable no-param-reassign */
           d.x = this.x(d[field_distance]);
           d.y = undefined;
-          d.radius = size_func(+d[num_name]);
+          d.radius = size_func(+d[num_name]) + collide_margin;
         }); /* eslint-enable no-param-reassign */
         // const swarm = new Beeswarm(data, height / 2);
         Beeswarm(data, height / 2);
@@ -1118,6 +1118,7 @@ export default class Similarity1plus {
       .on('mousemove.tooltip', function (d) {
         if (isContextMenuDisplayed()) return;
         clearTimeout(t);
+        let _h = 75;
         const { scrollX, scrollY } = getScrollValue();
         self.draw_group.selectAll('circle')
           .styles({ stroke: 'darkgray', 'stroke-width': '0.45' });
@@ -1139,6 +1140,14 @@ export default class Similarity1plus {
             content.push(`<b>${globalrank}ème</b> territoire le plus proche sur ces <b>${self.ratios.length}</b> indicateurs`);
           }
         }
+        if (self.proportionnal_symbols) {
+          _h += 25;
+          const num_n = app.current_config.pop_field;
+          const o = variables_info.find(ft => ft.id === num_n);
+          let coef = +o.formula;
+          coef = _isNaN(coef) || coef === 0 ? 1 : coef;
+          content.push(`${num_n} (numérateur) : ${formatNumber(d.data[num_n] * coef, 1)} ${o.unit}`);
+        }
         self.tooltip.select('.title')
           .attr('class', d.data.id === app.current_config.my_region ? 'title myRegion' : 'title')
           .html(`${d.data.name} (${d.data.id})`);
@@ -1148,7 +1157,7 @@ export default class Similarity1plus {
           .styles({
             display: null,
             left: `${d3.event.pageX - scrollX - 5}px`,
-            top: `${d3.event.pageY - scrollY - 75}px`,
+            top: `${d3.event.pageY - scrollY - _h}px`,
           });
       })
       .on('click', function (d) {

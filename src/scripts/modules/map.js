@@ -60,13 +60,14 @@ function map_zoomed() {
     transform.y = 0;
   }
 
-  const layers = svg_map.select('#layers');
-  const t = layers
+  // const layers = svg_map.select('#layers');
+  const t = svg_map
     .selectAll('g')
     .transition()
     .duration(125);
 
-  layers.selectAll('g')
+  svg_map.select('#layers')
+    .selectAll('g')
     .transition(t)
     .attr('transform', transform)
     .style('stroke-width', function () {
