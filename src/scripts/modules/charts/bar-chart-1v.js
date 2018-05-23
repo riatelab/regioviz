@@ -28,7 +28,7 @@ let displayed;
 function updateDimensions() {
   svg_bar = d3.select('svg#svg_bar')
     .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
-    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, app.map, Object.keys(app.colors)); });
+    .on('contextmenu', () => { svgContextMenu(app.chart, svg_bar, Object.keys(app.colors)); });
   margin = {
     top: 10,
     right: 20,

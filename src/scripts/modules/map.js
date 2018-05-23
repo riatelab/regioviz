@@ -18,7 +18,7 @@ const svg_map = d3.select('svg#svg_map')
     } else if (_id.indexOf('Similarity1plus') > -1 && app.chart.type === 'global') {
       selec = app.chart.highlighted;
     }
-    svgContextMenu(app.map, svg_map, undefined, selec);
+    svgContextMenu(app.map, svg_map, selec);
   });
 const width_map = fixed_dimension.map.width;
 const height_map = fixed_dimension.map.height;

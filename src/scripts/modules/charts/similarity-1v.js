@@ -28,7 +28,7 @@ const updateDimensions = () => {
     .attr('viewBox', `0 0 ${fixed_dimension.chart.width} ${fixed_dimension.chart.height}`)
     .on('contextmenu', () => {
       const selec = app.chart.type === 'global' ? app.chart.highlighted : null;
-      svgContextMenu(app.chart, svg_bar, app.map, selec);
+      svgContextMenu(app.chart, svg_bar, selec);
     })
     .on('wheel', () => { d3.event.preventDefault(); });
   margin = {
