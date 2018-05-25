@@ -712,51 +712,51 @@ export default class Similarity1plus {
         ? new PropSizer(d3.max(data, d => +d[num_name]), 40).scale
         : () => (data.length < 400 ? 4 : data.length < 800 ? 2.8 : 1.8);
       const collide_margin = self.proportionnal_symbols ? 1.5 : 1;
-      if (self.proportionnal_symbols) {
-        this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
-        // const xAxis = d3.axisBottom(this.x).ticks(10, '');
-        const simulation = d3.forceSimulation(data)
-          .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
-          .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
-          .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
-          .stop();
+      // if (self.proportionnal_symbols) {
+      this.x = d3.scaleLinear().rangeRound([0, width]).domain(d3.extent(values));
+      // const xAxis = d3.axisBottom(this.x).ticks(10, '');
+      const simulation = d3.forceSimulation(data)
+        .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
+        .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
+        .force('collide', d3.forceCollide(d => size_func(+d[num_name]) + collide_margin))
+        .stop();
 
-        let _vt;
-        if (values.length <= 300) {
-          _vt = 125;
-        } else if (values.length > 300 && values.length < 100) {
-          _vt = Math.round(values.length * 0.33);
-        } else {
-          _vt = 350;
-        }
-        for (let i = 0; i < _vt; ++i) {
-          simulation.tick();
-        }
+      let _vt;
+      if (values.length <= 300) {
+        _vt = 125;
+      } else if (values.length > 300 && values.length < 100) {
+        _vt = Math.round(values.length * 0.33);
       } else {
-        this.x = d3.scaleLinear()
-          .range([0, width])
-          .domain(d3.extent(data.map(ft => ft[field_distance])));
-        data.forEach((d) => { /* eslint-disable no-param-reassign */
-          d.x = this.x(d[field_distance]);
-          d.y = undefined;
-          d.radius = size_func(+d[num_name]) + collide_margin;
-        }); /* eslint-enable no-param-reassign */
-        // const swarm = new Beeswarm(data, height / 2);
-        Beeswarm(data, height / 2);
-        // data.forEach((d) => {
-        //   d.x += d.radius; // eslint-disable-line no-param-reassign
-        // });
-        // const simulation = d3.forceSimulation(data)
-        //   .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
-        //   .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
-        //   .force('collide', d3.forceCollide(d => d.radius + collide_margin))
-        //   .stop();
-        //
-        // for (let i = 0; i < 100; ++i) {
-        //   simulation.tick();
-        // }
-
+        _vt = 350;
       }
+      for (let i = 0; i < _vt; ++i) {
+        simulation.tick();
+      }
+      // } else {
+      //   this.x = d3.scaleLinear()
+      //     .range([0, width])
+      //     .domain(d3.extent(data.map(ft => ft[field_distance])));
+      //   data.forEach((d) => { /* eslint-disable no-param-reassign */
+      //     d.x = this.x(d[field_distance]);
+      //     d.y = undefined;
+      //     d.radius = size_func(+d[num_name]) + collide_margin;
+      //   }); /* eslint-enable no-param-reassign */
+      //   // const swarm = new Beeswarm(data, height / 2);
+      //   Beeswarm(data, height / 2);
+      //   // data.forEach((d) => {
+      //   //   d.x += d.radius; // eslint-disable-line no-param-reassign
+      //   // });
+      //   // const simulation = d3.forceSimulation(data)
+      //   //   .force('x', d3.forceX(d => this.x(d[field_distance])).strength(9))
+      //   //   .force('y', d3.forceY(height / 2)/* .strength(d => (d.id === app.current_config.my_region ? 1 : 0.06)) */)
+      //   //   .force('collide', d3.forceCollide(d => d.radius + collide_margin))
+      //   //   .stop();
+      //   //
+      //   // for (let i = 0; i < 100; ++i) {
+      //   //   simulation.tick();
+      //   // }
+      //
+      // }
       const voro = d3.voronoi()
         .extent([
           [-margin.left, -margin.top * 2],
