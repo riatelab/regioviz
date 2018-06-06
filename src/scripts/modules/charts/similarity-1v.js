@@ -14,7 +14,7 @@ import { app, resetColors, variables_info, territorial_mesh } from './../../main
 import TableResumeStat from './../table-resume-stat';
 import CompletudeSection from './../completude';
 import { prepareTooltip, Tooltipsify } from './../tooltip';
-import Beeswarm from './beeswarm';
+// import Beeswarm from './beeswarm';
 
 let svg_bar;
 let margin;
