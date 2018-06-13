@@ -1048,6 +1048,7 @@ export default class BarChart1 {
         this.data.length > 350 ? this.getRangeHundredAround() : this.x.range(),
       );
     app.map.removeRectBrush();
+    app.map.updateLegend();
     app.colors = {};
     app.colors[app.current_config.my_region] = color_highlight;
     this.update();

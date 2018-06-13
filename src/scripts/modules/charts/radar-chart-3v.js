@@ -1046,6 +1046,7 @@ export default class RadarChart3 {
     this.updateCompletude();
     this.updateTableStat();
     this.updateLegend();
+    app.map.updateLegend();
   }
 
   // eslint-disable-next-line no-unused-vars

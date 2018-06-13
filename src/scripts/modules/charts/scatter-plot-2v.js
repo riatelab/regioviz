@@ -1254,6 +1254,7 @@ export default class ScatterPlot2 {
     this.ref_value2 = tmp_my_region[this.variable2];
 
     app.map.removeRectBrush();
+    app.map.updateLegend();
     this.updateItemsCtxMenu();
     this.updateMapRegio();
     this.updateTableStat();
