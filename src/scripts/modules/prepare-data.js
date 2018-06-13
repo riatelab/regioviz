@@ -1,6 +1,6 @@
 import { color_highlight } from './options';
 import { variables_info, study_zones, territorial_mesh } from './../main';
-import { _isNaN } from './helpers';
+import { _isNaN, math_round } from './helpers';
 
 /* eslint-disable no-param-reassign */
 
@@ -183,7 +183,7 @@ export function changeRegion(app, id_region) {
   app.map.computeDistMat();
   // Set the minimum distance in order to select two regions:
   const dist_second_closest = app.map.dist_to_my_region[2].dist;
-  app.current_config.min_km_closest_unit = Math.round(dist_second_closest / 1000) + 1;
+  app.current_config.min_km_closest_unit = math_round(dist_second_closest / 1000) + 1;
   const input_dist = document.querySelector('#dist_filter');
   input_dist.setAttribute('min', app.current_config.min_km_closest_unit);
   if (input_dist.value < app.current_config.min_km_closest_unit) {
@@ -329,7 +329,7 @@ export function calcCompletudeSubset(app, vars, output = 'ratio') {
   }
   // Return the ratio of available values ("complétude") within
   // the study zone selected by the user:
-  return Math.round((filtered_length / total_length) * 10000) / 100;
+  return math_round((filtered_length / total_length) * 10000) / 100;
 }
 
 /**
@@ -383,6 +383,6 @@ export function calcPopCompletudeSubset(app, vars) {
   }
   // Return the ratio of population values ("complétude") within
   // the study zone selected by the user:
-  return Math.round((subset_pop / total_pop) * 10000) / 100;
+  return math_round((subset_pop / total_pop) * 10000) / 100;
 }
 /* eslint-enable no-param-reassign */
