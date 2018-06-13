@@ -650,7 +650,7 @@ export function bindHelpMenu() {
         <p style="color: #4f81bd;font-size: 1.2rem;">${name_variable} (${code_variable})</p>
         <p style="text-align: justify;">${o.methodo.split('\n').join('<br>')}</p>
         <p><i>${o.source}</i></p>
-        <p><i>Date de dernière mise-à-jour de la donnée : ${o.last_update}</i></p>`);
+        <p><i>Date de dernière mise à jour de la donnée : ${o.last_update}</i></p>`);
       modal.open();
     };
   });
