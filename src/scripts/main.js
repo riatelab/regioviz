@@ -715,7 +715,10 @@ export function bindHelpMenu() {
           },
         });
         let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
-  <p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
+<p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>
+<p><i>${o.source || ''}</i></p>
+<p><i>${o.last_update || ''}</i></p>`;
+
         if (hasUrl) {
           content += `<p><a class="buttonDownload" href="data/${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
         }
