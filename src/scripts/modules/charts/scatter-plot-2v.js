@@ -585,7 +585,7 @@ export default class ScatterPlot2 {
       .attrs({ type: 'checkbox', id: 'check_prop' });
     section.append('label')
       .attrs({ class: 'label not_selected noselect', for: 'check_prop' })
-      .text(`Cercles proportionnels à la variable
+      .text(`Cercles proportionnels à l'indicateur
  "${variables_info.find(d => d.id === app.current_config.pop_field).name.toLowerCase()}"`);
 
     this.bindMenu();

@@ -1132,7 +1132,6 @@ const execWithWaitingOverlay = function execWithWaitingOverlay(func) {
   }, 10);
 };
 
-
 export {
   comp,
   comp2,

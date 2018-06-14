@@ -252,7 +252,7 @@ class MapSelect {
     for (let i = 0, n_layer = layer_list.length; i < n_layer; i++) {
       const name_lyr = layer_list[i];
       const style_layer = styles[name_lyr];
-      if (style_layer.target === true) {
+      if (style_layer.target === "true") {
         this.target_layer = layers.append('g')
           .attrs(style_layer);
         this.target_layer.selectAll('path')

@@ -30,6 +30,7 @@ import {
   applyFilter,
   changeRegion,
   filterLevelVar,
+  parseStylesCsv,
   prepareDataset,
   prepareVariablesInfo,
   removeVariable,
@@ -769,7 +770,7 @@ export function bindHelpMenu() {
 * @return {void}
 *
 */
-function bindCreditsSource() {
+function bindCreditsSource(credits_data) {
   const credits_btn = document.querySelector('#link_credits_source');
   credits_btn.onclick = function () {
     // eslint-disable-next-line new-cap
@@ -790,8 +791,10 @@ function bindCreditsSource() {
 <p style="text-align: justify;">Code source : <a href="https://github.com/riatelab/regioviz/">https://github.com/riatelab/regioviz/</a></b> (licence CeCILL 2.1)</p>
 <p style="text-align: justify;">Développement : <b><a href="http://riate.cnrs.fr">UMS 2414 RIATE</a> (CNRS - CGET - Université Paris Diderot)</b></p>
 <hr></hr>
-<p style="text-align: justify;">Source des données : <b>Eurostat (téléchargement : octobre 2017)</b></p>
-<p style="text-align: justify;">Limite administrative : <b>UMS RIATE, CC-BY-SA</b></p>
+<p style="color: #4f81bd;font-size: 1.2rem;margin-bottom:1em;">Sources</p>
+<p style="text-align: justify;">Données : <b>${credits_data.find(d => d.item === 'data_source').desc}</b></p>
+<p style="text-align: justify;">Territoires d'étude : <b>${credits_data.find(d => d.item === 'study_area').desc}</b></p>
+<p style="text-align: justify;">Géométries : <b>${credits_data.find(d => d.item === 'geom').desc}</b></p>
 `);
     modal.open();
   };
@@ -860,6 +863,7 @@ function loadData() {
       let metadata_indicateurs;
       let full_dataset;
       let styles_map;
+      let credits_data;
       text.text('Préparation de la page ... 95%');
       setTimeout(() => {
         // Extract the content of the data.zip archive:
@@ -867,16 +871,18 @@ function loadData() {
           .then((zip) => {
             const p1 = [];
             // Store separatly the files for which we know the name
-            // (indicateurs_meta.csv, styles.json and REGIOVIZ_DATA.csv)
+            // (REGIOVIZ_META.csv, styles.json and REGIOVIZ_DATA.csv)
             // and the other files (which are GeoJSON layer)
             zip.forEach((relative_path, entry) => {
               const n = entry.name;
-              if (n.indexOf('indicateurs_meta') > -1) {
+              if (n.indexOf('REGIOVIZ_META') > -1) {
                 p1[0] = zip.file(n).async('string');
               } else if (n.indexOf('REGIOVIZ_DATA') > -1) {
                 p1[1] = zip.file(n).async('string');
-              } else if (n.indexOf('styles') > -1) {
+              } else if (n.indexOf('REGIOVIZ_STYLES') > -1) {
                 p1[2] = zip.file(n).async('string');
+              } else if (n.indexOf('REGIOVIZ_CREDITS') > -1) {
+                p1[3] = zip.file(n).async('string');
               } else {
                 name_layers.push(n);
                 p_layers.push(zip.file(n).async('string'));
@@ -885,20 +891,22 @@ function loadData() {
             text.text('Préparation de la page ... 95%');
             return Promise.all(p1);
           }).then((res_data1) => {
-            // Extract the 3 mandatory files (metadata, full dataset and styles
-            // for the map)
+            // Extract the 4 mandatory files (metadata, full dataset, credits
+            // and the styles for the map)
             text.text('Préparation de la page ... 96%');
             metadata_indicateurs = d3.csvParse(res_data1[0]);
             full_dataset = d3.csvParse(res_data1[1]);
-            styles_map = JSON.parse(res_data1[2]);
+            styles_map = parseStylesCsv(res_data1[2]);
+            credits_data = d3.csvParse(res_data1[3]);
             return Promise.all(p_layers);
           }).then((res_layers) => {
-            // Use the 'styles' info to fetch the name of the various layers to use:
+            console.log(styles_map);
+            // Use the 'REGIOVIZ_STYLES' info to fetch the name of the various layers to use:
             const layer_names = Object.keys(styles_map);
             // Reference our various layer and the target layer:
             layer_names.forEach((name) => {
               const ix = name_layers.findIndex(d => d.indexOf(name) > -1);
-              if (styles_map[name].target) {
+              if (styles_map[name].target === "true") {
                 territoires_layer = JSON.parse(res_layers[ix]);
               } else {
                 other_layers.set(name, JSON.parse(res_layers[ix]));
@@ -914,7 +922,7 @@ function loadData() {
               // Notably fill the 3 variables defined on the top of this file
               // 'study_zones', 'territorial_mesh' and 'variables_info'
               // with the appropriate metadata extracted from
-              // the 'indicateurs_meta.csv' file
+              // the 'REGIOVIZ_META.csv' file
               prepareVariablesInfo(metadata_indicateurs, app);
 
               // Notably extract the feature names from the dataset:
@@ -955,7 +963,7 @@ function loadData() {
               );
               // Binds various interactions on the left menu
               // (only done once at its creation)
-              bindCreditsSource();
+              bindCreditsSource(credits_data);
               updateMenuStudyZones();
               bindHelpMenu();
 

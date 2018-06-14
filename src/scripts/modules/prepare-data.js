@@ -386,3 +386,14 @@ export function calcPopCompletudeSubset(app, vars) {
   return math_round((subset_pop / total_pop) * 10000) / 100;
 }
 /* eslint-enable no-param-reassign */
+
+export const parseStylesCsv = (raw_data) => {
+  const data1 = d3.csvParse(raw_data);
+  const result = {};
+  for (let i = 0, len_i = data1.length; i < len_i; i++) {
+    const item = data1[i];
+    item.id = item.name;
+    result[item.name] = item;
+  }
+  return result;
+};
