@@ -1177,6 +1177,7 @@ export default class RadarChart3 {
   // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
+<div style="text-align=justify;">
 <h3>Position - 3 indicateurs</h3>
 <b>Aide générale</b>
 
@@ -1193,7 +1194,7 @@ N : Nombre total de territoires de l’espace d’étude
 </small>
 Cette méthode permet de rendre comparables les positions relatives des territoires sur différents indicateurs en termes de rangs, mais elle ne restitue pas d’information sur l’ampleur des écarts entre ces territoires.
 A partir de ces indices, on peut construire un graphique en radar qui correspond à un graphique multidimensionnel de rangs relatifs.
-
+</div>
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_3ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 

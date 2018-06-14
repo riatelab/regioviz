@@ -1764,17 +1764,20 @@ export default class Similarity1plus {
   // eslint-disable-next-line class-methods-use-this
   getHelpMessage() {
     return `
+<div style="text-align=justify;">
 <h3>Ressemblances</h3>
 <b>Aide générale</b>
 
-Les graphiques de ressemblance permettent de visualiser pour un indicateur et plus 1 les territoires les plus proches statistiquement d'un territoire de référence. Cette proximité statistique est évaluée selon une méthode classique : la distance euclidienne (ou distance à vol d'oiseau) prenant en compte des données préalablement standardisées. Si la valeur de l'indice équivaut à 0, la similarité est totale entre ces deux unités territoriales. Plus la valeur de la distance est élevée, moins la similarité est importante.
+Les graphiques de ressemblance permettent de visualiser pour un indicateur et plus les régions les plus proches statistiquement d’une région de référence.
 
-L'interface Regioviz propose deux niveaux pour la visualisation de ces ressemblances : la <b>ressemblance globale</b> et la <b>ressemblance détaillée</b> indicateur par indicateur.
+La proximité statistique est sensible à la méthode de mesure utilisée. Regioviz propose deux méthodes classiques et facilement interprétables. La <b>distance euclidienne</b> (ou distance à vol d’oiseau) prend en compte des données préalablement standardisées. Si la valeur de l’indice équivaut à 0, la similarité est totale entre ces deux unités territoriales. Plus la valeur de la distance est élevée, moins la similarité est importante. <b>L’écart de rang moyen</b> évalue la distance, exprimée en rang, qui sépare deux unités territoriales. La valeur de cet indice est théoriquement comprise entre 1 (écart de rang minimal) et le nombre d’unités territoriales que constitue l’espace d’étude – 1 (écart de rang maximal).
 
-L'option de distance globale propose une visualisation synthétique de l'éloignement statistique existant entre « mon territoire » et les autres territoires de l'espace d'étude sur les n indicateurs sélectionnés. Ce module est composé d’un graphique en essaim (beeswarm) qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre mon territoires et les autres territoires de l'espace d'étude. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (territoires les plus ressemblants) apparaissent dans des tonalités rouges, les 25 % les plus importantes (territoires les moins ressemblants) sont représentées par des tonalités bleues.
+L’interface Regioviz propose deux niveaux pour la visualisation de ces ressemblances : la <b>ressemblance globale</b> et la <b>ressemblance détaillée</b> indicateur par indicateur.
 
-Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d'évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l'application décompose cette ressemblance pour l'unité territoriale qui ressemble le plus à « mon territoire » de référence d'après la mesure globale de ressemblance. Libre ensuite à l'utilisateur de choisir plus ou moins d'unités territoriales de comparaison (les n unités les plus ressemblantes) en fonction de ses objectifs d'analyse.
+L’option de distance globale propose une visualisation synthétique de l’éloignement statistique existant entre « ma région » et les autres régions de l’espace d’étude sur les <i>n</i> indicateurs sélectionnés. Ce module est composé d’un graphique en essaim (<i>beeswarm</i>) qui permet de visualiser graphiquement le degré de ressemblance statistique existant entre ma région et les autres régions de l’espace d’étude. La carte associée à la représentation graphique rend compte de l’organisation spatiale de ces proximités statistiques : les 25 % des indices de similarité les plus faibles (régions les plus ressemblantes) apparaissent dans des tonalités rouges, les 25 % les plus importantes (régions les moins ressemblantes) sont représentées par des tonalités bleues.
 
+Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d’évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l’application décompose cette ressemblance pour l’unité territoriale qui ressemble le plus à « mon territoire » de référence d’après la mesure globale de ressemblance. Libre ensuite à l’utilisateur de choisir plus ou moins d’unités territoriales de comparaison (les <i>n</i> unités les plus ressemblantes) en fonction de ses objectifs d’analyse.
+</div>
 <br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_ressemblances.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
