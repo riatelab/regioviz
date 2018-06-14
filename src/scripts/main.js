@@ -900,13 +900,12 @@ function loadData() {
             credits_data = d3.csvParse(res_data1[3]);
             return Promise.all(p_layers);
           }).then((res_layers) => {
-            console.log(styles_map);
             // Use the 'REGIOVIZ_STYLES' info to fetch the name of the various layers to use:
             const layer_names = Object.keys(styles_map);
             // Reference our various layer and the target layer:
             layer_names.forEach((name) => {
               const ix = name_layers.findIndex(d => d.indexOf(name) > -1);
-              if (styles_map[name].target === "true") {
+              if (styles_map[name].target === 'true') {
                 territoires_layer = JSON.parse(res_layers[ix]);
               } else {
                 other_layers.set(name, JSON.parse(res_layers[ix]));
