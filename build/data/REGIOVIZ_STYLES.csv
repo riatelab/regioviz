@@ -1,8 +1,0 @@
-name,order,stroke,stroke-width,stroke-opacity,fill,fill-opacity,target
-back,1,,,,#e9f4fe,1,
-back_countries,2,,,,#cececd,1,
-territoires_france,3,#f7fcfe,0.15,0.9,#9390fc,1,true
-regions,4,#ffffff,0.3,1,none,,
-boundaries,5,#ffffff,0.4,1,none,,
-coasts,6,#3954b5,0.2,1,none,,
-boxes,7,#7a7a7a,0.3,1,none,,

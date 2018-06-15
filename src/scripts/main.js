@@ -464,7 +464,10 @@ export function bindUI_chart() {
         const obj_old_region = app.full_dataset.find(d => d.id === old_my_region);
         // For each feature we precomputed the nearest feature in each
         // territorial level:
-        const nearest_new_region = obj_old_region[`nearest_${level_value}`];
+        const nearest_new_region = obj_old_region[`nearest_${level_value}`] || getRandom(
+            app.full_dataset.filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1)
+              .map(d => d.id));
+
         // Update the menu displaying region names:
         d3.selectAll('.regioname')
           .style('display', d => (+d[level_value] === 1 ? null : 'none'))
