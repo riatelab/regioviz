@@ -1297,6 +1297,8 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value1 = tmp_my_region[this.variable1];
+    svg_container.select('.brush').call(this.brush.move, null);
+    app.map.removeRectBrush();
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
@@ -1338,6 +1340,8 @@ export default class ScatterPlot2 {
     computePercentileRank(this.data, this.variable1, this.rank_variable1);
     computePercentileRank(this.data, this.variable2, this.rank_variable2);
     this.ref_value2 = tmp_my_region[this.variable2];
+    svg_container.select('.brush').call(this.brush.move, null);
+    app.map.removeRectBrush();
     this.updateCompletude();
     this.updateMapRegio();
     this.updateTableStat();
