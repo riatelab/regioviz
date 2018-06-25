@@ -40,9 +40,9 @@ function get_bbox_layer_path(name) {
   return bbox_layer;
 }
 
-function fitLayer() {
+function fitLayer(background_layer) {
   projection.scale(1).translate([0, 0]);
-  const b = get_bbox_layer_path('back');
+  const b = get_bbox_layer_path(background_layer);
   const s = 1 / math_max((b[1][0] - b[0][0]) / width_map, (b[1][1] - b[0][1]) / height_map);
   const t = [(width_map - s * (b[1][0] + b[0][0])) / 2, (height_map - s * (b[1][1] + b[0][1])) / 2];
   projection.scale(s).translate(t);
@@ -205,7 +205,7 @@ class MapSelect {
     styles = Object.assign({}, user_styles);
     const width_value = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
     d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value}px`);
-
+    const background_layer = [...other_layers.keys()][0];
     svg_map.append('defs')
       .append('svg:clipPath')
       .attr('id', 'clip_map')
@@ -216,9 +216,11 @@ class MapSelect {
         x: 0,
         y: 0,
       });
-
     projection = d3.geoIdentity()
-      .fitExtent([[0, 0], [fixed_dimension.map.width, fixed_dimension.map.height]], other_layers.get('frame'))
+      .fitExtent(
+        [[0, 0], [fixed_dimension.map.width, fixed_dimension.map.height]],
+        other_layers.get(background_layer),
+      )
       .reflectY(true);
 
     path = d3.geoPath().projection(projection);
@@ -247,7 +249,6 @@ class MapSelect {
     const fn_attrs_layers = d => (d.properties.name
       ? { d: path, class: 'tg_ft', title: d.properties.name }
       : { d: path });
-
     const layer_list = Object.keys(styles);
     for (let i = 0, n_layer = layer_list.length; i < n_layer; i++) {
       const name_lyr = layer_list[i];
@@ -274,7 +275,7 @@ class MapSelect {
       .attrs({ id: 'temp' });
 
     this.layers = layers;
-    fitLayer();
+    fitLayer(background_layer);
     app.type_path = getSvgPathType(this.target_layer.select('path').node().getAttribute('d'));
     this.target_layer.selectAll('path')
       .each(function () {

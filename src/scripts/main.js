@@ -465,8 +465,8 @@ export function bindUI_chart() {
         // For each feature we precomputed the nearest feature in each
         // territorial level:
         const nearest_new_region = obj_old_region[`nearest_${level_value}`] || getRandom(
-            app.full_dataset.filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1)
-              .map(d => d.id));
+          app.full_dataset.filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1)
+            .map(d => d.id));
 
         // Update the menu displaying region names:
         d3.selectAll('.regioname')
@@ -907,7 +907,8 @@ function loadData() {
             const layer_names = Object.keys(styles_map);
             // Reference our various layer and the target layer:
             layer_names.forEach((name) => {
-              const ix = name_layers.findIndex(d => d.indexOf(name) > -1);
+              const ix = name_layers
+                .findIndex(d => d.replace('.geojson', '') === name);
               if (styles_map[name].target === 'true') {
                 territoires_layer = JSON.parse(res_layers[ix]);
               } else {
