@@ -26,7 +26,7 @@ export const MAX_VARIABLES = 7;
 
 // Fixed viewBox dimensions for svg elements:
 export const fixed_dimension = {
-  map: { width: 470, height: 455 },
+  map: { width: 470, height: 534 },
   chart: { width: 600, height: 569 },
   legend: { width: 470, height: 90 },
 };
