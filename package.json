@@ -35,6 +35,7 @@
     "sillyname": "^0.1.0"
   },
   "dependencies": {
+    "@turf/bbox": "6.0.1",
     "@turf/centroid": "^5.1.5",
     "alertifyjs": "^1.11.0",
     "babel-polyfill": "^6.26.0",
