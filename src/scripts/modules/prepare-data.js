@@ -389,11 +389,9 @@ export function calcPopCompletudeSubset(app, vars) {
 
 export const parseStylesCsv = (raw_data) => {
   const data1 = d3.csvParse(raw_data);
-  const result = {};
   for (let i = 0, len_i = data1.length; i < len_i; i++) {
-    const item = data1[i];
-    item.id = item.name;
-    result[item.name] = item;
+    data1[i].id = `${data1[i].name}_${data1[i].order}`;
   }
-  return result;
+  data1.sort((a, b) => +a.order > +b.order);
+  return data1;
 };

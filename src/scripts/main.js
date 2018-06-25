@@ -464,8 +464,9 @@ export function bindUI_chart() {
         const obj_old_region = app.full_dataset.find(d => d.id === old_my_region);
         // For each feature we precomputed the nearest feature in each
         // territorial level:
-        const nearest_new_region = obj_old_region[`nearest_${level_value}`] || getRandom(
-          app.full_dataset.filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1)
+        const nearest_new_region = obj_old_region[`nearest_${level_value}`]
+          || getRandom(app.full_dataset
+            .filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1)
             .map(d => d.id));
 
         // Update the menu displaying region names:
@@ -649,12 +650,11 @@ export function bindHelpMenu() {
       const unit_year = `${year.slice(0, 1)}${unit}, ${year.slice(1, 6)}`;
       name_variable = name_variable.replace(year, unit_year);
 
-      modal.setContent(
-        `<p style="color: #4f81bd;font-size: 1.2rem;"><b>Description de l'indicateur</b></p>
-        <p style="color: #4f81bd;font-size: 1.2rem;">${name_variable} (${code_variable})</p>
-        <p style="text-align: justify;">${o.methodo.split('\n').join('<br>')}</p>
-        <p><i>${o.source}</i></p>
-        <p><i>Date de dernière mise à jour de la donnée : ${o.last_update}</i></p>`);
+      modal.setContent(`<p style="color: #4f81bd;font-size: 1.2rem;"><b>Description de l'indicateur</b></p>
+<p style="color: #4f81bd;font-size: 1.2rem;">${name_variable} (${code_variable})</p>
+<p style="text-align: justify;">${o.methodo.split('\n').join('<br>')}</p>
+<p><i>${o.source}</i></p>
+<p><i>Date de dernière mise à jour de la donnée : ${o.last_update}</i></p>`);
       modal.open();
     };
   });
@@ -903,15 +903,15 @@ function loadData() {
             credits_data = d3.csvParse(res_data1[3]);
             return Promise.all(p_layers);
           }).then((res_layers) => {
-            // Use the 'REGIOVIZ_STYLES' info to fetch the name of the various layers to use:
-            const layer_names = Object.keys(styles_map);
-            // Reference our various layer and the target layer:
-            layer_names.forEach((name) => {
+            // Use the 'REGIOVIZ_STYLES' info to fetch the name of the various layers to use
+            // and reference our various layer + the target layer:
+            styles_map.forEach((elem) => {
+              const name = elem.name;
               const ix = name_layers
                 .findIndex(d => d.replace('.geojson', '') === name);
-              if (styles_map[name].target === 'true') {
+              if (elem.target === 'true') {
                 territoires_layer = JSON.parse(res_layers[ix]);
-              } else {
+              } else if (!(other_layers.has(name))) {
                 other_layers.set(name, JSON.parse(res_layers[ix]));
               }
             });

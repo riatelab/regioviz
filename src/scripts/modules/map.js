@@ -1,4 +1,5 @@
 import centroid from '@turf/centroid';
+import bbox from '@turf/bbox';
 import { app } from './../main';
 import {
   color_disabled, color_countries, color_sup, color_inf, color_highlight,
@@ -20,8 +21,8 @@ const svg_map = d3.select('svg#svg_map')
     }
     svgContextMenu(app.map, svg_map, selec);
   });
-const width_map = fixed_dimension.map.width;
-const height_map = fixed_dimension.map.height;
+let width_map;
+let height_map;
 let styles;
 let projection;
 let path;
@@ -71,8 +72,9 @@ function map_zoomed() {
     .transition(t)
     .attr('transform', transform)
     .style('stroke-width', function () {
-      return styles[this.id] ?
-        `${styles[this.id]['stroke-width'] / transform.k}px`
+      const a = styles.find(d => d.id === this.id);
+      return a ?
+        `${a['stroke-width'] / transform.k}px`
         : null;
     });
 
@@ -202,10 +204,25 @@ function getLegendElems(type) {
 
 class MapSelect {
   constructor(territ_layer, other_layers, user_styles, filter = 'N1') {
-    styles = Object.assign({}, user_styles);
+    styles = [].concat(user_styles);
+
+    const background_layer = {
+      id: styles[0].id,
+      name: styles[0].name,
+    };
+    // Bounding box of background/larger layer (as [minX, minY, maxX, maxY]):
+    const bbox_background = bbox(other_layers.get(background_layer.name));
+    const width_bg = bbox_background[2] - bbox_background[0];
+    const height_bg = bbox_background[3] - bbox_background[1];
+    fixed_dimension.map.height = Math.round((470 * height_bg) / width_bg);
+    width_map = fixed_dimension.map.width;
+    height_map = fixed_dimension.map.height;
+    svg_map.attr('viewBox', `0 0 ${width_map} ${height_map}`);
+
     const width_value = document.getElementById('map_section').getBoundingClientRect().width * 0.98;
-    d3.select('.cont_svg.cmap').style('padding-top', `${(fixed_dimension.map.height / fixed_dimension.map.width) * width_value}px`);
-    const background_layer = [...other_layers.keys()][0];
+    d3.select('.cont_svg.cmap')
+      .style('padding-top', `${(height_map / width_map) * width_value}px`);
+
     svg_map.append('defs')
       .append('svg:clipPath')
       .attr('id', 'clip_map')
@@ -218,8 +235,8 @@ class MapSelect {
       });
     projection = d3.geoIdentity()
       .fitExtent(
-        [[0, 0], [fixed_dimension.map.width, fixed_dimension.map.height]],
-        other_layers.get(background_layer),
+        [[0, 0], [width_map, height_map]],
+        other_layers.get(background_layer.name),
       )
       .reflectY(true);
 
@@ -249,13 +266,12 @@ class MapSelect {
     const fn_attrs_layers = d => (d.properties.name
       ? { d: path, class: 'tg_ft', title: d.properties.name }
       : { d: path });
-    const layer_list = Object.keys(styles);
-    for (let i = 0, n_layer = layer_list.length; i < n_layer; i++) {
-      const name_lyr = layer_list[i];
-      const style_layer = styles[name_lyr];
-      if (style_layer.target === "true") {
+    // const layer_list = styles.map(d => d.id);
+    for (let i = 0, n_layer = styles.length; i < n_layer; i++) {
+      const name_lyr = styles[i].name;
+      if (styles[i].target === 'true') {
         this.target_layer = layers.append('g')
-          .attrs(style_layer);
+          .attrs(styles[i]);
         this.target_layer.selectAll('path')
           .data(filterLevelGeom(this.territ_layer.features, filter), d => d.id)
           .enter()
@@ -263,7 +279,7 @@ class MapSelect {
           .attrs(fn_attrs_target_layer);
       } else {
         layers.append('g')
-          .attrs(style_layer)
+          .attrs(styles[i])
           .selectAll('path')
           .data(other_layers.get(name_lyr).features)
           .enter()
@@ -275,7 +291,7 @@ class MapSelect {
       .attrs({ id: 'temp' });
 
     this.layers = layers;
-    fitLayer(background_layer);
+    fitLayer(background_layer.id);
     app.type_path = getSvgPathType(this.target_layer.select('path').node().getAttribute('d'));
     this.target_layer.selectAll('path')
       .each(function () {
@@ -533,8 +549,9 @@ class MapSelect {
             .transition(t)
             .attr('transform', transf)
             .style('stroke-width', function () {
-              return styles[this.id] ?
-                `${styles[this.id]['stroke-width'] / scale}px`
+              const a = styles.find(ft => ft.id === this.id);
+              return a ?
+                `${a['stroke-width'] / scale}px`
                 : null;
             });
 
