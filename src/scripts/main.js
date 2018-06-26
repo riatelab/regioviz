@@ -461,10 +461,11 @@ export function bindUI_chart() {
         const old_nb_var = app.current_config.ratio.length;
         // Id of the current region (before changing level):
         const old_my_region = app.current_config.my_region;
-        const obj_old_region = app.full_dataset.find(d => d.id === old_my_region);
+        const obj_old_region = app.territoires_layer.features
+          .find(d => d.id === old_my_region);
         // For each feature we precomputed the nearest feature in each
         // territorial level:
-        const nearest_new_region = obj_old_region[`nearest_${level_value}`]
+        const nearest_new_region = obj_old_region.properties[`nearest_${level_value}`]
           || getRandom(app.full_dataset
             .filter(d => d.REGIOVIZ === '1' && +d[level_value] === 1)
             .map(d => d.id));
@@ -862,7 +863,7 @@ function loadData() {
       const other_layers = new Map();
       const p_layers = [];
       const name_layers = [];
-      let territoires_layer;
+      // let territoires_layer;
       let metadata_indicateurs;
       let full_dataset;
       let styles_map;
@@ -910,7 +911,7 @@ function loadData() {
               const ix = name_layers
                 .findIndex(d => d.replace('.geojson', '') === name);
               if (elem.target === 'true') {
-                territoires_layer = JSON.parse(res_layers[ix]);
+                app.territoires_layer = JSON.parse(res_layers[ix]);
               } else if (!(other_layers.has(name))) {
                 other_layers.set(name, JSON.parse(res_layers[ix]));
               }
@@ -942,7 +943,7 @@ function loadData() {
               setDefaultConfig(start_region, start_variable, start_territorial_mesh);
 
               // Prepare the targeted geometry layer:
-              prepareGeomLayerId(territoires_layer);
+              prepareGeomLayerId(app.territoires_layer);
 
               // Extract the features (regions) to be displayed for selection
               // in the left menu:
@@ -992,7 +993,7 @@ function loadData() {
 
               // Create the SVG map:
               app.map = new MapSelect(
-                territoires_layer,
+                app.territoires_layer,
                 other_layers,
                 styles_map,
                 start_territorial_mesh,
