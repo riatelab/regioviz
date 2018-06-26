@@ -392,6 +392,6 @@ export const parseStylesCsv = (raw_data) => {
   for (let i = 0, len_i = data1.length; i < len_i; i++) {
     data1[i].id = `${data1[i].name}_${data1[i].order}`;
   }
-  data1.sort((a, b) => +a.order > +b.order);
+  data1.sort((a, b) => +a.order - +b.order);
   return data1;
 };
