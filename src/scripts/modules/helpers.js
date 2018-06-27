@@ -1018,8 +1018,9 @@ function clickDlPdf(event) {
 *
 */
 const getNameStudyZone = () => (!app.current_config.filter_key
-  ? 'France' : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
-    ? ['France (Territoires dans un voisinage de ', document.getElementById('dist_filter').value, 'km)'].join('')
+  ? study_zones.find(d => d.id === 'DEFAULT').name
+  : app.current_config.filter_type === 'SPAT' && app.current_config.filter_key instanceof Array
+    ? [`${study_zones.find(d => d.id === 'DEFAULT').name} (Territoires dans un voisinage de `, document.getElementById('dist_filter').value, 'km)'].join('')
     : app.current_config.filter_type === 'CUSTOM' && app.current_config.filter_key instanceof Array
       ? document.querySelector('p[filter-value="CUSTOM"] > .filter_v.square.checked').nextSibling.innerHTML
       : study_zones.find(d => d.id === app.current_config.filter_key).name);
