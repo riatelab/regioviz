@@ -1,3 +1,4 @@
+import makeTour from './guide-tour';
 import { removeDuplicates, toggleVisibilityLeftMenu } from './helpers';
 import { app } from './../main';
 
@@ -96,6 +97,24 @@ const handleInputRegioName = (allowed_names, levels) => {
   };
 };
 
+const makeButtonTour = () => {
+  const i = document.createElement('img');
+  const d = document.createElement('div');
+  i.src = 'img/road-sign.png';
+  i.title = 'Visite guidée de l\'applciation';
+  i.style.paddingTop = '10px';
+  d.id = 'tour_link';
+  d.style.cursor = 'pointer';
+  d.style.position = 'absolute';
+  d.style.right = '10px';
+  d.style.top = '-50px';
+  d.onclick = function () {
+    makeTour().start();
+  };
+  d.appendChild(i);
+  return d;
+};
+
 const makeButtonMenuLeft = () => {
   const s = document.createElement('button');
   const d = document.createElement('div');
@@ -114,6 +133,7 @@ const makeButtonMenuLeft = () => {
 };
 
 export default function createMenu(names, variables, study_zones, territorial_mesh) {
+  const button_tour = makeButtonTour();
   const title_section1 = document.createElement('div');
   title_section1.style.backgroundColor = '#4f81bd';
   title_section1.style.color = 'white';
@@ -261,26 +281,26 @@ export default function createMenu(names, variables, study_zones, territorial_me
   blabla.style.float = 'right';
   blabla.style.cursor = 'pointer';
   blabla.innerHTML = 'Crédits & informations supplémentaires';
-  const tour_link = document.createElement('span');
-  tour_link.id = 'tour_link';
-  tour_link.className = 'link';
-  tour_link.style.margin = '1.4em 0.5em 0em 0.5em';
-  tour_link.style.fontSize = '0.65em';
-  tour_link.style.float = 'right';
-  tour_link.style.cursor = 'pointer';
-  tour_link.style.clear = 'both';
-  tour_link.innerHTML = 'Visite guidée de l\'application';
+  // const tour_link = document.createElement('span');
+  // tour_link.id = 'tour_link';
+  // tour_link.className = 'link';
+  // tour_link.style.margin = '1.4em 0.5em 0em 0.5em';
+  // tour_link.style.fontSize = '0.65em';
+  // tour_link.style.float = 'right';
+  // tour_link.style.cursor = 'pointer';
+  // tour_link.style.clear = 'both';
+  // tour_link.innerHTML = 'Visite guidée de l\'application';
 
   section5.appendChild(link2);
   section5.appendChild(logo_regioviz);
   section5.appendChild(link1);
   section5.appendChild(blabla);
-  section5.appendChild(tour_link);
+  // section5.appendChild(tour_link);
 
   // The actual menu containing these 5 sections:
   const menu = document.getElementById('menu');
-  menu.id = 'menu';
   menu.style.float = 'left';
+  menu.appendChild(button_tour);
   menu.appendChild(title_section1);
   menu.appendChild(section1);
   menu.appendChild(title_section4);

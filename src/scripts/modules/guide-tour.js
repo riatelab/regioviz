@@ -91,7 +91,7 @@ Les territoires proposés à la sélection dépendent du choix du maillage terri
     tooltipClass: 'steptour',
     element: document.querySelector('#menu_territ_level'),
     intro: `<p class="titlestep">Étape 1 (suite) : choix d'un type d'unité territoriale.</p>
-Les territoires proposés à la sélection ainsi que les espaces d'études permettant de restreindre l'analyse à des territoires proches ou présentant des similarités dépendent de ce choix d'unité territoriales`,
+Les territoires proposés à la sélection ainsi que les espaces d'études permettant de restreindre l'analyse à des territoires proches ou présentant des similarités dépendent de ce choix d'unité territoriales.`,
     position: 'right',
     disableInteraction: true,
   });
@@ -115,7 +115,7 @@ Les territoires proposés à la sélection ainsi que les espaces d'études perme
   tour.addStep({
     tooltipClass: 'steptour',
     element: document.querySelector('.top_section.t2'),
-    intro: '<p class="titlestep">Étape 4 : Choix d\'une fonctionnalité d\'analyse.</p> Les fonctionnalités disponibles (non-grisée) correspondent au nombre de variables disponibles.',
+    intro: '<p class="titlestep">Étape 4 : Choix d\'une fonctionnalité d\'analyse.</p> Les fonctionnalités disponibles (non-grisées) correspondent au nombre de variables disponibles.',
     position: 'bottom',
     disableInteraction: true,
   });
