@@ -23,6 +23,7 @@ const get_datasets_info = () => {
         ? true : false;
     datasets[name] = { size, default: _default };
   });
+  console.log('datasets', datasets);
   return datasets;
 };
 

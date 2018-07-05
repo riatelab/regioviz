@@ -850,8 +850,10 @@ function loadData() {
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
   const dataset_name = window.location.search.replace('?', '') || Object.keys(datasets_info).filter(n => datasets_info[n].default)[0];
-  console.log(dataset_name);
-  d3.request(`data_${dataset_name}/data.zip`)
+  const dataset_url = dataset_name === ''
+    ? 'data/data.zip'
+    : `data_${dataset_name}/data.zip`
+  d3.request(dataset_url)
     .responseType('arraybuffer')
     .on('progress', (val) => {
       const i = d3.interpolate(progress, val.loaded / datasets_info[dataset_name].size);
