@@ -49,7 +49,7 @@ export default function makeTour() {
   tour.addStep({
     tooltipClass: 'steptour',
     element: document.querySelector('#menu.t1'),
-    intro: '<p class="titlestep">Regioviz est organisé en trois panneaux. La partie de gauche est consacré aux paramètres d\'entrées (quelle unité territoriale ? Quel indicateur ? Quel espace d\'étude ? Quelle maille territoriale ?).</p>',
+    intro: '<p class="titlestep">Regioviz est organisé en trois panneaux. La partie de gauche est consacrée aux paramètres d\'entrée (quelle unité territoriale ? Quel indicateur ? Quel espace d\'étude ? Quelle maille territoriale ?).</p>',
     position: 'right',
     disableInteraction: true,
   });
@@ -91,7 +91,7 @@ Les territoires proposés à la sélection dépendent du choix du maillage terri
     tooltipClass: 'steptour',
     element: document.querySelector('#menu_territ_level'),
     intro: `<p class="titlestep">Étape 1 (suite) : choix d'un type d'unité territoriale.</p>
-Les territoires proposés à la sélection ainsi que les espaces d'études permettant de restreindre l'analyse à des territoires proches ou présentant des similarités dépendent de ce choix d'unité territoriales.`,
+Les territoires proposés à la sélection ainsi que les espaces d'études permettant de restreindre l'analyse à des territoires proches ou présentant des similarités dépendent de ce choix d'unité territoriale.`,
     position: 'right',
     disableInteraction: true,
   });
@@ -130,7 +130,7 @@ Les territoires proposés à la sélection ainsi que les espaces d'études perme
   tour.addStep({
     tooltipClass: 'steptour',
     element: elem_top_chart,
-    intro: '<p class="titlestep">Les options au dessus du graphique permettent de visualiser les aides pour chaque mode de représentation (méthode de construction, scénario d\'utilisation), de générer un rapport automatiquement contenant des clés de lecture des représentations proposées et de télécharger les données, métadonnées et géométries contenues dans l\'application.</p>',
+    intro: '<p class="titlestep">Les options au-dessus du graphique permettent de visualiser les aides pour chaque mode de représentation (méthode de construction, scénario d\'utilisation), de générer un rapport automatiquement contenant des clés de lecture des représentations proposées et de télécharger les données, métadonnées et géométries contenues dans l\'application.</p>',
     disableInteraction: true,
   });
 
