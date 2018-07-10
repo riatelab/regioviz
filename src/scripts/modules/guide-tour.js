@@ -1,41 +1,7 @@
 import introJs from 'intro.js';
 
-function getBbox(elements) {
-  let xmin = Infinity;
-  let xmax = -Infinity;
-  let ymin = Infinity;
-  let ymax = -Infinity;
-  for (let i = 0, n_elem = elements.length; i < n_elem; i++) {
-    const bbox = elements[i].getBoundingClientRect();
-    if (bbox.left < xmin) xmin = bbox.left;
-    if (bbox.right > xmax) xmax = bbox.right;
-    if (bbox.top < ymin) ymin = bbox.top;
-    if (bbox.bottom > ymax) ymax = bbox.bottom;
-  }
-  return {
-    xmin, xmax, ymin, ymax,
-  };
-}
-
-function makeDivSizeElements(elements, padding) {
-  const {
-    xmin, xmax, ymin, ymax,
-  } = getBbox(elements);
-  const elem = document.createElement('div');
-  elem.className = 'temp_tour_overlay';
-  elem.style.position = 'absolute';
-  elem.style.left = `${xmin - padding}px`;
-  elem.style.top = `${ymin - padding}px`;
-  elem.style.width = `${padding + xmax - xmin}px`;
-  elem.style.height = `${padding + ymax - ymin}px`;
-  document.body.insertBefore(elem, document.querySelector('#overlay'));
-  return elem;
-}
 
 export default function makeTour() {
-  const elem_top_chart = makeDivSizeElements(document.querySelectorAll('#header_chart > img'), 10);
-  const elem_top_map = makeDivSizeElements(document.querySelectorAll('#header_map > img'), 10);
-
   const tour = introJs.introJs();
   tour.setOption('scrollToElement', false);
   tour.setOption('keyboardNavigation', true);
@@ -129,7 +95,8 @@ Les territoires proposés à la sélection ainsi que les espaces d'études perme
   // Chart..
   tour.addStep({
     tooltipClass: 'steptour',
-    element: elem_top_chart,
+    // element: elem_top_chart,
+    element: document.getElementById('header_chart_cont_img'),
     intro: '<p class="titlestep">Les options au-dessus du graphique permettent de visualiser les aides pour chaque mode de représentation (méthode de construction, scénario d\'utilisation), de générer un rapport automatiquement contenant des clés de lecture des représentations proposées et de télécharger les données, métadonnées et géométries contenues dans l\'application.</p>',
     disableInteraction: true,
   });
@@ -153,7 +120,8 @@ Les territoires proposés à la sélection ainsi que les espaces d'études perme
   // Map..
   tour.addStep({
     tooltipClass: 'steptour',
-    element: elem_top_map,
+    // element: elem_top_map,
+    element: document.getElementById('header_map_cont_img'),
     intro: '<p class="titlestep">Les options situées au dessus de la carte permettent d\'effectuer des actions sur celle-ci (zoom, sélection, nom des unités territoriales) et rappellent le niveau de disponibilité des données.</p>',
     position: 'bottom',
     disableInteraction: true,

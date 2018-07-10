@@ -577,7 +577,7 @@ span.i_regio {
 /* Styles for buttons on the top of the map */
 .map_button {
   margin: -0.2em 0.3em 0 0.3em;
-  float: left;
+  /* float: left; */
   opacity: 0.25;
   cursor: pointer;
 }

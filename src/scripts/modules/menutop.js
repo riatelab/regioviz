@@ -84,7 +84,21 @@ export function makeHeaderMapSection() {
   completude_section.append('p')
     .attr('id', 'completude_population');
 
-  header_map_section.insert('img')
+  const container_img = header_map_section.append('div')
+    .attr('id', 'header_map_cont_img')
+    .style('float', 'left');
+
+  container_img.insert('img')
+    .attrs({
+      class: 'map_button img_scale',
+      width: 20,
+      height: 20,
+      src: 'img/gimp-cursor.png',
+      id: 'img_map_select',
+      title: 'Sélection par clic',
+    });
+
+  container_img.insert('img')
     .attrs({
       class: 'map_button active img_scale',
       width: 20,
@@ -103,16 +117,6 @@ export function makeHeaderMapSection() {
   //     id: 'img_map_zoom',
   //     title: 'Zoom',
   //   });
-
-  header_map_section.insert('img')
-    .attrs({
-      class: 'map_button img_scale',
-      width: 20,
-      height: 20,
-      src: 'img/gimp-cursor.png',
-      id: 'img_map_select',
-      title: 'Sélection par clic',
-    });
 
   header_map_section.insert('div')
     .attrs({
@@ -148,7 +152,56 @@ export function makeHeaderChart() {
     .style('margin-bottom', '0')
     .style('clear', 'both');
 
-  header_bar_section.insert('img')
+  const container_img = header_bar_section.append('div')
+    .attr('id', 'header_chart_cont_img')
+    .style('float', 'right');
+
+  container_img.insert('img')
+    .attrs({
+      width: 20,
+      height: 20,
+      src: 'img/picto_information2.png',
+      id: 'img_info',
+      title: 'Aide',
+      class: 'img_scale',
+    })
+    .styles({ margin: '3px', cursor: 'pointer' })
+    .on('click', () => {
+      const help_message = app.chart.getHelpMessage().split('\n').join('<br>');
+      // eslint-disable-next-line new-cap
+      const modal = new tingle.modal({
+        stickyFooter: false,
+        closeMethods: ['overlay', 'button', 'escape'],
+        closeLabel: 'Close',
+        onOpen() {
+          document.querySelector('div.tingle-modal').querySelector('.buttonDownload').onclick = clickDlPdf;
+          document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
+          setTimeout(() => {
+            const formula = document.querySelector('.tingle-modal-box__content').querySelector('#formula');
+            if (formula) MathJax.Hub.Queue(['Typeset', MathJax.Hub, formula]);
+          }, 15);
+        },
+        onClose() {
+          modal.destroy();
+        },
+      });
+      modal.setContent(help_message);
+      modal.open();
+    });
+
+  container_img.insert('img')
+    .attrs({
+      width: 20,
+      height: 20,
+      src: 'img/picto_report2.png',
+      id: 'img_printer',
+      title: 'Export d\'un rapport',
+      class: 'img_scale',
+    })
+    .styles({ margin: '3px', cursor: 'pointer' })
+    .on('click', makeModalReport);
+
+  container_img.insert('img')
     .attrs({
       width: 20,
       height: 20,
@@ -157,7 +210,7 @@ export function makeHeaderChart() {
       title: 'Téléchargement des données',
       class: 'img_scale',
     })
-    .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
+    .styles({ margin: '3px', cursor: 'pointer' })
     .on('click', () => {
       let href_geojson;
       let href_table;
@@ -239,50 +292,5 @@ export function makeHeaderChart() {
           document.body.removeChild(elem);
         };
       }, 550);
-    });
-
-  header_bar_section.insert('img')
-    .attrs({
-      width: 20,
-      height: 20,
-      src: 'img/picto_report2.png',
-      id: 'img_printer',
-      title: 'Export d\'un rapport',
-      class: 'img_scale',
-    })
-    .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
-    .on('click', makeModalReport);
-
-  header_bar_section.insert('img')
-    .attrs({
-      width: 20,
-      height: 20,
-      src: 'img/picto_information2.png',
-      id: 'img_info',
-      title: 'Aide',
-      class: 'img_scale',
-    })
-    .styles({ margin: '3px', float: 'right', cursor: 'pointer' })
-    .on('click', () => {
-      const help_message = app.chart.getHelpMessage().split('\n').join('<br>');
-      // eslint-disable-next-line new-cap
-      const modal = new tingle.modal({
-        stickyFooter: false,
-        closeMethods: ['overlay', 'button', 'escape'],
-        closeLabel: 'Close',
-        onOpen() {
-          document.querySelector('div.tingle-modal').querySelector('.buttonDownload').onclick = clickDlPdf;
-          document.querySelector('div.tingle-modal.tingle-modal--visible').style.background = 'rgba(0,0,0,0.4)';
-          setTimeout(() => {
-            const formula = document.querySelector('.tingle-modal-box__content').querySelector('#formula');
-            if (formula) MathJax.Hub.Queue(['Typeset', MathJax.Hub, formula]);
-          }, 15);
-        },
-        onClose() {
-          modal.destroy();
-        },
-      });
-      modal.setContent(help_message);
-      modal.open();
     });
 }
