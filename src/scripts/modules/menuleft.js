@@ -134,6 +134,8 @@ const makeButtonMenuLeft = () => {
 
 export default function createMenu(names, variables, study_zones, territorial_mesh) {
   const button_tour = makeButtonTour();
+  const levels = [];
+
   const title_section1 = document.createElement('div');
   title_section1.style.backgroundColor = '#4f81bd';
   title_section1.style.color = 'white';
@@ -167,24 +169,6 @@ export default function createMenu(names, variables, study_zones, territorial_me
     .on('mouseout', function () {
       d3.select(this).selectAll('span.minibutton').style('display', 'none');
     });
-
-  const levels = [];
-  // Fourth section:
-  const title_section4 = document.createElement('p');
-  title_section4.className = 'title_menu';
-  title_section4.innerHTML = 'Unités territoriales';
-  const section4 = document.createElement('div');
-  section4.id = 'menu_territ_level';
-  section4.className = 'box';
-  section4.style.overflow = 'auto';
-  section4.style.maxHeight = '20%';
-  for (let i = 0, len_i = territorial_mesh.length; i < len_i; i++) {
-    const entry = document.createElement('p');
-    const territ_level = territorial_mesh[i];
-    levels.push(territ_level.id);
-    entry.innerHTML = `<span value="${territ_level.id}" class='territ_level square'></span><span class="label_chk">${territ_level.name}</span><span class="i_info">i</span>`;
-    section4.appendChild(entry);
-  }
 
   // Second section, groups of variables:
   const title_section2 = document.createElement('p');
@@ -246,6 +230,23 @@ export default function createMenu(names, variables, study_zones, territorial_me
     section3.appendChild(entry);
   }
 
+  // Fourth section:
+  const title_section4 = document.createElement('p');
+  title_section4.className = 'title_menu';
+  title_section4.innerHTML = 'Unités territoriales';
+  const section4 = document.createElement('div');
+  section4.id = 'menu_territ_level';
+  section4.className = 'box';
+  section4.style.overflow = 'auto';
+  section4.style.maxHeight = '20%';
+  for (let i = 0, len_i = territorial_mesh.length; i < len_i; i++) {
+    const entry = document.createElement('p');
+    const territ_level = territorial_mesh[i];
+    levels.push(territ_level.id);
+    entry.innerHTML = `<span value="${territ_level.id}" class='territ_level square'></span><span class="label_chk">${territ_level.name}</span><span class="i_info">i</span>`;
+    section4.appendChild(entry);
+  }
+
   const section5 = document.createElement('div');
   const img2 = document.createElement('img');
   img2.className = 'img_scale_logo';
@@ -303,12 +304,12 @@ export default function createMenu(names, variables, study_zones, territorial_me
   menu.appendChild(button_tour);
   menu.appendChild(title_section1);
   menu.appendChild(section1);
-  menu.appendChild(title_section4);
-  menu.appendChild(section4);
   menu.appendChild(title_section2);
   menu.appendChild(section2);
   menu.appendChild(title_section3);
   menu.appendChild(section3);
+  menu.appendChild(title_section4);
+  menu.appendChild(section4);
   menu.appendChild(section5);
   handleInputRegioName(names, levels);
   makeButtonMenuLeft();
