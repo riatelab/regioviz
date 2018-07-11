@@ -24,7 +24,7 @@ export function generateHtmlRapport(sections, name_my_region) {
   const targetSvgMap = document.getElementById('svg_map').cloneNode(true);
   const targetSvgChart = document.getElementById('svg_bar').cloneNode(true);
   const targetSvgLegend = document.getElementById('svg_legend');
-  removeAll(targetSvgMap.querySelectorAll('.brush_map'));
+  removeAll(targetSvgMap.querySelectorAll('.brush_map,.brush,.brush_top'));
   removeAll(targetSvgChart.querySelectorAll('image'));
   const serializer = new XMLSerializer();
   const svg_sources = [
@@ -141,17 +141,14 @@ export function makeModalReport() {
   modal.open();
   const sections = app.chart.getTemplateHelp();
   const html_doc = generateHtmlRapport(sections, app.current_config.my_region_pretty_name);
-  // const href = `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`;
   href = URL.createObjectURL(new Blob([html_doc], { type: 'text/html' }));
-  // elem.setAttribute('href', `data:text/html;charset=utf-8,${encodeURIComponent(html_doc)}`);
-  // elem.setAttribute('download', 'rapport.html');
-  // elem.style.display = 'none';
   setTimeout(() => {
-    modal.setContent(`<div style="text-align: center;margin: auto;padding: 15px;"><h3>Export d'un rapport</h3><br><img src="img/thumbnail_report.png" /></div><div style="text-align: center;margin: auto;"><p><a class="buttonDownload" id="dl_rapport" download="Regioviz_rapport.html" href="${href}">Télécharger</a></p></div>`);
-    // document.querySelector('#dl_rapport').onclick = function () {
-    //   document.body.appendChild(elem);
-    //   elem.click();
-    //   document.body.removeChild(elem);
-    // };
+    modal.setContent(`
+<div style="text-align: center;margin: auto;padding: 15px;">
+  <h3>Export d'un rapport</h3><br><img src="img/thumbnail_report.png" />
+</div>
+<div style="text-align: center;margin: auto;">
+  <p><a class="buttonDownload" id="dl_rapport" download="Regioviz_rapport.html" href="${href}">Télécharger</a></p>
+</div>`);
   }, 250);
 }

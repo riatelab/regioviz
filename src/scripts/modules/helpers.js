@@ -740,7 +740,7 @@ const removeAll = (elems) => {
 export function exportSVG(elem, filename) {
   const targetSvg = elem.cloneNode(true);
   const serializer = new XMLSerializer();
-  removeAll(targetSvg.querySelectorAll('.brush_map'));
+  removeAll(targetSvg.querySelectorAll('.brush_map,.brush,.brush_top'));
   let source = serializer.serializeToString(targetSvg);
   source = ['<?xml version="1.0" encoding="utf-8" standalone="no"?>\r\n', source].join('');
 
@@ -768,9 +768,8 @@ export function exportSVG(elem, filename) {
 *
 */
 export function exportPNG(elem, filename) {
-  const bbox = elem.getBBox();
-  const _h = bbox.height;
-  const _w = bbox.width;
+  const _h = elem.viewBox.baseVal.height;
+  const _w = elem.viewBox.baseVal.width;
   const targetCanvas = d3.select('body')
     .append('canvas')
     .attr('id', 'canvas_export')
@@ -802,6 +801,7 @@ export function exportPNG(elem, filename) {
     if (window.navigator && window.navigator.msSaveOrOpenBlob) {
       const d = targetCanvas.msToBlob();
       window.navigator.msSaveOrOpenBlob(new Blob([d], { type: 'image/png' }), filename);
+      targetCanvas.remove();
     } else {
       const dataurl = targetCanvas.toDataURL('image/png');
       fetch(dataurl)
@@ -816,6 +816,7 @@ export function exportPNG(elem, filename) {
           dlAnchorElem.click();
           dlAnchorElem.remove();
           URL.revokeObjectURL(blobUrl);
+          targetCanvas.remove();
         });
     }
   };
