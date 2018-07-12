@@ -1778,7 +1778,7 @@ L’option de distance globale propose une visualisation synthétique de l’él
 
 Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemblance globale, Regioviz propose systématiquement une représentation graphique permettant d’évaluer visuellement le degré de similarité indicateur par indicateur (ressemblances par indicateur). Par défaut, l’application décompose cette ressemblance pour l’unité territoriale qui ressemble le plus à « mon territoire » de référence d’après la mesure globale de ressemblance. Libre ensuite à l’utilisateur de choisir plus ou moins d’unités territoriales de comparaison (les <i>n</i> unités les plus ressemblantes) en fonction de ses objectifs d’analyse.
 </div>
-<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_ressemblances.pdf">Aide détaillée (.pdf)</a></p>`;
+<br><p style="text-align: center;"><a class="buttonDownload" href="${app.dataset_path}Doc_methodo_ressemblances.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   /* eslint-disable function-paren-newline */
@@ -1814,20 +1814,23 @@ Pour comprendre quel est le poids de chaque indicateur dans la mesure de ressemb
     let compl = calcCompletudeSubset(app, this.ratios, 'array');
     compl = compl[0] === compl[1] ? 'la totalité des' : `${compl[0]} des ${compl[1]}`;
     const help2 = [];
+    const type_dist_text = self.type_dist === 'euclidienne'
+      ? 'Cette proximité statistique est évaluée selon la distance euclidienne (ou distance à vol d\'oiseau) prenant en compte des données préalablement standardisées. Si la valeur de l\'indice équivaut à 0, la similarité est totale entre ces deux unités territoriales.'
+      : 'Cette proximité statistique est évaluée selon l\'écart de rang moyen, exprimé en rang, séparant deux unités territoriales.'
     if (this.type === 'global') {
       let indic_list = this.ratios.map((v, i) => `<b>${info_var[i + 1].name}</b> <i>(${v})</i>`).join(' | ');
       indic_list = `${indic_list.slice(0, indic_list.lastIndexOf('|'))}et${indic_list.slice(indic_list.lastIndexOf('|') + 1, indic_list.length)}`;
       indic_list = indic_list.replace(/\|/g, ',');
       help2.push(`
-        Les graphiques de ressemblance permettent de visualiser les unités territoriales les plus proches statistiquement de <b>${my_region_pretty_name}</b> pour les indicateurs ${indic_list}, par rapport à l'espace d'étude <b>${name_study_zone}</b> et au maillage <b>${name_territorial_mesh}</b>.
-        Cette proximité statistique est évaluée selon une méthode classique : la distance euclidienne (ou distance à vol d'oiseau) prenant en compte des données préalablement standardisées.
-        Si la valeur de l'indice équivaut à 0, la similarité est totale entre ces deux unités territoriales. Plus la valeur de la distance est élevée, moins la similarité est importante.
-        <br><br>
-        L'option de distance globale propose une visualisation synthétique en essaim (<i>beeswarm</i>) de l'éloignement statistique existant entre l'unité territoriale <b>${my_region_pretty_name}</b> et les autres unités
-        territoriales de l'espace d'étude pour ces <b>${this.ratios.length}</b> indicateurs. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des unités territoriales les plus ressemblantes (indices de similarité les plus faibles) apparaissent dans des tons rouges, les 25 % les moins ressemblantes sont représentées par des tons bleus.
-        <br><br>
-        Les données sont ici disponibles pour <b>${compl} unités territoriales</b> de l'espace d'étude, soit ${formatNumber(calcPopCompletudeSubset(app, this.ratios), 0)}% de la population de l'espace d'étude.
-        Compte tenu de cette sélection, les cinq unités territoriales les plus ressemblantes sont les suivantes :<br>`);
+Les graphiques de ressemblance permettent de visualiser les unités territoriales les plus proches statistiquement de <b>${my_region_pretty_name}</b> pour les indicateurs ${indic_list}, par rapport à l'espace d'étude <b>${name_study_zone}</b> et au maillage <b>${name_territorial_mesh}</b>.
+${type_dist_text}
+Plus la valeur de la distance est élevée, moins la similarité est importante.
+<br><br>
+L'option de distance globale propose une visualisation synthétique en essaim (<i>beeswarm</i>) de l'éloignement statistique existant entre l'unité territoriale <b>${my_region_pretty_name}</b> et les autres unités
+territoriales de l'espace d'étude pour ces <b>${this.ratios.length}</b> indicateurs. La carte associée à la représentation graphique rend compte de l'organisation spatiale de ces proximités statistiques : les 25 % des unités territoriales les plus ressemblantes (indices de similarité les plus faibles) apparaissent dans des tons rouges, les 25 % les moins ressemblantes sont représentées par des tons bleus.
+<br><br>
+Les données sont ici disponibles pour <b>${compl} unités territoriales</b> de l'espace d'étude, soit ${formatNumber(calcPopCompletudeSubset(app, this.ratios), 0)}% de la population de l'espace d'étude.
+Compte tenu de cette sélection, les cinq unités territoriales les plus ressemblantes sont les suivantes :<br>`);
       this.data.slice(1, 6).forEach((d, i) => {
         if (i === 0) help2.push(`${d.id} - ${d.name} (avec un indice de similarité de ${formatNumber(d.dist, 1)})<br>`);
         else help2.push(`${d.id} - ${d.name} (${formatNumber(d.dist, 2)})<br>`);

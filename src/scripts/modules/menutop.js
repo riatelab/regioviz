@@ -267,7 +267,7 @@ export function makeHeaderChart() {
       setTimeout(() => {
         modal.setContent(`<h3>Téléchargements</h3><div style="text-align:center;">
 <p><a class="buttonDownload large" download="Regioviz_export.csv" id="dl_data" href="${href_table}">Table de données (.csv)</a></p>
-<p><a class="buttonDownload large" id="dl_metadata" href="data/Metadonnees_Regioviz.pdf">Fiche de métadonnées (.pdf)</a></p>
+<p><a class="buttonDownload large" id="dl_metadata" href="${app.dataset_path}/Metadonnees_Regioviz.pdf">Fiche de métadonnées (.pdf)</a></p>
 <p><a class="buttonDownload large" download="CGET_nuts_all.geojson" id="dl_geolayer" href="${href_geojson}" download>Fond de carte (.geojson)</a></p></div>`);
         document.getElementById('dl_metadata').onclick = clickDlPdf;
         document.getElementById('dl_data').onclick = function (e) {

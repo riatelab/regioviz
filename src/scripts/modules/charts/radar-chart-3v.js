@@ -1195,7 +1195,7 @@ N : Nombre total de territoires de l’espace d’étude
 Cette méthode permet de rendre comparables les positions relatives des territoires sur différents indicateurs en termes de rangs, mais elle ne restitue pas d’information sur l’ampleur des écarts entre ces territoires.
 A partir de ces indices, on peut construire un graphique en radar qui correspond à un graphique multidimensionnel de rangs relatifs.
 </div>
-<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_3ind.pdf">Aide détaillée (.pdf)</a></p>`;
+<br><p style="text-align: center;"><a class="buttonDownload" href="${app.dataset_path}Doc_methodo_pos_3ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   /* eslint-disable function-paren-newline */

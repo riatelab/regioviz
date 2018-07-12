@@ -728,7 +728,7 @@ export function bindHelpMenu() {
 <p><i>${o.last_update || ''}</i></p>`;
 
         if (hasUrl) {
-          content += `<p><a class="buttonDownload" href="data/${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
+          content += `<p><a class="buttonDownload" href="${app.dataset_path}${o.url}">Méthodologie détaillée (.pdf)</a></p>`;
         }
         modal.setContent(content);
         modal.open();
@@ -760,7 +760,7 @@ export function bindHelpMenu() {
       let content = `<p style="color: #4f81bd;font-size: 1.2rem;"><b>${o.name}</b></p>
 <p style="text-align: justify;">${o.methodology.split('\n').join('<br>')}</p>`;
       if (o.id === 'N12_POL') {
-        content += '<p><a class="buttonDownload" href="data/Doc_Maille_infranationale_decision.pdf">Méthodologie détaillée (.pdf)</a></p>';
+        content += `<p><a class="buttonDownload" href="${app.dataset_path}Doc_Maille_infranationale_decision.pdf">Méthodologie détaillée (.pdf)</a></p>`;
       }
       modal.setContent(content);
       modal.open();
@@ -850,9 +850,10 @@ function loadData() {
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
   const dataset_name = window.location.search.replace('?', '') || Object.keys(datasets_info).filter(n => datasets_info[n].default)[0];
-  const dataset_url = dataset_name === ''
-    ? 'data/data.zip'
-    : `data_${dataset_name}/data.zip`
+  app.dataset_path = dataset_name === ''
+    ? 'data/'
+    : `data_${dataset_name}/`;
+  const dataset_url = `${app.dataset_path}data.zip`
   d3.request(dataset_url)
     .responseType('arraybuffer')
     .on('progress', (val) => {
@@ -1014,13 +1015,6 @@ function loadData() {
 
               // Create the tooltips:
               Tooltipsify('[title-tooltip]');
-
-              // Fetch the layer in geographic coordinates now
-              // in case the user wants to download it later:
-              d3.request('data/territoires_france.geojson', (err, result) => {
-                if (err) throw err;
-                app.geo_layer = result.response;
-              });
 
               // Load/configure mathjax to render some math formulas in help dialogs:
               MathJax.Hub.Config({

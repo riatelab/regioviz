@@ -1604,7 +1604,7 @@ L’utilisateur est invité à renseigner l’indicateur qu’il souhaite voir a
 
 Il est possible de situer le territoire au regard de la moyenne (valeurs brutes) ou au regard de la médiane (rangs normalisés).
 
-<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_2ind.pdf">Aide détaillée (.pdf)</a></p>`;
+<br><p style="text-align: center;"><a class="buttonDownload" href="${app.dataset_path}Doc_methodo_pos_2ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   /* eslint-disable function-paren-newline */

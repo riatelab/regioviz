@@ -1169,7 +1169,7 @@ Par défaut, les rangs sont calculés de façon décroissante (premier rang : va
 
 Ce graphique rend également possible le positionnement des territoires au regard de la moyenne.
 
-<br><p style="text-align: center;"><a class="buttonDownload" href="data/Doc_methodo_pos_1ind.pdf">Aide détaillée (.pdf)</a></p>`;
+<br><p style="text-align: center;"><a class="buttonDownload" href="${app.dataset_path}Doc_methodo_pos_1ind.pdf">Aide détaillée (.pdf)</a></p>`;
   }
 
   /* eslint-disable function-paren-newline */
