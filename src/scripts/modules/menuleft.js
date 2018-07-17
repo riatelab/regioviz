@@ -12,9 +12,11 @@ const handleInputRegioName = (allowed_names, levels) => {
     names_lower[level] = [];
   });
   allowed_names.forEach((ft) => {
-    const ft_level = levels.find(level => +ft[level] === 1);
-    ids_names[ft_level].push(ft.id);
-    names_lower[ft_level].push(ft.name.toLowerCase());
+    levels.filter(level => +ft[level] === 1)
+      .forEach(ft_level => {
+        ids_names[ft_level].push(ft.id);
+        names_lower[ft_level].push(ft.name.toLowerCase());
+      });
   });
   const autocomplete = document.getElementById('autocomplete');
   const search = document.getElementById('search');
