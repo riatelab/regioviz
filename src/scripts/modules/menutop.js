@@ -235,7 +235,7 @@ export function makeHeaderChart() {
       modal.open();
 
       // Prepare the link for the GeoJSON file:
-      href_geojson = URL.createObjectURL(new Blob([app.geo_layer], { type: 'application/geo+json' }));
+      href_geojson = URL.createObjectURL(new Blob([JSON.stringify(app.territoires_layer)], { type: 'application/geo+json' }));
 
       // Prepare the data table:
       const ratios = app.current_config.ratio;
@@ -268,7 +268,7 @@ export function makeHeaderChart() {
         modal.setContent(`<h3>Téléchargements</h3><div style="text-align:center;">
 <p><a class="buttonDownload large" download="Regioviz_export.csv" id="dl_data" href="${href_table}">Table de données (.csv)</a></p>
 <p><a class="buttonDownload large" id="dl_metadata" href="${app.dataset_path}/Metadonnees_Regioviz.pdf">Fiche de métadonnées (.pdf)</a></p>
-<p><a class="buttonDownload large" download="CGET_nuts_all.geojson" id="dl_geolayer" href="${href_geojson}" download>Fond de carte (.geojson)</a></p></div>`);
+<p><a class="buttonDownload large" download="territoires_${app.dataset_name}.geojson" id="dl_geolayer" href="${href_geojson}" download>Fond de carte (.geojson)</a></p></div>`);
         document.getElementById('dl_metadata').onclick = clickDlPdf;
         document.getElementById('dl_data').onclick = function (e) {
           e.preventDefault();
@@ -285,7 +285,7 @@ export function makeHeaderChart() {
           e.preventDefault();
           const elem = document.createElement('a');
           elem.setAttribute('href', this.href);
-          elem.setAttribute('download', 'CGET_nuts_all.geojson');
+          elem.setAttribute('download', `territoires_${app.dataset_name}.geojson`);
           elem.style.display = 'none';
           document.body.appendChild(elem);
           elem.click();

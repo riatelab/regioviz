@@ -849,15 +849,15 @@ function loadData() {
   let progress = 0;
   const text = d3.select('.top-spinner').select('#progress');
   const formatPercent = d3.format('.0%');
-  const dataset_name = window.location.search.replace('?', '') || Object.keys(datasets_info).filter(n => datasets_info[n].default)[0];
-  app.dataset_path = dataset_name === ''
+  app.dataset_name = window.location.search.replace('?', '') || Object.keys(datasets_info).filter(n => datasets_info[n].default)[0];
+  app.dataset_path = app.dataset_name === ''
     ? 'data/'
-    : `data_${dataset_name}/`;
+    : `data_${app.dataset_name}/`;
   const dataset_url = `${app.dataset_path}data.zip`
   d3.request(dataset_url)
     .responseType('arraybuffer')
     .on('progress', (val) => {
-      const i = d3.interpolate(progress, val.loaded / datasets_info[dataset_name].size);
+      const i = d3.interpolate(progress, val.loaded / datasets_info[app.dataset_name].size);
       d3.transition().tween('progress', () => (t) => {
         progress = i(t);
         text.text(`Préparation de la page ... ${formatPercent(progress * 0.91)}`);
